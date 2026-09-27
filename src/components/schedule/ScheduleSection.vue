@@ -33,14 +33,6 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
       class="flex flex-col sm:flex-row sm:items-end justify-between mb-4 sm:mb-6 gap-4"
     >
       <div>
-        <div class="flex items-center gap-2 mb-1">
-          <span
-            class="text-xs font-bold uppercase tracking-wider text-primary dark:text-blue-400 flex items-center gap-1.5"
-          >
-            <span class="material-symbols-outlined text-[16px]">event_repeat</span>
-            Jadwal Kuliah Semester 3
-          </span>
-        </div>
         <h2
           class="text-2xl font-bold text-primary-navy dark:text-slate-100 flex items-center gap-2"
         >
