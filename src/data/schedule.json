@@ -1,0 +1,363 @@
+{
+  "akademik": {
+    "kelas": "03SIFE003",
+    "total_sks": 20,
+    "semester": "Ganjil 2026/2027 (20261)"
+  },
+  "master_mata_kuliah": [
+    {
+      "kode": "22SIF0103",
+      "nama": "Pemrograman Berorientasi Obyek (Java I)",
+      "sks": 3,
+      "kelompok": 1,
+      "jam": "07.40 - 09.20",
+      "dosen": "ABDURRAHMAN HARITS S.Kom., M.Kom."
+    },
+    {
+      "kode": "22SIF0132",
+      "nama": "Rekayasa Web",
+      "sks": 2,
+      "kelompok": 1,
+      "jam": "09.20 - 11.00",
+      "dosen": "AFIF EFENDI S.Kom., M.Kom."
+    },
+    {
+      "kode": "22SIF0123",
+      "nama": "Design Grafis",
+      "sks": 3,
+      "kelompok": 1,
+      "jam": "11.00 - 13.50",
+      "dosen": "ANANDA SYARIF HIDAYATULLAH S.Kom., M.Kom."
+    },
+    {
+      "kode": "22SIF0112",
+      "nama": "Analisa Proses Bisnis",
+      "sks": 2,
+      "kelompok": 1,
+      "jam": "13.50 - 15.30",
+      "dosen": "FINGKI MARWATI S.Kom., M.Kom."
+    },
+    {
+      "kode": "22SIF0142",
+      "nama": "Arsitektur dan Infrastruktur IT",
+      "sks": 2,
+      "kelompok": 2,
+      "jam": "07.40 - 09.20",
+      "dosen": "GHEMA NUSA PERSADA S. Kom., S. Pd., M. TI"
+    },
+    {
+      "kode": "22SIF0152",
+      "nama": "Pengantar Big Data",
+      "sks": 2,
+      "kelompok": 2,
+      "jam": "09.20 - 11.00",
+      "dosen": "IR AGUS SUHARTO M.KOM"
+    },
+    {
+      "kode": "22ILK0042",
+      "nama": "Aljabar Linier dan Matriks",
+      "sks": 2,
+      "kelompok": 2,
+      "jam": "11.00 - 13.50",
+      "dosen": "CHRISTIEN ROZALI S.Si., M.Kom."
+    },
+    {
+      "kode": "22SIF0162",
+      "nama": "Komunikasi Data",
+      "sks": 2,
+      "kelompok": 2,
+      "jam": "13.50 - 15.30",
+      "dosen": "ANDRI FAHMI S.Kom., M.Kom."
+    },
+    {
+      "kode": "22SIF0092",
+      "nama": "Pengantar Ekonomi, Manajemen & Bisnis",
+      "sks": 2,
+      "kelompok": 2,
+      "jam": "16.00 - 17.40",
+      "dosen": "MUHAMMAD IKHWAN BAYU HANDONO S.T., M.Kom."
+    }
+  ],
+  "jadwal_per_pekan": [
+    {
+      "pekan": "I",
+      "tanggal_daring": "31 Agustus – 5 September 2026",
+      "tanggal_luring": "5 September 2026",
+      "daring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [1]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [1]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [1]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [1]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [1]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [1], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [1], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [1], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [1], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "II",
+      "tanggal_daring": "7 – 12 September 2026",
+      "tanggal_luring": "12 September 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [3]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [3]},
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [2]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [2]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [2]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [2]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [2]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [2], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [2], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [2], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [2], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "III",
+      "tanggal_daring": "14 – 19 September 2026",
+      "tanggal_luring": "19 September 2026",
+      "daring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [3]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [3]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [3]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [3]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [3]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [4], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [3], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [4], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [3], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "IV",
+      "tanggal_daring": "21 – 26 September 2026",
+      "tanggal_luring": "26 September 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [6]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [6]},
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [4]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [4]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [4]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [4]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [4]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [5], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [4], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [5], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [4], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "V",
+      "tanggal_daring": "28 September – 3 Oktober 2026",
+      "tanggal_luring": "3 Oktober 2026",
+      "daring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [5]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [5]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [5]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [5]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [5]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [7], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [5], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [7], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [5], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "VI",
+      "tanggal_daring": "5 – 10 Oktober 2026",
+      "tanggal_luring": "10 Oktober 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [9]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [9]},
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [6]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [6]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [6]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [6]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [6]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [8], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [6], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [8], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [6], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "VII",
+      "tanggal_daring": "12 – 17 Oktober 2026",
+      "tanggal_luring": "17 Oktober 2026",
+      "daring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [7]},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [7]},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [7]},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [7]},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [7]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [10], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [7], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [10], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [7], "jam": "13.50 - 15.30"}
+      ]
+    },
+    {
+      "pekan": "UTS",
+      "tanggal_daring": "19 – 24 Oktober 2026",
+      "tanggal_luring": "24 Oktober 2026",
+      "daring": [
+        {"mata_kuliah": "UTS Daring Kelompok 2 (Semua Matkul Kelompok 2)"}
+      ],
+      "luring": [
+        {"mata_kuliah": "UTS Luring Kelompok 1 (Semua Matkul Kelompok 1)"}
+      ]
+    },
+    {
+      "pekan": "VIII",
+      "tanggal_daring": "26 – 31 Oktober 2026",
+      "tanggal_luring": "31 Oktober 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [11, 12]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [11, 12]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [8]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [8]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [8], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [8], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [8], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [8], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [8], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "IX",
+      "tanggal_daring": "2 – 7 November 2026",
+      "tanggal_luring": "7 November 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [13]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [13]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [9]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [9]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [9], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [9], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [9], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [9], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [9], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "X",
+      "tanggal_daring": "9 – 14 November 2026",
+      "tanggal_luring": "14 November 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [14, 15]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [14, 15]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [10]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [10]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [10], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [10], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [10], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [10], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [10], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "XI",
+      "tanggal_daring": "16 – 21 November 2026",
+      "tanggal_luring": "21 November 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [16]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [16]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [11]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [11]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [11], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [11], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [11], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [11], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [11], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "XII",
+      "tanggal_daring": "23 – 28 November 2026",
+      "tanggal_luring": "28 November 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [17, 18]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [17, 18]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [12]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [12]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [12], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [12], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [12], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [12], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [12], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "XIII",
+      "tanggal_daring": "30 November – 5 Desember 2026",
+      "tanggal_luring": "5 Desember 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [19]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [19]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [13]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [13]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [13], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [13], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [13], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [13], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [13], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "XIV",
+      "tanggal_daring": "7 – 12 Desember 2026",
+      "tanggal_luring": "12 Desember 2026",
+      "daring": [
+        {"mata_kuliah": "Pemrograman Berorientasi Obyek (Java I)", "pertemuan": [20, 21]},
+        {"mata_kuliah": "Design Grafis", "pertemuan": [20, 21]},
+        {"mata_kuliah": "Rekayasa Web", "pertemuan": [14]},
+        {"mata_kuliah": "Analisa Proses Bisnis", "pertemuan": [14]}
+      ],
+      "luring": [
+        {"mata_kuliah": "Arsitektur dan Infrastruktur IT", "pertemuan": [14], "jam": "07.40 - 09.20"},
+        {"mata_kuliah": "Pengantar Big Data", "pertemuan": [14], "jam": "09.20 - 11.00"},
+        {"mata_kuliah": "Aljabar Linier dan Matriks", "pertemuan": [14], "jam": "11.00 - 13.50"},
+        {"mata_kuliah": "Komunikasi Data", "pertemuan": [14], "jam": "13.50 - 15.30"},
+        {"mata_kuliah": "Pengantar Ekonomi, Manajemen & Bisnis", "pertemuan": [14], "jam": "16.00 - 17.40"}
+      ]
+    },
+    {
+      "pekan": "UAS",
+      "tanggal_daring": "14 – 19 Desember 2026",
+      "tanggal_luring": "19 Desember 2026",
+      "daring": [
+        {"mata_kuliah": "UAS Daring Kelompok 1 (Semua Matkul Kelompok 1)"}
+      ],
+      "luring": [
+        {"mata_kuliah": "UAS Luring Kelompok 2 (Semua Matkul Kelompok 2)"}
+      ]
+    }
+  ]
+}
