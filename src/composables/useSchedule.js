@@ -33,14 +33,14 @@ function parsePekanDateRange(dateStr) {
 
   // Format: "31 Agustus – 5 September 2026"
   const matchTwo = clean.match(
-    /(\d+)\s+([a-zA-Z]+)\s*[–\-]\s*(\d+)\s+([a-zA-Z]+)\s+(\d{4})/
+    /^(\d+)\s+([a-zA-Z]+)\s+[–-]\s+(\d+)\s+([a-zA-Z]+)\s+(\d{4})$/
   );
   if (matchTwo) {
-    const d1 = parseInt(matchTwo[1], 10);
+    const d1 = Number.parseInt(matchTwo[1], 10);
     const m1 = monthMap[matchTwo[2].toLowerCase()];
-    const d2 = parseInt(matchTwo[3], 10);
+    const d2 = Number.parseInt(matchTwo[3], 10);
     const m2 = monthMap[matchTwo[4].toLowerCase()];
-    const y = parseInt(matchTwo[5], 10);
+    const y = Number.parseInt(matchTwo[5], 10);
     return {
       start: new Date(y, m1, d1, 0, 0, 0),
       end: new Date(y, m2, d2 + 1, 23, 59, 59, 999),
@@ -49,13 +49,13 @@ function parsePekanDateRange(dateStr) {
 
   // Format: "21 – 26 September 2026"
   const matchOne = clean.match(
-    /(\d+)\s*[–\-]\s*(\d+)\s+([a-zA-Z]+)\s+(\d{4})/
+    /^(\d+)\s*[–-]\s*(\d+)\s+([a-zA-Z]+)\s+(\d{4})$/
   );
   if (matchOne) {
-    const d1 = parseInt(matchOne[1], 10);
-    const d2 = parseInt(matchOne[2], 10);
+    const d1 = Number.parseInt(matchOne[1], 10);
+    const d2 = Number.parseInt(matchOne[2], 10);
     const m = monthMap[matchOne[3].toLowerCase()];
-    const y = parseInt(matchOne[4], 10);
+    const y = Number.parseInt(matchOne[4], 10);
     return {
       start: new Date(y, m, d1, 0, 0, 0),
       end: new Date(y, m, d2 + 1, 23, 59, 59, 999),
@@ -94,6 +94,27 @@ function computeActiveWeekIndex() {
   return detected;
 }
 
+function getMaster(matkulName) {
+  return masterMap[matkulName?.trim().toLowerCase()] || null;
+}
+
+function getLmsUrl(item, master) {
+  if (!master?.kode) {
+    return "https://mentari.unpam.ac.id/u-courses";
+  }
+  const pNum =
+    item?.pertemuan && item.pertemuan.length > 0 ? item.pertemuan[0] : null;
+  const accordParam = pNum ? `?accord_pertemuan=PERTEMUAN_${pNum}` : "";
+  return `https://mentari.unpam.ac.id/u-courses/${semesterCode}-${kelasCode}-${master.kode}${accordParam}`;
+}
+
+function getPresensiUrl(master) {
+  if (!master?.kode) {
+    return "https://my.unpam.ac.id/presensi";
+  }
+  return `https://my.unpam.ac.id/presensi/pertemuan/${master.kode}/${kelasCode}/${semesterCode}`;
+}
+
 const activeWeekIndex = computeActiveWeekIndex();
 const viewedWeekIndex = ref(activeWeekIndex);
 
@@ -106,27 +127,6 @@ export function useSchedule() {
   );
   const isPastWeek = computed(() => viewedWeekIndex.value < activeWeekIndex);
   const isFutureWeek = computed(() => viewedWeekIndex.value > activeWeekIndex);
-
-  function getMaster(matkulName) {
-    return masterMap[matkulName?.trim().toLowerCase()] || null;
-  }
-
-  function getLmsUrl(item, master) {
-    if (!master || !master.kode) {
-      return "https://mentari.unpam.ac.id/u-courses";
-    }
-    const pNum =
-      item.pertemuan && item.pertemuan.length > 0 ? item.pertemuan[0] : null;
-    const accordParam = pNum ? `?accord_pertemuan=PERTEMUAN_${pNum}` : "";
-    return `https://mentari.unpam.ac.id/u-courses/${semesterCode}-${kelasCode}-${master.kode}${accordParam}`;
-  }
-
-  function getPresensiUrl(master) {
-    if (!master || !master.kode) {
-      return "https://my.unpam.ac.id/presensi";
-    }
-    return `https://my.unpam.ac.id/presensi/pertemuan/${master.kode}/${kelasCode}/${semesterCode}`;
-  }
 
   function setWeek(idx) {
     if (idx >= 0 && idx < allWeeks.length) {
@@ -152,7 +152,7 @@ export function useSchedule() {
 
   // Partition Daring into Kelompok 1, Kelompok 2, and others (exams)
   function partitionDaring(pekan, weekIdx) {
-    if (!pekan || !pekan.daring) return { k1: [], k2: [], other: [], k1Label: "", k2Label: "" };
+    if (!pekan?.daring) return { k1: [], k2: [], other: [], k1Label: "", k2Label: "" };
 
     const k1 = [];
     const k2 = [];
@@ -160,9 +160,9 @@ export function useSchedule() {
 
     pekan.daring.forEach((item) => {
       const master = getMaster(item.mata_kuliah);
-      if (master && master.kelompok === 1) {
+      if (master?.kelompok === 1) {
         k1.push({ item, master });
-      } else if (master && master.kelompok === 2) {
+      } else if (master?.kelompok === 2) {
         k2.push({ item, master });
       } else {
         other.push({ item, master });
@@ -170,23 +170,24 @@ export function useSchedule() {
     });
 
     const isK1Tambahan =
-      weekIdx < 7 && k1.every(({ master }) => master && master.sks === 3);
+      weekIdx < 7 && k1.every(({ master }) => master?.sks === 3);
     const k1Label = isK1Tambahan ? "Tambahan Online 3 SKS" : "Jadwal Daring Reguler";
 
     const isK2Tambahan =
-      weekIdx > 7 && k2.every(({ master }) => master && master.sks === 3);
-    const k2Label = isK2Tambahan
-      ? "Tambahan Online 3 SKS"
-      : weekIdx < 7
-        ? "Daring Reguler"
-        : "Jadwal Daring Reguler";
+      weekIdx > 7 && k2.every(({ master }) => master?.sks === 3);
+    let k2Label = "Jadwal Daring Reguler";
+    if (isK2Tambahan) {
+      k2Label = "Tambahan Online 3 SKS";
+    } else if (weekIdx < 7) {
+      k2Label = "Daring Reguler";
+    }
 
     return { k1, k2, other, k1Label, k2Label };
   }
 
   // Partition Luring into Kelompok 1, Kelompok 2, and others
   function partitionLuring(pekan) {
-    if (!pekan || !pekan.luring) return { k1: [], k2: [], other: [] };
+    if (!pekan?.luring) return { k1: [], k2: [], other: [] };
 
     const k1 = [];
     const k2 = [];
@@ -194,9 +195,9 @@ export function useSchedule() {
 
     pekan.luring.forEach((item) => {
       const master = getMaster(item.mata_kuliah);
-      if (master && master.kelompok === 1) {
+      if (master?.kelompok === 1) {
         k1.push({ item, master });
-      } else if (master && master.kelompok === 2) {
+      } else if (master?.kelompok === 2) {
         k2.push({ item, master });
       } else {
         other.push({ item, master });

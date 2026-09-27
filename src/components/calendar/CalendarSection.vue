@@ -34,10 +34,10 @@ function copyCalendarLink() {
         }, 2000);
       })
       .catch(() => {
-        window.open(baseCalUrl, "_blank");
+        window.open(baseCalUrl, "_blank", "noopener,noreferrer");
       });
   } else {
-    window.open(baseCalUrl, "_blank");
+    window.open(baseCalUrl, "_blank", "noopener,noreferrer");
   }
 }
 
@@ -116,8 +116,6 @@ onUnmounted(() => {
           <!-- Calendar View Switcher -->
           <div
             class="inline-flex rounded-lg bg-surface dark:bg-slate-800 p-0.5 border border-border-ui dark:border-slate-700 text-xs"
-            role="group"
-            aria-label="Mode Tampilan Kalender"
           >
             <button
               type="button"
@@ -170,7 +168,6 @@ onUnmounted(() => {
           v-if="isIframeLoaded"
           :src="iframeSrc"
           class="w-full h-[550px] md:h-[640px] border-0"
-          scrolling="no"
           loading="lazy"
           title="Google Calendar 03SIFE003"
         ></iframe>
