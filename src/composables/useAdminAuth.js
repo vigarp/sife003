@@ -87,10 +87,22 @@ export function useAdminAuth() {
     return data;
   }
 
+  const isAdmin = computed(() => {
+    if (!user.value) return false;
+    return Boolean(user.value.isAdmin || user.value.role === "pengurus" || user.value.role === "admin");
+  });
+
+  const isStudent = computed(() => {
+    if (!user.value) return false;
+    return !isAdmin.value;
+  });
+
   return {
     token,
     user,
     isAuthenticated,
+    isAdmin,
+    isStudent,
     loading,
     error,
     login,

@@ -45,4 +45,16 @@ describe("useAdminAuth composable", () => {
     expect(isAuthenticated.value).toBe(false);
     expect(localStorage.getItem("03sife003_admin_token")).toBe(null);
   });
+
+  it("should compute isAdmin and isStudent correctly based on user role", () => {
+    const { user, isAdmin, isStudent } = useAdminAuth();
+
+    user.value = { id: "s-1", username: "251011700310", role: "student", isAdmin: false };
+    expect(isAdmin.value).toBe(false);
+    expect(isStudent.value).toBe(true);
+
+    user.value = { id: "s-2", username: "251011700333", role: "pengurus", isAdmin: true };
+    expect(isAdmin.value).toBe(true);
+    expect(isStudent.value).toBe(false);
+  });
 });

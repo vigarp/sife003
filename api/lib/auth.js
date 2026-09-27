@@ -4,12 +4,14 @@ import bcrypt from "bcryptjs";
 const JWT_SECRET = process.env.JWT_SECRET || "03sife003-portal-kelas-super-secret-key-2026";
 
 export function generateToken(user) {
+  const isAdmin = Boolean(user.isAdmin ?? (user.role === "pengurus" || user.role === "admin"));
   return jwt.sign(
     {
       id: user.id,
       username: user.username,
       nama_lengkap: user.nama_lengkap,
-      role: user.role || "pengurus",
+      role: user.role || (isAdmin ? "pengurus" : "student"),
+      isAdmin,
     },
     JWT_SECRET,
     { expiresIn: "7d" }

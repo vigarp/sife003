@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 
 const router = useRouter();
-const { login, isAuthenticated, loading, error } = useAdminAuth();
+const { login, isAuthenticated, isAdmin, loading, error } = useAdminAuth();
 
 const username = ref("");
 const password = ref("");
@@ -12,20 +12,28 @@ const errorMessage = ref("");
 
 onMounted(() => {
   if (isAuthenticated.value) {
-    router.replace("/pengurus");
+    if (isAdmin.value) {
+      router.replace("/pengurus");
+    } else {
+      router.replace("/");
+    }
   }
 });
 
 async function handleLogin() {
   errorMessage.value = "";
   if (!username.value.trim() || !password.value) {
-    errorMessage.value = "Username dan password tidak boleh kosong.";
+    errorMessage.value = "NIM/Username dan kata sandi tidak boleh kosong.";
     return;
   }
 
   const result = await login(username.value, password.value);
   if (result.success) {
-    router.push("/pengurus");
+    if (isAdmin.value) {
+      router.push("/pengurus");
+    } else {
+      router.push("/");
+    }
   } else {
     errorMessage.value = result.message || "Gagal masuk. Periksa kembali akun Anda.";
   }
@@ -44,10 +52,10 @@ async function handleLogin() {
           </svg>
         </div>
         <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Zona Pengurus Kelas
+          Portal Masuk Kelas 03SIFE003
         </h1>
         <p class="text-xs text-slate-500 dark:text-slate-400">
-          Masuk untuk mengelola agenda tugas dan jadwal kegiatan kelas 03SIFE003
+          Masuk menggunakan NIM Mahasiswa atau akun Pengurus Kelas
         </p>
       </div>
 
@@ -63,7 +71,7 @@ async function handleLogin() {
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <label for="username" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-            Username
+            NIM Mahasiswa / Username
           </label>
           <input
             id="username"
@@ -71,8 +79,8 @@ async function handleLogin() {
             type="text"
             required
             autocomplete="username"
-            placeholder="admin"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+            placeholder="Contoh: 251011700310 atau admin"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors font-mono"
           />
         </div>
 
@@ -81,6 +89,9 @@ async function handleLogin() {
             <label for="password" class="text-xs font-semibold text-slate-700 dark:text-slate-300">
               Kata Sandi
             </label>
+            <span class="text-[11px] text-slate-400 font-normal">
+              Bawaan: sama dengan NIM
+            </span>
           </div>
           <input
             id="password"
@@ -88,7 +99,7 @@ async function handleLogin() {
             type="password"
             required
             autocomplete="current-password"
-            placeholder="••••••••"
+            placeholder="Masukkan NIM atau kata sandi..."
             class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
           />
         </div>
@@ -102,16 +113,19 @@ async function handleLogin() {
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span>{{ loading ? "Memproses Masuk..." : "Masuk ke Dashboard" }}</span>
+          <span>{{ loading ? "Memproses Masuk..." : "Masuk ke Akun" }}</span>
         </button>
       </form>
 
-      <!-- Default Credentials Hint for First-time setup -->
-      <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-        <span class="font-semibold text-slate-700 dark:text-slate-300 block">Akun Awal Pengurus:</span>
-        <div class="flex items-center justify-between font-mono text-slate-600 dark:text-slate-400">
-          <span>User: <strong class="text-slate-800 dark:text-slate-200">admin</strong></span>
-          <span>Pass: <strong class="text-slate-800 dark:text-slate-200">admin123</strong></span>
+      <!-- Instructions Hint -->
+      <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5">
+        <div class="flex items-start gap-1.5">
+          <span class="text-blue-600 dark:text-blue-400 font-bold shrink-0">🎓 Mahasiswa:</span>
+          <span>Username dan kata sandi awal adalah <strong>NIM Anda</strong> yang terdaftar di kelas.</span>
+        </div>
+        <div class="flex items-start gap-1.5">
+          <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">🛡️ Pengurus:</span>
+          <span>Mahasiswa yang telah disahkan sebagai admin dapat mengakses Zona Pengurus menggunakan NIM-nya atau akun <code>admin</code>.</span>
         </div>
       </div>
 

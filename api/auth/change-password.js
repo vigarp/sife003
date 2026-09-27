@@ -14,6 +14,40 @@ function parseBody(req) {
   return req.body;
 }
 
+async function changeStudentPassword(db, student, oldPassword, newPassword) {
+  let isMatch = false;
+  if (student.password_hash) {
+    isMatch = comparePassword(oldPassword, student.password_hash);
+  } else {
+    isMatch = oldPassword.trim() === String(student.nim).trim();
+  }
+
+  if (!isMatch) {
+    return { error: "Kata sandi lama tidak sesuai." };
+  }
+
+  const newHash = hashPassword(newPassword);
+  await db.execute({
+    sql: "UPDATE students SET password_hash = ? WHERE id = ?",
+    args: [newHash, student.id],
+  });
+  return { success: true };
+}
+
+async function changeUserPassword(db, user, oldPassword, newPassword) {
+  const isMatch = comparePassword(oldPassword, user.password_hash);
+  if (!isMatch) {
+    return { error: "Kata sandi lama tidak sesuai." };
+  }
+
+  const newHash = hashPassword(newPassword);
+  await db.execute({
+    sql: "UPDATE users SET password_hash = ? WHERE id = ?",
+    args: [newHash, user.id],
+  });
+  return { success: true };
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -55,36 +89,37 @@ export default async function handler(req, res) {
       });
     }
 
-    const result = await db.execute({
+    // 1. Check students table
+    const studentRes = await db.execute({
+      sql: "SELECT * FROM students WHERE id = ? OR LOWER(nim) = ? LIMIT 1",
+      args: [payload.id, String(payload.username || "").toLowerCase()],
+    });
+
+    if (studentRes.rows.length > 0) {
+      const studentChange = await changeStudentPassword(db, studentRes.rows[0], oldPassword, newPassword);
+      if (studentChange.error) {
+        return res.status(400).json({ success: false, message: studentChange.error });
+      }
+      return res.status(200).json({ success: true, message: "Kata sandi berhasil diperbarui." });
+    }
+
+    // 2. Check users table
+    const userRes = await db.execute({
       sql: "SELECT * FROM users WHERE id = ? LIMIT 1",
       args: [payload.id],
     });
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Pengguna tidak ditemukan.",
-      });
+    if (userRes.rows.length > 0) {
+      const userChange = await changeUserPassword(db, userRes.rows[0], oldPassword, newPassword);
+      if (userChange.error) {
+        return res.status(400).json({ success: false, message: userChange.error });
+      }
+      return res.status(200).json({ success: true, message: "Kata sandi berhasil diperbarui." });
     }
 
-    const user = result.rows[0];
-    const isMatch = comparePassword(oldPassword, user.password_hash);
-    if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: "Password lama tidak sesuai.",
-      });
-    }
-
-    const newHash = hashPassword(newPassword);
-    await db.execute({
-      sql: "UPDATE users SET password_hash = ? WHERE id = ?",
-      args: [newHash, payload.id],
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Password berhasil diperbarui.",
+    return res.status(404).json({
+      success: false,
+      message: "Pengguna tidak ditemukan.",
     });
   } catch (error) {
     console.error("Change Password Error:", error);

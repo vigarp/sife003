@@ -35,4 +35,32 @@ describe("api/lib/auth.js verifyToken", () => {
     expect(verifyToken({ headers: {} })).toBeNull();
     expect(verifyToken({ headers: { authorization: "Basic 123" } })).toBeNull();
   });
+
+  it("should generate and verify student tokens with proper roles and isAdmin flag", () => {
+    const regularStudent = {
+      id: "s-1",
+      username: "251011700310",
+      nama_lengkap: "ADAM BURHANUDIN LUBIS",
+      role: "student",
+      isAdmin: false,
+    };
+    const tokenStudent = generateToken(regularStudent);
+    const payloadStudent = verifyToken(tokenStudent);
+    expect(payloadStudent.username).toBe("251011700310");
+    expect(payloadStudent.role).toBe("student");
+    expect(payloadStudent.isAdmin).toBe(false);
+
+    const adminStudent = {
+      id: "s-2",
+      username: "251011700333",
+      nama_lengkap: "AHMAD SANDI",
+      role: "pengurus",
+      isAdmin: true,
+    };
+    const tokenAdmin = generateToken(adminStudent);
+    const payloadAdmin = verifyToken(tokenAdmin);
+    expect(payloadAdmin.username).toBe("251011700333");
+    expect(payloadAdmin.role).toBe("pengurus");
+    expect(payloadAdmin.isAdmin).toBe(true);
+  });
 });

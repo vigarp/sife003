@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useTheme } from "@/composables/useTheme";
+import { useAdminAuth } from "@/composables/useAdminAuth";
 
 const { isDark, toggleTheme } = useTheme();
+const { user, isAuthenticated, isAdmin, logout } = useAdminAuth();
 const isDropdownOpen = ref(false);
 const dropdownContainer = ref(null);
 
@@ -61,6 +63,25 @@ onUnmounted(() => {
 
       <!-- Right Menu: Links Dropdown & Dark Mode Toggle -->
       <div class="flex items-center gap-2">
+        <!-- User Badge when authenticated -->
+        <router-link
+          v-if="isAuthenticated && isAdmin"
+          to="/pengurus"
+          class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 text-xs font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors shadow-2xs"
+          title="Buka Zona Pengurus"
+        >
+          <span class="material-symbols-outlined text-[15px]">admin_panel_settings</span>
+          <span class="max-w-[110px] truncate">{{ user?.nama_lengkap?.split(' ')[0] || "Pengurus" }}</span>
+        </router-link>
+
+        <div
+          v-else-if="isAuthenticated"
+          class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-2xs"
+        >
+          <span class="material-symbols-outlined text-[15px] text-slate-500">person</span>
+          <span class="max-w-[110px] truncate">{{ user?.nama_lengkap?.split(' ')[0] || "Mahasiswa" }}</span>
+        </div>
+
         <!-- Links Dropdown -->
         <div class="relative" ref="dropdownContainer">
           <button
@@ -86,6 +107,18 @@ onUnmounted(() => {
             class="absolute right-0 mt-2 w-56 rounded-xl bg-surface-card dark:bg-slate-900 border border-border-ui dark:border-slate-800 shadow-xl py-1.5 z-50 transition-all duration-150 animate-in fade-in-50 zoom-in-95"
             role="menu"
           >
+            <!-- User Status in Dropdown -->
+            <div v-if="isAuthenticated" class="px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border-b border-border-ui dark:border-slate-800 mb-1">
+              <p class="text-xs font-bold text-slate-900 dark:text-white truncate">
+                {{ user?.nama_lengkap || user?.username }}
+              </p>
+              <div class="flex items-center justify-between text-[11px] mt-0.5">
+                <span :class="isAdmin ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-slate-500 dark:text-slate-400'">
+                  {{ isAdmin ? '🛡️ Pengurus Kelas' : '👤 Mahasiswa' }}
+                </span>
+                <span class="font-mono text-[10px] text-slate-400" v-if="user?.nim">{{ user.nim }}</span>
+              </div>
+            </div>
             <!-- Navigation items -->
             <a
               href="#jadwal"
@@ -185,6 +218,30 @@ onUnmounted(() => {
               <span>SPM UNPAM</span>
               <span class="material-symbols-outlined text-[14px]">open_in_new</span>
             </a>
+
+            <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
+
+            <button
+              v-if="isAuthenticated"
+              type="button"
+              @click="logout(); closeDropdown();"
+              class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer text-left"
+              role="menuitem"
+            >
+              <span class="material-symbols-outlined text-[17px]">logout</span>
+              <span>Keluar (Logout)</span>
+            </button>
+
+            <router-link
+              v-else
+              to="/pengurus/login"
+              @click="closeDropdown"
+              class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+              role="menuitem"
+            >
+              <span class="material-symbols-outlined text-[17px]">login</span>
+              <span>Masuk (NIM / Admin)</span>
+            </router-link>
           </div>
         </div>
 

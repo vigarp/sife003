@@ -22,6 +22,32 @@ export default async function handler(req, res) {
   try {
     await ensureSchema();
     const db = getDb();
+
+    // 1. Check students table
+    const studentRes = await db.execute({
+      sql: "SELECT id, nim, name, phone, is_admin, is_guest FROM students WHERE id = ? OR LOWER(nim) = ? LIMIT 1",
+      args: [payload.id, String(payload.username || "").toLowerCase()],
+    });
+
+    if (studentRes.rows.length > 0) {
+      const s = studentRes.rows[0];
+      const isAdmin = Boolean(s.is_admin);
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: s.id,
+          username: s.nim,
+          nim: s.nim,
+          nama_lengkap: s.name,
+          role: isAdmin ? "pengurus" : "student",
+          isAdmin,
+          phone: s.phone || null,
+          isGuest: Boolean(s.is_guest),
+        },
+      });
+    }
+
+    // 2. Check users table
     const result = await db.execute({
       sql: "SELECT id, username, nama_lengkap, role, created_at FROM users WHERE id = ? LIMIT 1",
       args: [payload.id],
@@ -34,9 +60,16 @@ export default async function handler(req, res) {
       });
     }
 
+    const u = result.rows[0];
     return res.status(200).json({
       success: true,
-      data: result.rows[0],
+      data: {
+        id: u.id,
+        username: u.username,
+        nama_lengkap: u.nama_lengkap,
+        role: u.role,
+        isAdmin: u.role === "pengurus" || u.role === "admin",
+      },
     });
   } catch (error) {
     console.error("Auth Me Error:", error);

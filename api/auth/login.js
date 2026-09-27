@@ -14,6 +14,81 @@ function parseBody(req) {
   return req.body;
 }
 
+function checkStudentPassword(password, student) {
+  if (student.password_hash) {
+    return comparePassword(password, student.password_hash);
+  }
+  return String(password).trim() === String(student.nim).trim();
+}
+
+async function tryUserLogin(db, username, password) {
+  const result = await db.execute({
+    sql: "SELECT * FROM users WHERE LOWER(username) = ? LIMIT 1",
+    args: [username.toLowerCase()],
+  });
+  if (result.rows.length === 0) return null;
+
+  const user = result.rows[0];
+  if (!comparePassword(password, user.password_hash)) {
+    return { error: "Username atau kata sandi salah." };
+  }
+
+  const token = generateToken({
+    id: user.id,
+    username: user.username,
+    nama_lengkap: user.nama_lengkap,
+    role: user.role,
+    isAdmin: true,
+  });
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      nama_lengkap: user.nama_lengkap,
+      role: user.role,
+      isAdmin: true,
+    },
+  };
+}
+
+async function tryStudentLogin(db, username, password) {
+  const result = await db.execute({
+    sql: "SELECT * FROM students WHERE LOWER(nim) = ? LIMIT 1",
+    args: [username.toLowerCase()],
+  });
+  if (result.rows.length === 0) return null;
+
+  const student = result.rows[0];
+  if (!checkStudentPassword(password, student)) {
+    return { error: "NIM atau kata sandi salah. Kata sandi bawaan adalah NIM Anda." };
+  }
+
+  const isAdmin = Boolean(student.is_admin);
+  const role = isAdmin ? "pengurus" : "student";
+  const token = generateToken({
+    id: student.id,
+    username: student.nim,
+    nama_lengkap: student.name,
+    role,
+    isAdmin,
+  });
+
+  return {
+    token,
+    user: {
+      id: student.id,
+      username: student.nim,
+      nim: student.nim,
+      nama_lengkap: student.name,
+      role,
+      isAdmin,
+      phone: student.phone || null,
+    },
+  };
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -36,45 +111,43 @@ export default async function handler(req, res) {
     if (!username || !password) {
       return res.status(400).json({
         success: false,
-        message: "Username dan password wajib diisi.",
+        message: "Username/NIM dan kata sandi wajib diisi.",
       });
     }
 
-    const result = await db.execute({
-      sql: "SELECT * FROM users WHERE username = ? LIMIT 1",
-      args: [username.trim().toLowerCase()],
-    });
+    const trimmedUser = String(username).trim();
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: "Username atau password salah.",
+    // 1. Check users table (e.g. master admin)
+    const userAuth = await tryUserLogin(db, trimmedUser, password);
+    if (userAuth?.error) {
+      return res.status(401).json({ success: false, message: userAuth.error });
+    }
+    if (userAuth) {
+      return res.status(200).json({
+        success: true,
+        message: "Login berhasil sebagai Pengurus.",
+        data: userAuth,
       });
     }
 
-    const user = result.rows[0];
-    const isMatch = comparePassword(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Username atau password salah.",
+    // 2. Check students table (by NIM)
+    const studentAuth = await tryStudentLogin(db, trimmedUser, password);
+    if (studentAuth?.error) {
+      return res.status(401).json({ success: false, message: studentAuth.error });
+    }
+    if (studentAuth) {
+      return res.status(200).json({
+        success: true,
+        message: studentAuth.user.isAdmin
+          ? "Login berhasil sebagai Pengurus Kelas."
+          : "Login berhasil sebagai Mahasiswa.",
+        data: studentAuth,
       });
     }
 
-    const token = generateToken(user);
-
-    return res.status(200).json({
-      success: true,
-      message: "Login berhasil.",
-      data: {
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          nama_lengkap: user.nama_lengkap,
-          role: user.role,
-        },
-      },
+    return res.status(401).json({
+      success: false,
+      message: "Akun atau NIM tidak terdaftar dalam sistem kelas 03SIFE003.",
     });
   } catch (error) {
     console.error("Login API Error:", error);

@@ -43,12 +43,26 @@ async function createTables(db) {
       phone TEXT DEFAULT NULL,
       is_guest INTEGER DEFAULT 0,
       course_ids TEXT DEFAULT NULL,
+      is_admin INTEGER DEFAULT 0,
+      password_hash TEXT DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
   try {
     await db.execute("ALTER TABLE students ADD COLUMN phone TEXT DEFAULT NULL");
+  } catch (err) {
+    // Column may already exist in existing database tables
+  }
+
+  try {
+    await db.execute("ALTER TABLE students ADD COLUMN is_admin INTEGER DEFAULT 0");
+  } catch (err) {
+    // Column may already exist in existing database tables
+  }
+
+  try {
+    await db.execute("ALTER TABLE students ADD COLUMN password_hash TEXT DEFAULT NULL");
   } catch (err) {
     // Column may already exist in existing database tables
   }

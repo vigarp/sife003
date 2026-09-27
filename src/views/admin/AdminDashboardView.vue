@@ -10,7 +10,7 @@ import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue"
 import scheduleData from "@/data/schedule.json";
 
 const router = useRouter();
-const { user, isAuthenticated, logout, changePassword } = useAdminAuth();
+const { user, isAuthenticated, logout, changePassword, isAdmin } = useAdminAuth();
 const { agendas, loading, fetchAgendas, createAgenda, updateAgenda, deleteAgenda } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
 
@@ -219,13 +219,49 @@ onMounted(async () => {
     router.replace("/pengurus/login");
     return;
   }
+  if (!isAdmin.value) {
+    return;
+  }
   form.pekan = activeWeekNumber.value;
   await loadData();
 });
 </script>
 
 <template>
-  <div class="w-full space-y-6 pb-16">
+  <!-- Unauthorized Regular Student Notice -->
+  <div v-if="!isAdmin" class="max-w-md mx-auto text-center py-16 px-4 space-y-4">
+    <div class="w-16 h-16 mx-auto rounded-3xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center shadow-xs">
+      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    </div>
+    <div class="space-y-1">
+      <h2 class="text-base font-bold text-slate-900 dark:text-white">Akses Terbatas: Bukan Pengurus Kelas</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400">
+        Halo, <strong class="text-slate-800 dark:text-slate-200">{{ user?.nama_lengkap || "Mahasiswa" }}</strong>
+        <span v-if="user?.nim"> (NIM: {{ user.nim }})</span>.
+      </p>
+      <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">
+        Akun Anda berstatus <strong>Mahasiswa Reguler</strong>. Hanya mahasiswa yang telah disahkan sebagai <strong>Pengurus / Admin</strong> oleh pengurus kelas yang dapat mengakses Zona Pengurus.
+      </p>
+    </div>
+    <div class="flex items-center justify-center gap-2 pt-2">
+      <router-link
+        to="/"
+        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs"
+      >
+        Kembali ke Portal
+      </router-link>
+      <button
+        @click="handleLogout"
+        class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+      >
+        Keluar
+      </button>
+    </div>
+  </div>
+
+  <div v-else class="w-full space-y-6 pb-16">
     <!-- Top Action Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-xs">
       <div class="flex items-center gap-3">
@@ -242,7 +278,9 @@ onMounted(async () => {
             </span>
           </h1>
           <p class="text-xs text-slate-500 dark:text-slate-400">
-            Halo, <strong class="text-slate-800 dark:text-slate-200">{{ user?.nama_lengkap || "Pengurus Kelas" }}</strong> • Manajemen Agenda & Tugas Mahasiswa
+            Halo, <strong class="text-slate-800 dark:text-slate-200">{{ user?.nama_lengkap || "Pengurus Kelas" }}</strong>
+            <span v-if="user?.nim" class="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-semibold ml-1">({{ user.nim }})</span>
+            • Manajemen Agenda & Tugas Mahasiswa
           </p>
         </div>
       </div>

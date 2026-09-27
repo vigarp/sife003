@@ -16,6 +16,7 @@ const courses = ref([]);
 const loading = ref(false);
 const searchQuery = ref("");
 const statusFilter = ref("all"); // 'all' | 'regular' | 'guest'
+const roleFilter = ref("all"); // 'all' | 'admin' | 'student'
 
 // Modal Create/Edit state
 const isModalOpen = ref(false);
@@ -28,6 +29,7 @@ const form = reactive({
   name: "",
   phone: "",
   isGuest: false,
+  isAdmin: false,
   courseIds: [],
 });
 
@@ -73,25 +75,32 @@ async function fetchStudents() {
 
 const stats = computed(() => {
   const total = students.value.length;
+  const adminCount = students.value.filter((s) => s.isAdmin).length;
   const regular = students.value.filter((s) => !s.isGuest).length;
   const guest = total - regular;
-  return { total, regular, guest };
+  return { total, adminCount, regular, guest };
 });
 
 const filteredStudents = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
+  const normQ = normalizeWhatsAppNumber(q);
+
   return students.value.filter((s) => {
-    // Search
+    // Role Filter
+    if (roleFilter.value === "admin" && !s.isAdmin) return false;
+    if (roleFilter.value === "student" && s.isAdmin) return false;
+
+    // Status Filter
+    if (statusFilter.value === "regular" && s.isGuest) return false;
+    if (statusFilter.value === "guest" && !s.isGuest) return false;
+
+    // Search Query
     if (q) {
       const matchName = s.name.toLowerCase().includes(q);
       const matchNim = s.nim.toLowerCase().includes(q);
-      const matchPhone = s.phone && s.phone.includes(q);
+      const matchPhone = s.phone && (s.phone.includes(q) || (normQ && s.phone.includes(normQ)));
       if (!matchName && !matchNim && !matchPhone) return false;
     }
-
-    // Filter
-    if (statusFilter.value === "regular" && s.isGuest) return false;
-    if (statusFilter.value === "guest" && !s.isGuest) return false;
 
     return true;
   });
@@ -104,6 +113,7 @@ function openCreateModal() {
   form.name = "";
   form.phone = "";
   form.isGuest = false;
+  form.isAdmin = false;
   form.courseIds = [];
   isModalOpen.value = true;
 }
@@ -115,6 +125,7 @@ function openEditModal(st) {
   form.name = st.name;
   form.phone = st.phone ? formatPhoneDisplay(st.phone) : "";
   form.isGuest = Boolean(st.isGuest);
+  form.isAdmin = Boolean(st.isAdmin);
   form.courseIds = Array.isArray(st.courseIds) ? [...st.courseIds] : [];
   isModalOpen.value = true;
 }
@@ -125,6 +136,41 @@ function toggleCourseSelection(courseId) {
     form.courseIds.push(courseId);
   } else {
     form.courseIds.splice(idx, 1);
+  }
+}
+
+async function handleToggleAdmin(st) {
+  const newStatus = !st.isAdmin;
+  const confirmMsg = newStatus
+    ? `Jadikan "${st.name}" (${st.nim}) sebagai Pengurus Kelas? Mahasiswa ini akan mendapatkan hak akses penuh ke Zona Pengurus.`
+    : `Cabut status Pengurus dari "${st.name}" (${st.nim})? Mahasiswa ini akan kembali menjadi mahasiswa biasa.`;
+
+  if (!window.confirm(confirmMsg)) return;
+
+  try {
+    const res = await fetch(`/api/presensi/students?id=${encodeURIComponent(st.id)}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify({ isAdmin: newStatus }),
+    });
+
+    const json = await res.json();
+    if (json.success) {
+      emit(
+        "toast",
+        newStatus
+          ? `Berhasil mengangkat ${st.name} sebagai Pengurus Kelas.`
+          : `Berhasil mencabut status pengurus ${st.name}.`
+      );
+      await fetchStudents();
+    } else {
+      emit("toast", json.message || "Gagal mengubah hak akses.", "error");
+    }
+  } catch (err) {
+    emit("toast", err.message || "Gagal mengubah hak akses.", "error");
   }
 }
 
@@ -150,6 +196,7 @@ async function handleSubmit() {
       name: form.name.trim(),
       phone: normPhone,
       isGuest: form.isGuest,
+      isAdmin: form.isAdmin,
       courseIds: form.isGuest ? form.courseIds : [],
     };
 
@@ -299,6 +346,42 @@ onMounted(async () => {
             Revisi ({{ stats.guest }})
           </button>
         </div>
+
+        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
+          <button
+            @click="roleFilter = 'all'"
+            :class="[
+              'px-2.5 py-1 rounded-lg transition-colors cursor-pointer',
+              roleFilter === 'all'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
+            ]"
+          >
+            Semua Peran
+          </button>
+          <button
+            @click="roleFilter = 'admin'"
+            :class="[
+              'px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1',
+              roleFilter === 'admin'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
+            ]"
+          >
+            <span>🛡️ Pengurus ({{ stats.adminCount }})</span>
+          </button>
+          <button
+            @click="roleFilter = 'student'"
+            :class="[
+              'px-2.5 py-1 rounded-lg transition-colors cursor-pointer',
+              roleFilter === 'student'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
+            ]"
+          >
+            <span>👤 Mahasiswa ({{ stats.total - stats.adminCount }})</span>
+          </button>
+        </div>
       </div>
 
       <!-- Action Buttons -->
@@ -349,6 +432,7 @@ onMounted(async () => {
               <th class="p-4">Nama Mahasiswa</th>
               <th class="p-4 w-44">WhatsApp</th>
               <th class="p-4 w-28">Status</th>
+              <th class="p-4 w-44">Hak Akses</th>
               <th class="p-4 w-44">Mata Kuliah</th>
               <th class="p-4 w-24 text-right">Aksi</th>
             </tr>
@@ -398,6 +482,33 @@ onMounted(async () => {
                 >
                   {{ st.isGuest ? 'Revisi' : 'Reguler' }}
                 </span>
+              </td>
+              <td class="p-4">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1"
+                    :class="[
+                      st.isAdmin
+                        ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700',
+                    ]"
+                  >
+                    <span>{{ st.isAdmin ? '🛡️ Pengurus' : '👤 Mahasiswa' }}</span>
+                  </span>
+                  <button
+                    type="button"
+                    @click="handleToggleAdmin(st)"
+                    :title="st.isAdmin ? 'Cabut hak akses Pengurus' : 'Jadikan Pengurus / Admin Kelas'"
+                    :class="[
+                      'px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer border',
+                      st.isAdmin
+                        ? 'border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60'
+                        : 'border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60',
+                    ]"
+                  >
+                    {{ st.isAdmin ? 'Cabut' : '+ Jadikan Admin' }}
+                  </button>
+                </div>
               </td>
               <td class="p-4 text-slate-500 dark:text-slate-400">
                 <span v-if="!st.isGuest" class="text-slate-400">
@@ -549,6 +660,24 @@ onMounted(async () => {
                 </span>
               </label>
             </div>
+          </div>
+
+          <!-- Hak Akses Pengurus / Admin Kelas -->
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <input
+                id="form-is-admin"
+                v-model="form.isAdmin"
+                type="checkbox"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <label for="form-is-admin" class="font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                Hak Akses Pengurus / Admin Kelas
+              </label>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5 ml-5">
+              Jika dicentang, mahasiswa ini dapat mengelola Zona Pengurus dan memberikan hak admin kepada mahasiswa lain.
+            </p>
           </div>
 
           <!-- Actions -->
