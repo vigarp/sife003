@@ -40,11 +40,18 @@ async function createTables(db) {
       id TEXT PRIMARY KEY,
       nim TEXT NOT NULL UNIQUE,
       name TEXT NOT NULL,
+      phone TEXT DEFAULT NULL,
       is_guest INTEGER DEFAULT 0,
       course_ids TEXT DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  try {
+    await db.execute("ALTER TABLE students ADD COLUMN phone TEXT DEFAULT NULL");
+  } catch (err) {
+    // Column may already exist in existing database tables
+  }
 
   await db.execute(`
     CREATE TABLE IF NOT EXISTS courses (
@@ -113,12 +120,13 @@ async function seedCourses(db, courses) {
 async function seedStudents(db, students) {
   for (const s of students) {
     await db.execute({
-      sql: `INSERT OR IGNORE INTO students (id, nim, name, is_guest, course_ids)
-            VALUES (?, ?, ?, ?, ?)`,
+      sql: `INSERT OR IGNORE INTO students (id, nim, name, phone, is_guest, course_ids)
+            VALUES (?, ?, ?, ?, ?, ?)`,
       args: [
         s.id,
         s.nim,
         s.name,
+        s.phone || null,
         s.isGuest ? 1 : 0,
         s.courseIds?.length ? JSON.stringify(s.courseIds) : null,
       ],

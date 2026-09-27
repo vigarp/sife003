@@ -19,11 +19,12 @@ function authenticate(req) {
 }
 
 async function handleGet(res, db) {
-  const studentsRes = await db.execute("SELECT id, nim, name, is_guest, course_ids FROM students ORDER BY name ASC");
+  const studentsRes = await db.execute("SELECT id, nim, name, phone, is_guest, course_ids FROM students ORDER BY name ASC");
   const students = studentsRes.rows.map((s) => ({
     id: s.id,
     nim: s.nim,
     name: s.name,
+    phone: s.phone || null,
     isGuest: Boolean(s.is_guest),
     courseIds: s.course_ids ? JSON.parse(s.course_ids) : undefined,
   }));
@@ -36,11 +37,12 @@ async function handleBulkPost(students, res, db) {
     if (!s.nim || !s.name) continue;
     const id = s.id || `s-${Date.now()}-${Date.now().toString(36)}-${inserted}`;
     await db.execute({
-      sql: `INSERT OR REPLACE INTO students (id, nim, name, is_guest, course_ids) VALUES (?, ?, ?, ?, ?)`,
+      sql: `INSERT OR REPLACE INTO students (id, nim, name, phone, is_guest, course_ids) VALUES (?, ?, ?, ?, ?, ?)`,
       args: [
         id,
         String(s.nim).trim(),
         String(s.name).trim(),
+        s.phone ? String(s.phone).trim() : null,
         s.isGuest ? 1 : 0,
         s.courseIds?.length ? JSON.stringify(s.courseIds) : null,
       ],
@@ -60,18 +62,19 @@ async function handlePost(req, res, db) {
     return handleBulkPost(body.students, res, db);
   }
 
-  const { nim, name, isGuest, courseIds } = body;
+  const { nim, name, phone, isGuest, courseIds } = body;
   if (!nim || !name) {
     return res.status(400).json({ success: false, message: "NIM dan Nama mahasiswa wajib diisi." });
   }
 
   const id = body.id || `s-${Date.now()}-${Date.now().toString(36)}`;
   await db.execute({
-    sql: `INSERT INTO students (id, nim, name, is_guest, course_ids) VALUES (?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO students (id, nim, name, phone, is_guest, course_ids) VALUES (?, ?, ?, ?, ?, ?)`,
     args: [
       id,
       String(nim).trim(),
       String(name).trim(),
+      phone ? String(phone).trim() : null,
       isGuest ? 1 : 0,
       courseIds?.length ? JSON.stringify(courseIds) : null,
     ],
@@ -91,22 +94,29 @@ async function handlePut(req, res, db) {
     return res.status(400).json({ success: false, message: "ID mahasiswa wajib disertakan." });
   }
 
-  const { nim, name, isGuest, courseIds } = body;
+  const { nim, name, phone, isGuest, courseIds } = body;
   let isGuestVal = null;
   if (isGuest !== undefined) {
     isGuestVal = isGuest ? 1 : 0;
+  }
+  let phoneVal = null;
+  if (phone !== undefined) {
+    phoneVal = phone ? String(phone).trim() : null;
   }
 
   await db.execute({
     sql: `UPDATE students SET
             nim = COALESCE(?, nim),
             name = COALESCE(?, name),
+            phone = CASE WHEN ? = 1 THEN ? ELSE phone END,
             is_guest = COALESCE(?, is_guest),
             course_ids = ?
           WHERE id = ?`,
     args: [
       nim ? String(nim).trim() : null,
       name ? String(name).trim() : null,
+      phone !== undefined ? 1 : 0,
+      phoneVal,
       isGuestVal,
       courseIds?.length ? JSON.stringify(courseIds) : null,
       id,

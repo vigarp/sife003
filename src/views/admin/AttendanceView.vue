@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { useAttendance } from "@/composables/useAttendance";
 import { formatWhatsAppReport, formatIndonesianDate } from "@/utils/whatsappFormatter";
+import { normalizeWhatsAppNumber, getWhatsAppLink } from "@/utils/phoneUtils";
 
 const router = useRouter();
 const { user, isAuthenticated } = useAdminAuth();
@@ -464,9 +465,21 @@ watch(
               Revisi
             </span>
           </div>
-          <p class="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
-            {{ st.nim }}
-          </p>
+          <div class="flex items-center gap-2 mt-0.5">
+            <span class="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+              {{ st.nim }}
+            </span>
+            <a
+              v-if="st.phone"
+              :href="getWhatsAppLink(st.phone)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 hover:underline"
+              title="Chat WhatsApp"
+            >
+              <span>wa.me/+{{ normalizeWhatsAppNumber(st.phone) }}</span>
+            </a>
+          </div>
         </div>
 
         <!-- 4-Button Attendance Toggle: H, I, S, A -->

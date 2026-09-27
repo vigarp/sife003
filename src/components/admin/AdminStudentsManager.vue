@@ -2,6 +2,11 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { parseExcelStudentText } from "@/utils/smartPaste";
+import {
+  normalizeWhatsAppNumber,
+  formatPhoneDisplay,
+  getWhatsAppLink,
+} from "@/utils/phoneUtils";
 
 const emit = defineEmits(["toast"]);
 const { token } = useAdminAuth();
@@ -21,8 +26,13 @@ const submitting = ref(false);
 const form = reactive({
   nim: "",
   name: "",
+  phone: "",
   isGuest: false,
   courseIds: [],
+});
+
+const normalizedPhonePreview = computed(() => {
+  return form.phone ? normalizeWhatsAppNumber(form.phone) : null;
 });
 
 // Modal Smart Paste state
@@ -75,7 +85,8 @@ const filteredStudents = computed(() => {
     if (q) {
       const matchName = s.name.toLowerCase().includes(q);
       const matchNim = s.nim.toLowerCase().includes(q);
-      if (!matchName && !matchNim) return false;
+      const matchPhone = s.phone && s.phone.includes(q);
+      if (!matchName && !matchNim && !matchPhone) return false;
     }
 
     // Filter
@@ -91,6 +102,7 @@ function openCreateModal() {
   editingId.value = null;
   form.nim = "";
   form.name = "";
+  form.phone = "";
   form.isGuest = false;
   form.courseIds = [];
   isModalOpen.value = true;
@@ -101,6 +113,7 @@ function openEditModal(st) {
   editingId.value = st.id;
   form.nim = st.nim;
   form.name = st.name;
+  form.phone = st.phone ? formatPhoneDisplay(st.phone) : "";
   form.isGuest = Boolean(st.isGuest);
   form.courseIds = Array.isArray(st.courseIds) ? [...st.courseIds] : [];
   isModalOpen.value = true;
@@ -121,11 +134,21 @@ async function handleSubmit() {
     return;
   }
 
+  let normPhone = null;
+  if (form.phone.trim()) {
+    normPhone = normalizeWhatsAppNumber(form.phone);
+    if (!normPhone) {
+      emit("toast", "Format nomor WhatsApp tidak valid. Gunakan format seperti 0812-xxxx-xxxx atau +628...", "error");
+      return;
+    }
+  }
+
   submitting.value = true;
   try {
     const payload = {
       nim: form.nim.trim(),
       name: form.name.trim(),
+      phone: normPhone,
       isGuest: form.isGuest,
       courseIds: form.isGuest ? form.courseIds : [],
     };
@@ -322,11 +345,12 @@ onMounted(async () => {
           <thead>
             <tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
               <th class="p-4 w-12 text-center">No</th>
-              <th class="p-4 w-40">NIM</th>
+              <th class="p-4 w-36">NIM</th>
               <th class="p-4">Nama Mahasiswa</th>
-              <th class="p-4 w-32">Status</th>
-              <th class="p-4 w-48">Mata Kuliah</th>
-              <th class="p-4 w-28 text-right">Aksi</th>
+              <th class="p-4 w-44">WhatsApp</th>
+              <th class="p-4 w-28">Status</th>
+              <th class="p-4 w-44">Mata Kuliah</th>
+              <th class="p-4 w-24 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -343,6 +367,25 @@ onMounted(async () => {
               </td>
               <td class="p-4 font-semibold text-slate-900 dark:text-white">
                 {{ st.name }}
+              </td>
+              <td class="p-4">
+                <a
+                  v-if="st.phone"
+                  :href="getWhatsAppLink(st.phone)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-mono text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900 transition-colors group"
+                  title="Buka Chat WhatsApp"
+                >
+                  <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm.01 1.67c4.55 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.83a8.176 8.176 0 01-5.82 2.41c-1.42 0-2.82-.37-4.06-1.07l-.29-.17-3.02.79.81-2.95-.19-.3a8.188 8.188 0 01-1.25-4.54c0-4.55 3.7-8.24 8.24-8.24zm4.51 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.98-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.01-1.24-.74-.66-1.25-1.48-1.39-1.73-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.45.06-.68.32-.23.25-.89.87-.89 2.12s.91 2.46 1.04 2.63c.13.17 1.79 2.73 4.33 3.83.61.26 1.08.42 1.45.54.61.19 1.16.17 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.22-.19-.47-.32z"/>
+                  </svg>
+                  <span>wa.me/+{{ normalizeWhatsAppNumber(st.phone) }}</span>
+                  <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+                <span v-else class="text-slate-400 dark:text-slate-600 font-mono text-[11px]">-</span>
               </td>
               <td class="p-4">
                 <span
@@ -443,6 +486,27 @@ onMounted(async () => {
             />
           </div>
 
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label for="form-phone-input" class="font-semibold text-slate-700 dark:text-slate-300">
+                Nomor WhatsApp <span class="font-normal text-slate-400">(Opsional)</span>
+              </label>
+              <span v-if="normalizedPhonePreview" class="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                wa.me/+{{ normalizedPhonePreview }}
+              </span>
+            </div>
+            <input
+              id="form-phone-input"
+              v-model="form.phone"
+              type="tel"
+              placeholder="Contoh: 0812-3456-7890 atau +62812..."
+              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+            />
+            <p class="text-[11px] text-slate-400 mt-1">
+              Format fleksibel: 08xx, +628xx, spasi, atau tanda strip. Otomatis dinormalisasi.
+            </p>
+          </div>
+
           <!-- Status Mahasiswa: Reguler vs Revisi -->
           <div class="pt-1">
             <div class="flex items-center gap-2">
@@ -521,7 +585,7 @@ onMounted(async () => {
               </span>
             </h2>
             <p class="text-[11px] text-slate-400 mt-0.5">
-              Salin 2 kolom (NIM dan Nama Mahasiswa) dari Excel atau Google Sheets, lalu tempel di bawah.
+              Salin data (NIM, Nama Mahasiswa, dan No WhatsApp opsional) dari Excel atau Google Sheets, lalu tempel di bawah.
             </p>
           </div>
           <button @click="isSmartPasteOpen = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold cursor-pointer">
@@ -538,7 +602,7 @@ onMounted(async () => {
               id="smart-paste-textarea"
               v-model="smartPasteText"
               rows="6"
-              placeholder="Contoh:&#10;251011700310	ADAM BURHANUDIN LUBIS&#10;251011700333	AHMAD SANDI"
+              placeholder="Contoh:&#10;251011700310	ADAM BURHANUDIN LUBIS	0812-3456-7890&#10;251011700333	AHMAD SANDI	+62 818-999-000"
               class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-[11px] leading-relaxed resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             ></textarea>
           </div>
@@ -555,8 +619,9 @@ onMounted(async () => {
                 <thead class="bg-slate-100 dark:bg-slate-800 font-semibold text-slate-600 dark:text-slate-300">
                   <tr>
                     <th class="p-2 w-10">No</th>
-                    <th class="p-2 w-32">NIM</th>
+                    <th class="p-2 w-28">NIM</th>
                     <th class="p-2">Nama</th>
+                    <th class="p-2 w-32">WhatsApp</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -564,6 +629,9 @@ onMounted(async () => {
                     <td class="p-2 text-slate-400">{{ i + 1 }}</td>
                     <td class="p-2 font-mono font-semibold">{{ p.nim }}</td>
                     <td class="p-2">{{ p.name }}</td>
+                    <td class="p-2 font-mono text-[10px] text-emerald-600 dark:text-emerald-400">
+                      {{ p.phone ? 'wa.me/+' + p.phone : '-' }}
+                    </td>
                   </tr>
                 </tbody>
               </table>

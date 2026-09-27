@@ -42,4 +42,34 @@ describe("smartPaste.js parser", () => {
     expect(parsed.length).toBe(1);
     expect(parsed[0].name).toBe("ADAM BURHANUDIN");
   });
+
+  it("should parse 3-column rows containing WhatsApp numbers", () => {
+    const raw = `NIM\tNAMA MAHASISWA\tNO WA
+251011700310\tADAM BURHANUDIN\t0812-3456-7890
+251011700333\tAHMAD SANDI\t+62 818-999-888`;
+
+    const parsed = parseExcelStudentText(raw);
+    expect(parsed.length).toBe(2);
+    expect(parsed[0]).toEqual({
+      nim: "251011700310",
+      name: "ADAM BURHANUDIN",
+      phone: "6281234567890",
+    });
+    expect(parsed[1]).toEqual({
+      nim: "251011700333",
+      name: "AHMAD SANDI",
+      phone: "62818999888",
+    });
+  });
+
+  it("should parse 4-column rows with index numbers and WhatsApp", () => {
+    const raw = `1\t251011700310\tADAM BURHANUDIN\t081234567890`;
+    const parsed = parseExcelStudentText(raw);
+    expect(parsed.length).toBe(1);
+    expect(parsed[0]).toEqual({
+      nim: "251011700310",
+      name: "ADAM BURHANUDIN",
+      phone: "6281234567890",
+    });
+  });
 });

@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     }));
 
     // 2. Fetch students
-    const studentsRes = await db.execute("SELECT id, nim, name, is_guest, course_ids FROM students ORDER BY name ASC");
+    const studentsRes = await db.execute("SELECT id, nim, name, phone, is_guest, course_ids FROM students ORDER BY name ASC");
     const students = studentsRes.rows.map((s) => {
       let courseIds = [];
       if (s.course_ids) {
@@ -44,6 +44,7 @@ export default async function handler(req, res) {
         id: s.id,
         nim: s.nim,
         name: s.name,
+        phone: s.phone || null,
         isGuest: Boolean(s.is_guest),
         courseIds: courseIds.length ? courseIds : undefined,
       };
