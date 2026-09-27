@@ -61,6 +61,60 @@ function normalizeNimAndName(rawNim, rawName) {
   return { nim, name };
 }
 
+function isLikelyPhoneString(str, norm) {
+  return (
+    Boolean(norm) &&
+    (str.includes("+") ||
+      str.startsWith("08") ||
+      str.startsWith("628") ||
+      str.startsWith("8"))
+  );
+}
+
+function extractPhoneAndParts(parts) {
+  let detectedPhone = null;
+  const nonPhoneParts = [];
+
+  for (const p of parts) {
+    const cleanP = stripQuotes(p);
+    const norm = normalizeWhatsAppNumber(cleanP);
+
+    if (!detectedPhone && cleanP.length <= 16 && isLikelyPhoneString(cleanP, norm)) {
+      detectedPhone = norm;
+    } else {
+      nonPhoneParts.push(cleanP);
+    }
+  }
+
+  if (nonPhoneParts.length >= 3 && /^\d{1,3}$/.test(nonPhoneParts[0])) {
+    nonPhoneParts.shift();
+  }
+
+  return { detectedPhone, nonPhoneParts };
+}
+
+function parseSingleLine(line) {
+  const trimmed = line.trim();
+  if (!trimmed) return null;
+
+  const parts = splitLineToParts(trimmed);
+  if (parts.length < 2) return null;
+
+  const { detectedPhone, nonPhoneParts } = extractPhoneAndParts(parts);
+  if (nonPhoneParts.length < 2) return null;
+
+  const { nim, name } = normalizeNimAndName(nonPhoneParts[0], nonPhoneParts.slice(1).join(" "));
+  if (isHeaderRow(nim, name) || !nim || !name) {
+    return null;
+  }
+
+  const student = { nim, name };
+  if (detectedPhone) {
+    student.phone = detectedPhone;
+  }
+  return student;
+}
+
 export function parseExcelStudentText(rawText) {
   const text = (rawText || "").trim();
   if (!text) return [];
@@ -70,48 +124,9 @@ export function parseExcelStudentText(rawText) {
   const seenNims = new Set();
 
   for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const parts = splitLineToParts(trimmed);
-    if (parts.length < 2) continue;
-
-    // Detect if one of parts is a phone number
-    let detectedPhone = null;
-    const nonPhoneParts = [];
-
-    for (const p of parts) {
-      const cleanP = stripQuotes(p);
-      const norm = normalizeWhatsAppNumber(cleanP);
-      const isLikelyPhone =
-        norm &&
-        (cleanP.includes("+") ||
-          cleanP.startsWith("08") ||
-          cleanP.startsWith("628") ||
-          cleanP.startsWith("8"));
-
-      if (!detectedPhone && isLikelyPhone && cleanP.length <= 16) {
-        detectedPhone = norm;
-      } else {
-        nonPhoneParts.push(cleanP);
-      }
-    }
-
-    // If first column is just a row index number (e.g. 1, 2, 3...) and more columns follow
-    if (nonPhoneParts.length >= 3 && /^\d{1,3}$/.test(nonPhoneParts[0])) {
-      nonPhoneParts.shift();
-    }
-
-    if (nonPhoneParts.length < 2) continue;
-
-    const { nim, name } = normalizeNimAndName(nonPhoneParts[0], nonPhoneParts.slice(1).join(" "));
-
-    if (!isHeaderRow(nim, name) && nim && name && !seenNims.has(nim)) {
-      seenNims.add(nim);
-      const student = { nim, name };
-      if (detectedPhone) {
-        student.phone = detectedPhone;
-      }
+    const student = parseSingleLine(line);
+    if (student && !seenNims.has(student.nim)) {
+      seenNims.add(student.nim);
       results.push(student);
     }
   }

@@ -65,7 +65,7 @@ async function fetchStudents() {
       students.value = json.data;
     }
   } catch (err) {
-    emit("toast", "Gagal memuat data mahasiswa.", "error");
+    emit("toast", err.message || "Gagal memuat data mahasiswa.", "error");
   } finally {
     loading.value = false;
   }
@@ -531,21 +531,23 @@ onMounted(async () => {
               Pilih Mata Kuliah yang Diambil:
             </p>
             <div class="max-h-40 overflow-y-auto space-y-1.5">
-              <div
+              <label
                 v-for="c in courses"
                 :key="c.id"
+                :for="`course-select-${c.id}`"
                 class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 p-1.5 rounded-lg"
-                @click="toggleCourseSelection(c.id)"
               >
                 <input
+                  :id="`course-select-${c.id}`"
                   type="checkbox"
                   :checked="form.courseIds.includes(c.id)"
-                  class="rounded border-slate-300 text-blue-600"
+                  @change="toggleCourseSelection(c.id)"
+                  class="rounded border-slate-300 text-blue-600 cursor-pointer"
                 />
                 <span class="text-[11px] text-slate-700 dark:text-slate-200 font-medium">
                   {{ c.name }}
                 </span>
-              </div>
+              </label>
             </div>
           </div>
 
