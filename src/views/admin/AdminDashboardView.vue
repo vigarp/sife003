@@ -4,12 +4,16 @@ import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
 import { useSchedule } from "@/composables/useSchedule";
+import AdminStudentsManager from "@/components/admin/AdminStudentsManager.vue";
+import AdminCoursesManager from "@/components/admin/AdminCoursesManager.vue";
 import scheduleData from "@/data/schedule.json";
 
 const router = useRouter();
 const { user, isAuthenticated, logout, changePassword } = useAdminAuth();
 const { agendas, loading, fetchAgendas, createAgenda, updateAgenda, deleteAgenda } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
+
+const activeAdminTab = ref("agenda"); // 'agenda' | 'students' | 'courses'
 
 // Compute active week number
 const activeWeekNumber = computed(() => {
@@ -293,8 +297,58 @@ onMounted(async () => {
       <button @click="toast.show = false" class="text-xs font-bold opacity-75 hover:opacity-100 cursor-pointer">✕</button>
     </div>
 
-    <!-- Management Controls & Filters -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <!-- Admin Navigation Tabs -->
+    <div class="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 w-fit text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
+      <button
+        @click="activeAdminTab = 'agenda'"
+        :class="[
+          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+          activeAdminTab === 'agenda'
+            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <span>Agenda & Tugas</span>
+      </button>
+
+      <button
+        @click="activeAdminTab = 'students'"
+        :class="[
+          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+          activeAdminTab === 'students'
+            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <span>Data Mahasiswa</span>
+      </button>
+
+      <button
+        @click="activeAdminTab = 'courses'"
+        :class="[
+          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+          activeAdminTab === 'courses'
+            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        <span>Mata Kuliah</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: AGENDA & TUGAS -->
+    <div v-if="activeAdminTab === 'agenda'" class="space-y-6">
+      <!-- Management Controls & Filters -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl w-fit">
         <button
           @click="handleFilterChange('active')"
@@ -430,6 +484,19 @@ onMounted(async () => {
         </table>
       </div>
     </div>
+    </div>
+
+    <!-- TAB 2: DATA MAHASISWA -->
+    <AdminStudentsManager
+      v-else-if="activeAdminTab === 'students'"
+      @toast="showToast"
+    />
+
+    <!-- TAB 3: MATA KULIAH -->
+    <AdminCoursesManager
+      v-else-if="activeAdminTab === 'courses'"
+      @toast="showToast"
+    />
 
     <!-- MODAL TAMBAH / EDIT AGENDA -->
     <div

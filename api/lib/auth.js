@@ -16,17 +16,28 @@ export function generateToken(user) {
   );
 }
 
-export function verifyToken(req) {
-  const authHeader = req.headers?.authorization || req.headers?.Authorization;
-  if (!authHeader || typeof authHeader !== "string") {
+export function verifyToken(reqOrToken) {
+  if (!reqOrToken) return null;
+
+  let rawToken = reqOrToken;
+  if (typeof reqOrToken === "object") {
+    const authHeader = reqOrToken.headers?.authorization || reqOrToken.headers?.Authorization;
+    if (!authHeader || typeof authHeader !== "string") {
+      return null;
+    }
+    const parts = authHeader.split(" ");
+    if (parts.length !== 2 || parts[0] !== "Bearer") {
+      return null;
+    }
+    rawToken = parts[1];
+  }
+
+  if (typeof rawToken !== "string") {
     return null;
   }
-  const parts = authHeader.split(" ");
-  if (parts.length !== 2 || parts[0] !== "Bearer") {
-    return null;
-  }
+
   try {
-    return jwt.verify(parts[1], JWT_SECRET);
+    return jwt.verify(rawToken, JWT_SECRET);
   } catch {
     return null;
   }
