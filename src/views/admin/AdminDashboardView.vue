@@ -6,6 +6,7 @@ import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
 import { useSchedule } from "@/composables/useSchedule";
 import AdminStudentsManager from "@/components/admin/AdminStudentsManager.vue";
 import AdminCoursesManager from "@/components/admin/AdminCoursesManager.vue";
+import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue";
 import scheduleData from "@/data/schedule.json";
 
 const router = useRouter();
@@ -13,7 +14,7 @@ const { user, isAuthenticated, logout, changePassword } = useAdminAuth();
 const { agendas, loading, fetchAgendas, createAgenda, updateAgenda, deleteAgenda } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
 
-const activeAdminTab = ref("agenda"); // 'agenda' | 'students' | 'courses'
+const activeAdminTab = ref("agenda"); // 'agenda' | 'students' | 'courses' | 'lecturers'
 
 // Compute active week number
 const activeWeekNumber = computed(() => {
@@ -343,6 +344,21 @@ onMounted(async () => {
         </svg>
         <span>Mata Kuliah</span>
       </button>
+
+      <button
+        @click="activeAdminTab = 'lecturers'"
+        :class="[
+          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+          activeAdminTab === 'lecturers'
+            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+        </svg>
+        <span>Data Dosen</span>
+      </button>
     </div>
 
     <!-- TAB 1: AGENDA & TUGAS -->
@@ -495,6 +511,12 @@ onMounted(async () => {
     <!-- TAB 3: MATA KULIAH -->
     <AdminCoursesManager
       v-else-if="activeAdminTab === 'courses'"
+      @toast="showToast"
+    />
+
+    <!-- TAB 4: DATA DOSEN -->
+    <AdminLecturersManager
+      v-else-if="activeAdminTab === 'lecturers'"
       @toast="showToast"
     />
 

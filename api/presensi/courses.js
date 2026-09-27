@@ -19,13 +19,24 @@ function authenticate(req) {
 }
 
 async function handleGet(res, db) {
-  const coursesRes = await db.execute("SELECT id, code, name, class_name, lecturer, time FROM courses ORDER BY name ASC");
+  const coursesRes = await db.execute(`
+    SELECT
+      c.id, c.code, c.name, c.class_name, c.lecturer_id,
+      COALESCE(l.name, c.lecturer) as lecturer,
+      l.phone as lecturer_phone,
+      c.time
+    FROM courses c
+    LEFT JOIN lecturers l ON c.lecturer_id = l.id
+    ORDER BY c.name ASC
+  `);
   const courses = coursesRes.rows.map((c) => ({
     id: c.id,
     code: c.code || "",
     name: c.name,
     className: c.class_name || "03SIFE003",
+    lecturerId: c.lecturer_id || null,
     lecturer: c.lecturer || "",
+    lecturerPhone: c.lecturer_phone || null,
     time: c.time || "",
   }));
   return res.status(200).json({ success: true, data: courses });
@@ -33,7 +44,7 @@ async function handleGet(res, db) {
 
 async function handlePost(req, res, db) {
   const body = parseBody(req);
-  const { code, name, className, lecturer, time } = body;
+  const { code, name, className, lecturer, lecturerId, time } = body;
 
   if (!name?.trim()) {
     return res.status(400).json({ success: false, message: "Nama mata kuliah wajib diisi." });
@@ -41,14 +52,15 @@ async function handlePost(req, res, db) {
 
   const id = body.id || `c-${Date.now()}-${Date.now().toString(36)}`;
   await db.execute({
-    sql: `INSERT INTO courses (id, code, name, class_name, lecturer, time)
-          VALUES (?, ?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO courses (id, code, name, class_name, lecturer, lecturer_id, time)
+          VALUES (?, ?, ?, ?, ?, ?, ?)`,
     args: [
       id,
       code ? code.trim() : null,
       name.trim(),
       className ? className.trim() : "03SIFE003",
       lecturer ? lecturer.trim() : null,
+      lecturerId ? lecturerId.trim() : null,
       time ? time.trim() : null,
     ],
   });
@@ -67,13 +79,14 @@ async function handlePut(req, res, db) {
     return res.status(400).json({ success: false, message: "ID mata kuliah wajib disertakan." });
   }
 
-  const { code, name, className, lecturer, time } = body;
+  const { code, name, className, lecturer, lecturerId, time } = body;
   await db.execute({
     sql: `UPDATE courses SET
             code = COALESCE(?, code),
             name = COALESCE(?, name),
             class_name = COALESCE(?, class_name),
             lecturer = COALESCE(?, lecturer),
+            lecturer_id = CASE WHEN ? = 1 THEN ? ELSE lecturer_id END,
             time = COALESCE(?, time)
           WHERE id = ?`,
     args: [
@@ -81,6 +94,8 @@ async function handlePut(req, res, db) {
       name !== undefined ? name?.trim() : null,
       className !== undefined ? className?.trim() : null,
       lecturer !== undefined ? lecturer?.trim() : null,
+      lecturerId !== undefined ? 1 : 0,
+      lecturerId ? lecturerId.trim() : null,
       time !== undefined ? time?.trim() : null,
       id,
     ],

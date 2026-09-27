@@ -32,6 +32,8 @@ function apiDevPlugin() {
             handlerModule = await import("./api/presensi/students.js");
           } else if (pathname === "/api/presensi/courses") {
             handlerModule = await import("./api/presensi/courses.js");
+          } else if (pathname === "/api/presensi/lecturers") {
+            handlerModule = await import("./api/presensi/lecturers.js");
           }
 
           if (!handlerModule) {

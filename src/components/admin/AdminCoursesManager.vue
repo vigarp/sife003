@@ -1,11 +1,17 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
 import { useAdminAuth } from "@/composables/useAdminAuth";
+import {
+  normalizeWhatsAppNumber,
+  formatPhoneDisplay,
+  getWhatsAppLink,
+} from "@/utils/phoneUtils";
 
 const emit = defineEmits(["toast"]);
 const { token } = useAdminAuth();
 
 const courses = ref([]);
+const lecturers = ref([]);
 const loading = ref(false);
 
 // Modal state
@@ -18,6 +24,7 @@ const form = reactive({
   code: "",
   name: "",
   className: "03SIFE003",
+  lecturerId: "",
   lecturer: "",
   time: "",
 });
@@ -37,12 +44,34 @@ async function fetchCourses() {
   }
 }
 
+async function fetchLecturers() {
+  try {
+    const res = await fetch("/api/presensi/lecturers");
+    const json = await res.json();
+    if (json.success) {
+      lecturers.value = json.data;
+    }
+  } catch (err) {
+    console.error("Gagal memuat data dosen:", err);
+  }
+}
+
+function handleLecturerChange(e) {
+  const val = e.target.value;
+  form.lecturerId = val;
+  const found = lecturers.value.find((l) => l.id === val);
+  if (found) {
+    form.lecturer = found.name;
+  }
+}
+
 function openCreateModal() {
   isEditing.value = false;
   editingId.value = null;
   form.code = "";
   form.name = "";
   form.className = "03SIFE003";
+  form.lecturerId = "";
   form.lecturer = "";
   form.time = "";
   isModalOpen.value = true;
@@ -54,6 +83,7 @@ function openEditModal(c) {
   form.code = c.code || "";
   form.name = c.name;
   form.className = c.className || "03SIFE003";
+  form.lecturerId = c.lecturerId || "";
   form.lecturer = c.lecturer || "";
   form.time = c.time || "";
   isModalOpen.value = true;
@@ -71,6 +101,7 @@ async function handleSubmit() {
       code: form.code.trim(),
       name: form.name.trim(),
       className: form.className.trim(),
+      lecturerId: form.lecturerId || null,
       lecturer: form.lecturer.trim(),
       time: form.time.trim(),
     };
@@ -127,8 +158,8 @@ async function handleDelete(c) {
   }
 }
 
-onMounted(() => {
-  fetchCourses();
+onMounted(async () => {
+  await Promise.all([fetchCourses(), fetchLecturers()]);
 });
 </script>
 
@@ -197,7 +228,20 @@ onMounted(() => {
                 <div class="text-[10px] text-slate-400 font-normal">Kelas: {{ c.className }}</div>
               </td>
               <td class="p-4 text-slate-700 dark:text-slate-300 font-medium">
-                {{ c.lecturer || "-" }}
+                <div>{{ c.lecturer || "-" }}</div>
+                <a
+                  v-if="c.lecturerPhone"
+                  :href="getWhatsAppLink(c.lecturerPhone)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 mt-1 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 hover:underline"
+                  title="Chat WhatsApp Dosen Pengampu"
+                >
+                  <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm.01 1.67c4.55 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.83a8.176 8.176 0 01-5.82 2.41c-1.42 0-2.82-.37-4.06-1.07l-.29-.17-3.02.79.81-2.95-.19-.3a8.188 8.188 0 01-1.25-4.54c0-4.55 3.7-8.24 8.24-8.24zm4.51 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.98-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.01-1.24-.74-.66-1.25-1.48-1.39-1.73-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.45.06-.68.32-.23.25-.89.87-.89 2.12s.91 2.46 1.04 2.63c.13.17 1.79 2.73 4.33 3.83.61.26 1.08.42 1.45.54.61.19 1.16.17 1.6.1.49-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.22-.19-.47-.32z"/>
+                  </svg>
+                  <span>wa.me/+{{ normalizeWhatsAppNumber(c.lecturerPhone) }}</span>
+                </a>
               </td>
               <td class="p-4 text-slate-600 dark:text-slate-400">
                 {{ c.time || "-" }}
@@ -272,8 +316,23 @@ onMounted(() => {
           </div>
 
           <div>
-            <label for="course-lecturer-input" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Dosen Pengampu
+            <label for="course-lecturer-select" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Pilih Dosen Pengampu (Master Dosen)
+            </label>
+            <select
+              id="course-lecturer-select"
+              v-model="form.lecturerId"
+              @change="handleLecturerChange"
+              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white mb-2"
+            >
+              <option value="">-- Pilih dari Master Dosen (atau ketik manual di bawah) --</option>
+              <option v-for="l in lecturers" :key="l.id" :value="l.id">
+                {{ l.name }} {{ l.phone ? '(WA: ' + formatPhoneDisplay(l.phone) + ')' : '' }}
+              </option>
+            </select>
+
+            <label for="course-lecturer-input" class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+              Nama Dosen Pengampu
             </label>
             <input
               id="course-lecturer-input"

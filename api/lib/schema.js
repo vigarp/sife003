@@ -54,16 +54,34 @@ async function createTables(db) {
   }
 
   await db.execute(`
+    CREATE TABLE IF NOT EXISTS lecturers (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      phone TEXT DEFAULT NULL,
+      email TEXT DEFAULT NULL,
+      note TEXT DEFAULT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS courses (
       id TEXT PRIMARY KEY,
       code TEXT,
       name TEXT NOT NULL,
       class_name TEXT DEFAULT '03SIFE003',
       lecturer TEXT,
+      lecturer_id TEXT DEFAULT NULL,
       time TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  try {
+    await db.execute("ALTER TABLE courses ADD COLUMN lecturer_id TEXT DEFAULT NULL");
+  } catch (err) {
+    // Column may already exist in existing database tables
+  }
 
   await db.execute(`
     CREATE TABLE IF NOT EXISTS attendance_sessions (
@@ -172,6 +190,35 @@ async function seedInitialData(db) {
   }
 }
 
+async function seedLecturers(db) {
+  const countRes = await db.execute("SELECT COUNT(*) as count FROM lecturers");
+  const count = countRes.rows[0]?.count ?? 0;
+  if (count > 0) return;
+
+  const coursesRes = await db.execute("SELECT id, lecturer FROM courses WHERE lecturer IS NOT NULL AND lecturer != ''");
+  const seenLecturers = new Map();
+
+  for (const c of coursesRes.rows) {
+    const rawName = String(c.lecturer).trim();
+    if (!rawName) continue;
+
+    let lecturerId = seenLecturers.get(rawName);
+    if (!lecturerId) {
+      lecturerId = `d-${Date.now()}-${seenLecturers.size + 1}`;
+      await db.execute({
+        sql: `INSERT OR IGNORE INTO lecturers (id, name, phone) VALUES (?, ?, NULL)`,
+        args: [lecturerId, rawName],
+      });
+      seenLecturers.set(rawName, lecturerId);
+    }
+
+    await db.execute({
+      sql: `UPDATE courses SET lecturer_id = ? WHERE id = ? AND lecturer_id IS NULL`,
+      args: [lecturerId, c.id],
+    });
+  }
+}
+
 export async function ensureSchema() {
   if (initialized) return;
 
@@ -179,6 +226,7 @@ export async function ensureSchema() {
   await createTables(db);
   await ensureAdminUser(db);
   await seedInitialData(db);
+  await seedLecturers(db);
 
   initialized = true;
 }
