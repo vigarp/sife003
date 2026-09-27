@@ -9,7 +9,7 @@ import scheduleData from "@/data/schedule.json";
 const router = useRouter();
 const { user, isAuthenticated, logout, changePassword } = useAdminAuth();
 const { agendas, loading, fetchAgendas, createAgenda, updateAgenda, deleteAgenda } = useAgenda();
-const { currentWeek } = useSchedule();
+const { currentWeek, activeWeekStatus } = useSchedule();
 
 // Compute active week number
 const activeWeekNumber = computed(() => {
@@ -20,6 +20,11 @@ const activeWeekNumber = computed(() => {
   };
   return romanMap[roman] || 5;
 });
+
+const isUpcoming = computed(() => activeWeekStatus.value === "upcoming");
+const activeWeekBadgeText = computed(() =>
+  isUpcoming.value ? "(Upcoming)" : "(Ongoing)"
+);
 
 // Filter state: 'active' or 'all'
 const selectedFilter = ref("active");
@@ -51,7 +56,7 @@ const submitting = ref(false);
 
 const form = reactive({
   pekan: 5,
-  pertemuan: 4,
+  pertemuan: null,
   mata_kuliah: masterMatkulList[0] || "Analisa Proses Bisnis",
   judul: "",
   keterangan: "",
@@ -74,7 +79,7 @@ function openCreateModal() {
   isEditing.value = false;
   editingId.value = null;
   form.pekan = activeWeekNumber.value;
-  form.pertemuan = 4;
+  form.pertemuan = null;
   form.mata_kuliah = masterMatkulList[0];
   form.judul = "";
   form.keterangan = "";
@@ -88,7 +93,7 @@ function openEditModal(item) {
   isEditing.value = true;
   editingId.value = item.id;
   form.pekan = item.pekan;
-  form.pertemuan = item.pertemuan || 4;
+  form.pertemuan = item.pertemuan ?? null;
   form.mata_kuliah = item.mata_kuliah;
   form.judul = item.judul;
   form.keterangan = item.keterangan || "";
@@ -130,7 +135,10 @@ async function handleSubmit() {
   try {
     const payload = {
       pekan: Number.parseInt(form.pekan, 10),
-      pertemuan: Number.parseInt(form.pertemuan, 10),
+      pertemuan:
+        form.pertemuan !== null && form.pertemuan !== "" && !Number.isNaN(Number(form.pertemuan))
+          ? Number.parseInt(form.pertemuan, 10)
+          : null,
       mata_kuliah: form.mata_kuliah.trim(),
       judul: form.judul.trim(),
       keterangan: form.keterangan.trim(),
@@ -287,7 +295,7 @@ onMounted(async () => {
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
           ]"
         >
-          Pekan Berjalan (Pekan {{ activeWeekNumber }})
+          Pekan {{ activeWeekNumber }} {{ activeWeekBadgeText }}
         </button>
         <button
           @click="handleFilterChange('all')"
@@ -451,14 +459,14 @@ onMounted(async () => {
                 class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
               >
                 <option v-for="w in 16" :key="w" :value="w">
-                  Pekan {{ w }} {{ w === activeWeekNumber ? '(Pekan Ini)' : '' }}
+                  Pekan {{ w }} {{ w === activeWeekNumber ? activeWeekBadgeText : '' }}
                 </option>
               </select>
             </div>
 
             <div>
               <label for="agenda-pertemuan" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Pertemuan Ke-
+                Pertemuan Ke- <span class="font-normal text-slate-400 dark:text-slate-500">(Opsional)</span>
               </label>
               <input
                 id="agenda-pertemuan"
@@ -466,7 +474,7 @@ onMounted(async () => {
                 type="number"
                 min="1"
                 max="16"
-                placeholder="4"
+                placeholder="Contoh: 4 (Opsional)"
                 class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               />
             </div>

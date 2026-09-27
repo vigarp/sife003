@@ -36,7 +36,7 @@ async function handlePost(req, res, db, user) {
   const body = parseBody(req);
   const {
     pekan,
-    pertemuan = 4,
+    pertemuan = null,
     mata_kuliah,
     judul,
     keterangan = "",
@@ -52,12 +52,17 @@ async function handlePost(req, res, db, user) {
     });
   }
 
+  const parsedPertemuan =
+    pertemuan !== undefined && pertemuan !== null && pertemuan !== ""
+      ? Number.parseInt(pertemuan, 10)
+      : null;
+
   const result = await db.execute({
     sql: `INSERT INTO agenda (pekan, pertemuan, mata_kuliah, judul, keterangan, tipe_deadline, tanggal, jam, created_by)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [
       Number.parseInt(pekan, 10),
-      Number.parseInt(pertemuan, 10) || 4,
+      parsedPertemuan,
       mata_kuliah.trim(),
       judul.trim(),
       keterangan ? keterangan.trim() : null,
@@ -100,10 +105,15 @@ async function handlePut(req, res, db) {
     is_completed,
   } = body;
 
+  const parsedPertemuan =
+    pertemuan !== undefined && pertemuan !== null && pertemuan !== ""
+      ? Number.parseInt(pertemuan, 10)
+      : null;
+
   await db.execute({
     sql: `UPDATE agenda SET
             pekan = COALESCE(?, pekan),
-            pertemuan = COALESCE(?, pertemuan),
+            pertemuan = ?,
             mata_kuliah = COALESCE(?, mata_kuliah),
             judul = COALESCE(?, judul),
             keterangan = COALESCE(?, keterangan),
@@ -115,7 +125,7 @@ async function handlePut(req, res, db) {
           WHERE id = ?`,
     args: [
       pekan ? Number.parseInt(pekan, 10) : null,
-      pertemuan ? Number.parseInt(pertemuan, 10) : null,
+      parsedPertemuan,
       mata_kuliah ? mata_kuliah.trim() : null,
       judul ? judul.trim() : null,
       keterangan !== undefined ? keterangan : null,

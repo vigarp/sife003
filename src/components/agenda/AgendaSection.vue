@@ -64,7 +64,7 @@ onMounted(() => {
           </span>
         </div>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          {{ isUpcoming ? 'Target tugas yang akan dimulai pada Senin–Jumat pekan ini' : 'Target tugas yang harus diselesaikan pada Senin–Jumat pekan ini' }}
+          {{ isUpcoming ? 'Target tugas yang akan dimulai pada pekan nanti' : 'Target tugas yang harus diselesaikan pada pekan ini' }}
         </p>
       </div>
 

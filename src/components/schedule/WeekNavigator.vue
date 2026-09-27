@@ -4,6 +4,7 @@ import { useSchedule } from "@/composables/useSchedule";
 const {
   allWeeks,
   activeWeekIndex,
+  activeWeekStatus,
   viewedWeekIndex,
   isCurrentWeek,
   isPastWeek,
@@ -54,7 +55,7 @@ const {
           :key="idx"
           :value="idx"
         >
-          Pekan {{ pekan.pekan }} ({{ pekan.tanggal_daring }}){{ idx === activeWeekIndex ? ' • Aktif' : '' }}
+          Pekan {{ pekan.pekan }} ({{ pekan.tanggal_daring }}){{ idx === activeWeekIndex ? (activeWeekStatus === 'upcoming' ? ' • Upcoming' : ' • Aktif') : '' }}
         </option>
       </select>
       <div
