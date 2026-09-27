@@ -1,0 +1,477 @@
+{
+  "version": 1,
+  "exportedAt": "2026-09-27T08:58:51.881Z",
+  "mainStudents": [
+    {
+      "id": "s-1788702695905-lzsb",
+      "nim": "251011700310",
+      "name": "ADAM BURHANUDIN LUBIS",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695906-l7n7",
+      "nim": "251011700333",
+      "name": "AHMAD SANDI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695907-ujak",
+      "nim": "251011700334",
+      "name": "ALI SOPYAN",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695908-0zlv",
+      "nim": "251011700304",
+      "name": "ANDINE NOVIA AZIZAH",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695909-ypwl",
+      "nim": "251011700382",
+      "name": "APRILIAN DWI PUTRANTO",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695910-4th7",
+      "nim": "251011700269",
+      "name": "ARYO DEAN PRADANA SAPUTRA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695911-cit2",
+      "nim": "251011701202",
+      "name": "BELFRIANTO WAU",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695912-9ah4",
+      "nim": "251011700340",
+      "name": "BINTANG ADITYA NUGRAHA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695913-layt",
+      "nim": "251011700350",
+      "name": "BREGAS WAHYU ADI PUTRA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695914-ikky",
+      "nim": "251011700296",
+      "name": "DECKY PRAMUDIA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695915-0u0q",
+      "nim": "251011701172",
+      "name": "DIKI CANDRA MAULANA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695916-skt4",
+      "nim": "251011700224",
+      "name": "DINI RAHMAWATI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695917-3mqg",
+      "nim": "251011700329",
+      "name": "DIO NOFRIANSYAH PUTRA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695918-hkxh",
+      "nim": "251011700263",
+      "name": "DZAKY RIZKY RAMADHAN",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695919-5vio",
+      "nim": "251011700832",
+      "name": "EKA PRASETYO FADLI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695920-x628",
+      "nim": "251011700001",
+      "name": "FARRAS DEHYA AL-QALBI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695921-l3y5",
+      "nim": "251011701272",
+      "name": "FAZRIAH AULIA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695922-cno2",
+      "nim": "251011700245",
+      "name": "ICA MADINAH",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695924-p7ec",
+      "nim": "251011700008",
+      "name": "ILHAM PANGESTU",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695925-0mrt",
+      "nim": "251011700232",
+      "name": "ISMAM FARIS WIJAYANTO",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695926-e6s8",
+      "nim": "251011700281",
+      "name": "KATFAH FARELIL DEVISAH",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695927-qyh4",
+      "nim": "251011700292",
+      "name": "LULU DEWI AGUSTINA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695928-urwk",
+      "nim": "251011700235",
+      "name": "MIPTAH",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695929-7son",
+      "nim": "251011700870",
+      "name": "MITA LISTIANA LESTARI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695930-syky",
+      "nim": "251011700291",
+      "name": "MUHAMMAD FARREL ALIBY",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695931-5qvv",
+      "nim": "251011700365",
+      "name": "MUHAMMAD MUNIR",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695932-b07r",
+      "nim": "251011700826",
+      "name": "MUHAMMAD RIZKY",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695933-7zka",
+      "nim": "251011700331",
+      "name": "MUHAMMAD SAVERO PUTRA RAHMAN",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695934-qhsf",
+      "nim": "251011700266",
+      "name": "NAUFAL ALVINO RAKHA DIANTO",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695935-jsfo",
+      "nim": "251011700182",
+      "name": "RAHMAHDIANTY SAKINAH",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695936-h4t7",
+      "nim": "251011700066",
+      "name": "RAKHA RESTU RAVINOLDI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695937-3ysq",
+      "nim": "251011700836",
+      "name": "RIO OKTAVIABERD",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695938-mj2e",
+      "nim": "251011701083",
+      "name": "RONA FITRIYANI",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695939-kkz3",
+      "nim": "251011700389",
+      "name": "SHELY ROSTIA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695940-l9ka",
+      "nim": "251011701263",
+      "name": "SITI YULIA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695941-klum",
+      "nim": "251011700247",
+      "name": "SYAHRIL SOBIRIN",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702695942-xdae",
+      "nim": "251011700088",
+      "name": "VIGAR RIVAI PUTRA",
+      "isGuest": false
+    },
+    {
+      "id": "s-1788702731056-qgnb",
+      "nim": "221011700278",
+      "name": "RIFALDI RAMADAN",
+      "courseIds": [
+        "c-1788702657632-wn2s"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788702763368-mecj",
+      "nim": "221011700096",
+      "name": "AFRIZAL",
+      "courseIds": [
+        "c-1788702657633-et6x"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788702813678-7nlt",
+      "nim": "221011700649",
+      "name": "MUHAMMAD ILHAM",
+      "courseIds": [
+        "c-1788702657633-et6x"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788792969496-xycr",
+      "nim": "231011701090",
+      "name": "CAMELIA FAJARYANI",
+      "courseIds": [
+        "c-1788702657635-cvt1"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788793101310-oyq3",
+      "nim": "211011750082",
+      "name": "MUHAMMAD RIZAL DIMAS PRAMANA",
+      "courseIds": [
+        "c-1788702657637-zokh"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788793170424-b14e",
+      "nim": "231011701008",
+      "name": "MOCHAMAD FADHLI",
+      "courseIds": [
+        "c-1788702657639-w5b3"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788793295834-2mxf",
+      "nim": "221011700278",
+      "name": "RIFALDI RAMADAN",
+      "courseIds": [
+        "c-1788702657632-wn2s"
+      ],
+      "isGuest": true
+    },
+    {
+      "id": "s-1788793402130-fxsf",
+      "nim": "221011700683",
+      "name": "AKMALUDDIN DIANDI",
+      "courseIds": [
+        "c-1788702657638-7496"
+      ],
+      "isGuest": true
+    }
+  ],
+  "courses": [
+    {
+      "id": "c-1788702657631-wmm5",
+      "name": "PEMROGRAMAN BERORIENTASI OBYEK (JAVA I)",
+      "code": "22SIF0103",
+      "className": "03SIFE003",
+      "lecturer": "ABDURRAHMAN HARITS, S.Kom., M.Kom.",
+      "time": "Sabtu, 07.40 - 09.20",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657632-wn2s",
+      "name": "REKAYASA WEB",
+      "code": "22SIF0132",
+      "className": "03SIFE003",
+      "lecturer": "AFIF EFENDI, S.Kom., M.Kom.",
+      "time": "Sabtu, 09.20 - 11.00",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657633-et6x",
+      "name": "DESIGN GRAFIS",
+      "code": "22SIF0123",
+      "className": "03SIFE003",
+      "lecturer": "ANANDA SYARIF HIDAYATULLAH, S,Kom., M.Kom.",
+      "time": "Sabtu, 11.00 - 13.50",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657634-0f84",
+      "name": "ANALISA PROSES BISNIS",
+      "code": "22SIF0112",
+      "className": "03SIFE003",
+      "lecturer": "FINGKI MARWATI, S.Kom., M.Kom.",
+      "time": "Sabtu, 13.50 - 15.30",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657635-cvt1",
+      "name": "ARSITEKTUR DAN INFRASTRUKTUR IT",
+      "code": "22SIF0142",
+      "className": "03SIFE003",
+      "lecturer": "GHEMA NUSA PERSADA, S. Kom., S. Pd., M. TI",
+      "time": "Sabtu, 07.40 - 09.20",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657636-du4h",
+      "name": "PENGANTAR BIG DATA",
+      "code": "22SIF0152",
+      "className": "03SIFE003",
+      "lecturer": "IR AGUS SUHARTO, M.KOM",
+      "time": "Sabtu, 09.20 - 11.00",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657637-zokh",
+      "name": "ALJABAR LINIER DAN MATRIKS",
+      "code": "22ILK0042",
+      "className": "03SIFE003",
+      "lecturer": "CHRISTIEN ROZALI, S.Si., M.Kom.",
+      "time": "Sabtu, 11.00 - 13.50",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657638-7496",
+      "name": "KOMUNIKASI DATA",
+      "code": "22SIF0162",
+      "className": "03SIFE003",
+      "lecturer": "ANDRI FAHMI, S.Kom., M.Kom.",
+      "time": "Sabtu, 13.50 - 15.30",
+      "customStudents": []
+    },
+    {
+      "id": "c-1788702657639-w5b3",
+      "name": "PENGANTAR EKONOMI, MANAJEMEN & BISNIS",
+      "code": "22SIF0092",
+      "className": "03SIFE003",
+      "lecturer": "MUHAMMAD IKHWAN BAYU HANDONO, S.T., M.Kom.",
+      "time": "Sabtu, 16.00 - 17.40",
+      "customStudents": []
+    }
+  ],
+  "sessions": [
+    {
+      "id": "c-1788702657632-wn2s_2026-09-26",
+      "courseId": "c-1788702657632-wn2s",
+      "date": "2026-09-26",
+      "records": {
+        "s-1788702695905-lzsb": "present",
+        "s-1788702695906-l7n7": "present",
+        "s-1788702695907-ujak": "permit",
+        "s-1788702695908-0zlv": "present",
+        "s-1788702695909-ypwl": "absent",
+        "s-1788702695910-4th7": "present",
+        "s-1788702695911-cit2": "present",
+        "s-1788702695912-9ah4": "absent",
+        "s-1788702695913-layt": "absent",
+        "s-1788702695914-ikky": "present",
+        "s-1788702695915-0u0q": "absent",
+        "s-1788702695916-skt4": "present",
+        "s-1788702695917-3mqg": "absent",
+        "s-1788702695918-hkxh": "present",
+        "s-1788702695919-5vio": "present",
+        "s-1788702695920-x628": "present",
+        "s-1788702695921-l3y5": "present",
+        "s-1788702695922-cno2": "present",
+        "s-1788702695924-p7ec": "present",
+        "s-1788702695925-0mrt": "absent",
+        "s-1788702695926-e6s8": "present",
+        "s-1788702695927-qyh4": "present",
+        "s-1788702695928-urwk": "present",
+        "s-1788702695929-7son": "present",
+        "s-1788702695930-syky": "present",
+        "s-1788702695931-5qvv": "absent",
+        "s-1788702695932-b07r": "permit",
+        "s-1788702695933-7zka": "present",
+        "s-1788702695934-qhsf": "present",
+        "s-1788702695935-jsfo": "present",
+        "s-1788702695936-h4t7": "absent",
+        "s-1788702695937-3ysq": "present",
+        "s-1788702695938-mj2e": "present",
+        "s-1788702695939-kkz3": "absent",
+        "s-1788702695940-l9ka": "present",
+        "s-1788702695941-klum": "present",
+        "s-1788702695942-xdae": "present",
+        "s-1788702731056-qgnb": "present"
+      },
+      "updatedAt": 1790389707953
+    },
+    {
+      "id": "c-1788702657634-0f84_2026-09-05",
+      "courseId": "c-1788702657634-0f84",
+      "date": "2026-09-05",
+      "meetingNo": 1,
+      "records": {
+        "s-1788702695905-lzsb": "present",
+        "s-1788702695906-l7n7": "present",
+        "s-1788702695907-ujak": "absent",
+        "s-1788702695908-0zlv": "present",
+        "s-1788702695909-ypwl": "present",
+        "s-1788702695910-4th7": "present",
+        "s-1788702695911-cit2": "present",
+        "s-1788702695912-9ah4": "present",
+        "s-1788702695913-layt": "absent",
+        "s-1788702695914-ikky": "present",
+        "s-1788702695915-0u0q": "present",
+        "s-1788702695916-skt4": "present",
+        "s-1788702695917-3mqg": "present",
+        "s-1788702695918-hkxh": "present",
+        "s-1788702695919-5vio": "present",
+        "s-1788702695920-x628": "present",
+        "s-1788702695921-l3y5": "present",
+        "s-1788702695922-cno2": "present",
+        "s-1788702695924-p7ec": "present",
+        "s-1788702695925-0mrt": "present",
+        "s-1788702695926-e6s8": "present",
+        "s-1788702695927-qyh4": "present",
+        "s-1788702695928-urwk": "present",
+        "s-1788702695929-7son": "present",
+        "s-1788702695930-syky": "present",
+        "s-1788702695931-5qvv": "present",
+        "s-1788702695932-b07r": "present",
+        "s-1788702695933-7zka": "absent",
+        "s-1788702695934-qhsf": "present",
+        "s-1788702695935-jsfo": "present",
+        "s-1788702695936-h4t7": "present",
+        "s-1788702695937-3ysq": "present",
+        "s-1788702695938-mj2e": "present",
+        "s-1788702695939-kkz3": "present",
+        "s-1788702695940-l9ka": "present",
+        "s-1788702695941-klum": "permit",
+        "s-1788702695942-xdae": "present"
+      },
+      "updatedAt": 1788793533187
+    }
+  ]
+}

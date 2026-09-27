@@ -1,0 +1,42 @@
+{
+  "name": "Portal 03SIFE003 & m-hadir Presensi",
+  "short_name": "03SIFE003",
+  "description": "Portal Kelas & Presensi Cepat Mahasiswa 03SIFE003 UNPAM",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "m-hadir Presensi",
+      "short_name": "m-hadir",
+      "description": "Buka Presensi Kelas Offline KM",
+      "url": "/pengurus/presensi",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Jadwal & Agenda",
+      "short_name": "Jadwal",
+      "description": "Lihat Jadwal Kuliah & Tugas",
+      "url": "/"
+    }
+  ]
+}

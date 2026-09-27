@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 import AdminLoginView from "@/views/admin/AdminLoginView.vue";
 import AdminDashboardView from "@/views/admin/AdminDashboardView.vue";
+import AttendanceView from "@/views/admin/AttendanceView.vue";
 
 const routes = [
   {
@@ -23,6 +24,15 @@ const routes = [
     meta: {
       requiresAuth: true,
       title: "Zona Pengurus - 03SIFE003",
+    },
+  },
+  {
+    path: "/pengurus/presensi",
+    name: "admin-attendance",
+    component: AttendanceView,
+    meta: {
+      requiresAuth: true,
+      title: "m-hadir Presensi - 03SIFE003",
     },
   },
   {

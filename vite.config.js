@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 
 function apiDevPlugin() {
@@ -24,6 +24,12 @@ function apiDevPlugin() {
             handlerModule = await import("./api/auth/me.js");
           } else if (pathname === "/api/auth/change-password") {
             handlerModule = await import("./api/auth/change-password.js");
+          } else if (pathname === "/api/presensi") {
+            handlerModule = await import("./api/presensi/index.js");
+          } else if (pathname === "/api/presensi/sync") {
+            handlerModule = await import("./api/presensi/sync.js");
+          } else if (pathname === "/api/presensi/students") {
+            handlerModule = await import("./api/presensi/students.js");
           }
 
           if (!handlerModule) {
@@ -75,15 +81,20 @@ function apiDevPlugin() {
   };
 }
 
-export default defineConfig({
-  plugins: [vue(), apiDevPlugin()],
-  resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  Object.assign(process.env, env);
+
+  return {
+    plugins: [vue(), apiDevPlugin()],
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      },
     },
-  },
-  test: {
-    environment: "happy-dom",
-    globals: true,
-  },
+    test: {
+      environment: "happy-dom",
+      globals: true,
+    },
+  };
 });

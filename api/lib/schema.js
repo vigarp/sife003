@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { getDb } from "./db.js";
 import { hashPassword } from "./auth.js";
 
@@ -39,6 +41,59 @@ export async function ensureSchema() {
     );
   `);
 
+  // Create students table
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS students (
+      id TEXT PRIMARY KEY,
+      nim TEXT NOT NULL UNIQUE,
+      name TEXT NOT NULL,
+      is_guest INTEGER DEFAULT 0,
+      course_ids TEXT DEFAULT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Create courses table
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS courses (
+      id TEXT PRIMARY KEY,
+      code TEXT,
+      name TEXT NOT NULL,
+      class_name TEXT DEFAULT '03SIFE003',
+      lecturer TEXT,
+      time TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Create attendance_sessions table
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS attendance_sessions (
+      id TEXT PRIMARY KEY,
+      course_id TEXT NOT NULL,
+      date TEXT NOT NULL,
+      meeting_no INTEGER,
+      note TEXT,
+      created_by TEXT DEFAULT 'Pengurus',
+      updated_at INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Create attendance_records table
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS attendance_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id TEXT NOT NULL,
+      student_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      note TEXT,
+      UNIQUE(session_id, student_id),
+      FOREIGN KEY (session_id) REFERENCES attendance_sessions(id) ON DELETE CASCADE,
+      FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+    );
+  `);
+
   // Ensure default admin exists
   const existingUser = await db.execute({
     sql: "SELECT id FROM users WHERE username = ? LIMIT 1",
@@ -53,89 +108,60 @@ export async function ensureSchema() {
     });
   }
 
-  // Check if agenda table has any rows. If empty, populate with sample items for Pekan 4 and 5
-  const existingAgenda = await db.execute("SELECT COUNT(*) as count FROM agenda");
-  const count = existingAgenda.rows[0]?.count ?? 0;
+  // Seed students & courses from attendance-initial.json if table is empty
+  const studentCountRes = await db.execute("SELECT COUNT(*) as count FROM students");
+  const studentCount = studentCountRes.rows[0]?.count ?? 0;
+  if (studentCount === 0) {
+    try {
+      const initialPath = path.resolve(process.cwd(), "src/data/attendance-initial.json");
+      if (fs.existsSync(initialPath)) {
+        const initialData = JSON.parse(fs.readFileSync(initialPath, "utf-8"));
 
-  if (count === 0) {
-    const initialAgendas = [
-      {
-        pekan: 5,
-        pertemuan: 4,
-        mata_kuliah: "Analisa Proses Bisnis",
-        judul: "Tugas 2: Pemodelan Diagram BPMN Pengadaan Barang",
-        keterangan: "Upload PDF di LMS Mentari. Batas toleransi penutupan slot tugas otomatis jam 23.59 WIB.",
-        tipe_deadline: "datetime",
-        tanggal: "2026-10-02",
-        jam: "23:59",
-      },
-      {
-        pekan: 5,
-        pertemuan: 4,
-        mata_kuliah: "Rekayasa Web",
-        judul: "Laporan Praktikum: State Management & Vue Router",
-        keterangan: "Format laporan bebas PDF, kumpulkan via drive kelas sebelum hari Sabtu.",
-        tipe_deadline: "date_only",
-        tanggal: "2026-10-02",
-        jam: null,
-      },
-      {
-        pekan: 5,
-        pertemuan: 4,
-        mata_kuliah: "Pemrograman Berorientasi Obyek (Java I)",
-        judul: "Lanjutan Latihan Praktikum Pertemuan 4 (Polymorphism)",
-        keterangan: "Dikerjakan di laptop masing-masing, akan dibahas dan dicek oleh dosen saat masuk kelas pertemuan 5 hari Sabtu.",
-        tipe_deadline: "week_only",
-        tanggal: null,
-        jam: null,
-      },
-      {
-        pekan: 4,
-        pertemuan: 4,
-        mata_kuliah: "Analisa Proses Bisnis",
-        judul: "Tugas 2: Pemodelan Diagram BPMN Pengadaan Barang",
-        keterangan: "Upload PDF di LMS Mentari. Batas toleransi penutupan slot tugas otomatis jam 23.59 WIB.",
-        tipe_deadline: "datetime",
-        tanggal: "2026-10-02",
-        jam: "23:59",
-      },
-      {
-        pekan: 4,
-        pertemuan: 4,
-        mata_kuliah: "Rekayasa Web",
-        judul: "Laporan Praktikum: State Management & Vue Router",
-        keterangan: "Format laporan bebas PDF, kumpulkan via drive kelas sebelum hari Sabtu.",
-        tipe_deadline: "date_only",
-        tanggal: "2026-10-02",
-        jam: null,
-      },
-      {
-        pekan: 4,
-        pertemuan: 4,
-        mata_kuliah: "Pemrograman Berorientasi Obyek (Java I)",
-        judul: "Lanjutan Latihan Praktikum Pertemuan 4 (Polymorphism)",
-        keterangan: "Dikerjakan di laptop masing-masing, akan dibahas dan dicek oleh dosen saat masuk kelas pertemuan 5 hari Sabtu.",
-        tipe_deadline: "week_only",
-        tanggal: null,
-        jam: null,
-      },
-    ];
+        // Seed courses
+        for (const c of initialData.courses || []) {
+          await db.execute({
+            sql: `INSERT OR IGNORE INTO courses (id, code, name, class_name, lecturer, time)
+                  VALUES (?, ?, ?, ?, ?, ?)`,
+            args: [c.id, c.code || null, c.name, c.className || "03SIFE003", c.lecturer || null, c.time || null],
+          });
+        }
 
-    for (const item of initialAgendas) {
-      await db.execute({
-        sql: `INSERT INTO agenda (pekan, pertemuan, mata_kuliah, judul, keterangan, tipe_deadline, tanggal, jam)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        args: [
-          item.pekan,
-          item.pertemuan,
-          item.mata_kuliah,
-          item.judul,
-          item.keterangan,
-          item.tipe_deadline,
-          item.tanggal,
-          item.jam,
-        ],
-      });
+        // Seed students
+        for (const s of initialData.mainStudents || []) {
+          await db.execute({
+            sql: `INSERT OR IGNORE INTO students (id, nim, name, is_guest, course_ids)
+                  VALUES (?, ?, ?, ?, ?)`,
+            args: [
+              s.id,
+              s.nim,
+              s.name,
+              s.isGuest ? 1 : 0,
+              s.courseIds && s.courseIds.length ? JSON.stringify(s.courseIds) : null,
+            ],
+          });
+        }
+
+        // Seed initial sessions & records
+        for (const sess of initialData.sessions || []) {
+          await db.execute({
+            sql: `INSERT OR IGNORE INTO attendance_sessions (id, course_id, date, meeting_no, updated_at)
+                  VALUES (?, ?, ?, ?, ?)`,
+            args: [sess.id, sess.courseId, sess.date, sess.meetingNo || null, sess.updatedAt || Date.now()],
+          });
+
+          if (sess.records) {
+            for (const [studentId, status] of Object.entries(sess.records)) {
+              await db.execute({
+                sql: `INSERT OR IGNORE INTO attendance_records (session_id, student_id, status)
+                      VALUES (?, ?, ?)`,
+                args: [sess.id, studentId, status],
+              });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error seeding initial attendance data:", e);
     }
   }
 
