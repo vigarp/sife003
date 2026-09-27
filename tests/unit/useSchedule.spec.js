@@ -129,4 +129,8 @@ describe("useSchedule composable", () => {
       week0.luring.length
     );
   });
+
+  it("should have activeWeekStatus defined as upcoming or ongoing", () => {
+    expect(["upcoming", "ongoing"]).toContain(schedule.activeWeekStatus.value);
+  });
 });

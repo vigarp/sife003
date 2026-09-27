@@ -5,9 +5,6 @@ import { useLastVisited } from "@/composables/useLastVisited";
 
 import Navbar from "@/components/layout/Navbar.vue";
 import Footer from "@/components/layout/Footer.vue";
-import HeroSection from "@/components/hero/HeroSection.vue";
-import ScheduleSection from "@/components/schedule/ScheduleSection.vue";
-import CalendarSection from "@/components/calendar/CalendarSection.vue";
 
 const { initTheme } = useTheme();
 const { initGlobalListeners, cleanupGlobalListeners } = useLastVisited();
@@ -27,20 +24,11 @@ onUnmounted(() => {
     <!-- Sticky Navigation Header -->
     <Navbar />
 
-    <!-- Main Content Container -->
+    <!-- Main Content Container with Router View -->
     <main
       class="w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-10 min-h-[calc(100vh-16rem)] flex-1"
     >
-      <div class="flex flex-col w-full pb-space-xl">
-        <!-- Hero Section -->
-        <HeroSection />
-
-        <!-- Jadwal Pekan Perkuliahan Section -->
-        <ScheduleSection />
-
-        <!-- Google Calendar Section -->
-        <CalendarSection />
-      </div>
+      <router-view />
     </main>
 
     <!-- Academic Footer -->

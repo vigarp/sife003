@@ -10,6 +10,7 @@ const {
   isCurrentWeek,
   isPastWeek,
   isFutureWeek,
+  activeWeekStatus,
   partitionDaring,
   partitionLuring,
 } = useSchedule();
@@ -51,7 +52,18 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
         <!-- Week Status Badge -->
         <span
-          v-if="isCurrentWeek"
+          v-if="isCurrentWeek && activeWeekStatus === 'upcoming'"
+          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60 shadow-2xs"
+        >
+          <span class="relative flex h-2 w-2">
+            <span
+              class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"
+            ></span>
+          </span>
+          <span>Pekan Mendatang (Upcoming)</span>
+        </span>
+        <span
+          v-else-if="isCurrentWeek"
           class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 shadow-2xs"
         >
           <span class="relative flex h-2 w-2">
@@ -62,7 +74,7 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
               class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
             ></span>
           </span>
-          <span>Pekan Berjalan</span>
+          <span>Pekan Berjalan (Ongoing)</span>
         </span>
         <span
           v-else-if="isPastWeek"

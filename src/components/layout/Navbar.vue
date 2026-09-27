@@ -45,9 +45,9 @@ onUnmounted(() => {
       class="h-16 w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex items-center justify-between"
     >
       <!-- Brand / Identity -->
-      <div class="flex items-center gap-space-sm">
+      <router-link to="/" class="flex items-center gap-space-sm group">
         <div
-          class="flex items-center gap-space-xs px-2.5 py-1 bg-primary-subtle/80 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 rounded-lg shadow-2xs"
+          class="flex items-center gap-space-xs px-2.5 py-1 bg-primary-subtle/80 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/70 rounded-lg shadow-2xs group-hover:border-primary/50 transition-colors"
         >
           <span class="text-xs font-bold text-primary dark:text-blue-400 tracking-tight"
             >03SIFE003</span
@@ -57,7 +57,7 @@ onUnmounted(() => {
             >Portal Kelas</span
           >
         </div>
-      </div>
+      </router-link>
 
       <!-- Right Menu: Links Dropdown & Dark Mode Toggle -->
       <div class="flex items-center gap-2">
@@ -100,7 +100,7 @@ onUnmounted(() => {
             </a>
 
             <a
-              href="#kalender"
+              href="#agenda"
               @click="closeDropdown"
               class="flex items-center gap-2.5 px-3 py-2 text-sm text-text-main dark:text-slate-200 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
               role="menuitem"
@@ -110,6 +110,18 @@ onUnmounted(() => {
               >
               <span>Agenda Kelas</span>
             </a>
+
+            <router-link
+              to="/pengurus"
+              @click="closeDropdown"
+              class="flex items-center gap-2.5 px-3 py-2 text-sm text-text-main dark:text-slate-200 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
+              role="menuitem"
+            >
+              <span class="material-symbols-outlined text-[18px] text-emerald-500"
+                >admin_panel_settings</span
+              >
+              <span>Zona Pengurus</span>
+            </router-link>
 
             <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
 

@@ -43,7 +43,7 @@ function parsePekanDateRange(dateStr) {
     const y = Number.parseInt(matchTwo[5], 10);
     return {
       start: new Date(y, m1, d1, 0, 0, 0),
-      end: new Date(y, m2, d2 + 1, 23, 59, 59, 999),
+      end: new Date(y, m2, d2, 23, 59, 59, 999),
     };
   }
 
@@ -58,40 +58,64 @@ function parsePekanDateRange(dateStr) {
     const y = Number.parseInt(matchOne[4], 10);
     return {
       start: new Date(y, m, d1, 0, 0, 0),
-      end: new Date(y, m, d2 + 1, 23, 59, 59, 999),
+      end: new Date(y, m, d2, 23, 59, 59, 999),
     };
   }
   return null;
 }
 
-// Compute active week index
-function computeActiveWeekIndex() {
+// Compute active week info with Sunday buffer zone
+function computeActiveWeekInfo() {
   const now = new Date();
   let detected = -1;
+  let status = "ongoing"; // "ongoing" | "upcoming"
 
-  scheduleData.jadwal_per_pekan.forEach((pekan, idx) => {
-    const range = parsePekanDateRange(pekan.tanggal_daring);
+  const parsedWeeks = scheduleData.jadwal_per_pekan.map((p, idx) => ({
+    idx,
+    pekan: p.pekan,
+    range: parsePekanDateRange(p.tanggal_daring),
+  }));
+
+  // 1. Inside any regular active week (Monday to Saturday)
+  for (let i = 0; i < parsedWeeks.length; i++) {
+    const { range } = parsedWeeks[i];
     if (range && now >= range.start && now <= range.end) {
-      detected = idx;
-    }
-  });
-
-  if (detected === -1) {
-    const firstRange = parsePekanDateRange(
-      scheduleData.jadwal_per_pekan[0]?.tanggal_daring
-    );
-    const lastRange = parsePekanDateRange(
-      scheduleData.jadwal_per_pekan[scheduleData.jadwal_per_pekan.length - 1]?.tanggal_daring
-    );
-    if (firstRange && now < firstRange.start) {
-      detected = 0;
-    } else if (lastRange && now > lastRange.end) {
-      detected = scheduleData.jadwal_per_pekan.length - 1;
-    } else {
-      detected = 3; // Default to Pekan 4 if in semester bounds
+      detected = i;
+      status = "ongoing";
+      break;
     }
   }
-  return detected;
+
+  // 2. Buffer zone (Sunday between week i and week i+1)
+  if (detected === -1) {
+    for (let i = 0; i < parsedWeeks.length - 1; i++) {
+      const currentEnd = parsedWeeks[i].range?.end;
+      const nextStart = parsedWeeks[i + 1].range?.start;
+      if (currentEnd && nextStart && now > currentEnd && now < nextStart) {
+        detected = i + 1; // Advance to the upcoming week
+        status = "upcoming";
+        break;
+      }
+    }
+  }
+
+  // 3. Semester bound fallbacks
+  if (detected === -1) {
+    const firstStart = parsedWeeks[0].range?.start;
+    const lastEnd = parsedWeeks[parsedWeeks.length - 1].range?.end;
+    if (firstStart && now < firstStart) {
+      detected = 0;
+      status = "upcoming";
+    } else if (lastEnd && now > lastEnd) {
+      detected = parsedWeeks.length - 1;
+      status = "ongoing";
+    } else {
+      detected = 4;
+      status = "ongoing";
+    }
+  }
+
+  return { detected, status };
 }
 
 function getMaster(matkulName) {
@@ -115,7 +139,9 @@ function getPresensiUrl(master) {
   return `https://my.unpam.ac.id/presensi/pertemuan/${master.kode}/${kelasCode}/${semesterCode}`;
 }
 
-const activeWeekIndex = computeActiveWeekIndex();
+const activeInfo = computeActiveWeekInfo();
+const activeWeekIndex = activeInfo.detected;
+const activeWeekStatus = ref(activeInfo.status);
 const viewedWeekIndex = ref(activeWeekIndex);
 
 export function useSchedule() {
@@ -212,6 +238,7 @@ export function useSchedule() {
     masterList: scheduleData.master_mata_kuliah,
     allWeeks,
     activeWeekIndex,
+    activeWeekStatus,
     viewedWeekIndex,
     currentWeek,
     isCurrentWeek,
