@@ -12,10 +12,10 @@ const currentYear = new Date().getFullYear();
       <div
         class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col sm:flex-row items-center justify-between gap-space-sm text-center sm:text-left"
       >
-        <span class="text-xs text-text-subtle dark:text-slate-500"
+        <span class="text-xs text-slate-600 dark:text-slate-400"
           >© {{ currentYear }} Sistem Informasi Kelas 03SIFE003.</span
         >
-        <span class="text-xs text-text-subtle dark:text-slate-500 font-medium"
+        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium"
           >Universitas Pamulang</span
         >
       </div>

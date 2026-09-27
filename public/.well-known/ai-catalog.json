@@ -1,0 +1,11 @@
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "name": "Portal Kelas 03SIFE003",
+      "type": "website",
+      "description": "Portal informasi perkuliahan daring LMS Mentari dan tatap muka Program Studi Sistem Informasi Universitas Pamulang.",
+      "url": "https://03sife003.vercel.app"
+    }
+  ]
+}

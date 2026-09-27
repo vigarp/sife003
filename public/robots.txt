@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://03sife003.vercel.app/sitemap.xml

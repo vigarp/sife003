@@ -148,6 +148,7 @@ const presensiUrl = computed(() => getPresensiUrl(props.master));
           rel="noopener noreferrer"
           @click="setVisited(mentariBtnKey)"
           :data-btn-key="mentariBtnKey"
+          :aria-label="`Buka ${item.mata_kuliah} ${pNum ? 'Pertemuan ' + pNum : ''} di LMS Mentari`"
           :class="[
             'action-link-btn btn-mentari inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all shadow-2xs cursor-pointer',
             'bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200/90 border border-gold-border dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-950/60 dark:hover:border-amber-700/60',
@@ -168,6 +169,7 @@ const presensiUrl = computed(() => getPresensiUrl(props.master));
           rel="noopener noreferrer"
           @click="setVisited(presensiBtnKey)"
           :data-btn-key="presensiBtnKey"
+          :aria-label="`Cek presensi ${item.mata_kuliah} di MyUNPAM`"
           :class="[
             'action-link-btn btn-presensi inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all shadow-2xs cursor-pointer',
             'bg-surface-card dark:bg-slate-900 text-text-main dark:text-slate-200 border border-border-ui dark:border-slate-700 hover:text-primary dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700',

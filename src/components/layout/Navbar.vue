@@ -69,6 +69,7 @@ onUnmounted(() => {
             class="px-3 py-1.5 rounded-lg bg-surface-card dark:bg-slate-800 text-text-main dark:text-slate-200 hover:text-primary dark:hover:text-blue-400 border border-border-ui dark:border-slate-700/80 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40"
             :aria-expanded="isDropdownOpen"
             aria-haspopup="true"
+            aria-label="Menu navigasi tautan cepat"
           >
             <span class="material-symbols-outlined text-[17px] text-primary dark:text-blue-400">link</span>
             <span>Tautan</span>

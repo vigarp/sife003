@@ -1,0 +1,9 @@
+# Portal Kelas 03SIFE003
+
+> Portal informasi jadwal kuliah daring (LMS Mentari) dan tatap muka (luring), presensi MyUNPAM, serta agenda kelas Program Studi Sistem Informasi Universitas Pamulang.
+
+## Informasi Akademik
+- [Jadwal Perkuliahan](https://03sife003.vercel.app/#jadwal): Jadwal perkuliahan daring dan tatap muka semester ganjil.
+- [Agenda Kelas](https://03sife003.vercel.app/#kalender): Kalender akademik dan agenda kelas terpadu.
+- [LMS Mentari](https://mentari.unpam.ac.id): Portal perkuliahan daring e-learning Universitas Pamulang.
+- [MyUNPAM Presensi](https://my.unpam.ac.id): Portal presensi dan akademik mahasiswa Universitas Pamulang.

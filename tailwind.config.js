@@ -21,8 +21,8 @@ export default {
         "surface-alt": "#f1f5f9",
         "border-ui": "#e2e8f0",
         "text-main": "#0f172a",
-        "text-muted": "#475569",
-        "text-subtle": "#64748b",
+        "text-muted": "#334155",
+        "text-subtle": "#475569",
       },
       spacing: {
         "space-xs": "0.25rem",
