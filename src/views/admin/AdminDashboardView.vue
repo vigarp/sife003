@@ -7,6 +7,7 @@ import { useSchedule } from "@/composables/useSchedule";
 import AdminStudentsManager from "@/components/admin/AdminStudentsManager.vue";
 import AdminCoursesManager from "@/components/admin/AdminCoursesManager.vue";
 import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue";
+import AdminCalendarManager from "@/components/admin/AdminCalendarManager.vue";
 import scheduleData from "@/data/schedule.json";
 
 const router = useRouter();
@@ -15,7 +16,7 @@ const verifyingAuth = ref(!user.value && isAuthenticated.value);
 const { agendas, loading, fetchAgendas, createAgenda, updateAgenda, deleteAgenda } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
 
-const activeAdminTab = ref("agenda"); // 'agenda' | 'students' | 'courses' | 'lecturers'
+const activeAdminTab = ref("agenda"); // 'agenda' | 'students' | 'courses' | 'lecturers' | 'calendar'
 
 // Compute active week number
 const activeWeekNumber = computed(() => {
@@ -409,6 +410,21 @@ onMounted(async () => {
         </svg>
         <span>Data Dosen</span>
       </button>
+
+      <button
+        @click="activeAdminTab = 'calendar'"
+        :class="[
+          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
+          activeAdminTab === 'calendar'
+            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+        ]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Kalender Akademik</span>
+      </button>
     </div>
 
     <!-- TAB 1: AGENDA & TUGAS -->
@@ -567,6 +583,12 @@ onMounted(async () => {
     <!-- TAB 4: DATA DOSEN -->
     <AdminLecturersManager
       v-else-if="activeAdminTab === 'lecturers'"
+      @toast="showToast"
+    />
+
+    <!-- TAB 5: KALENDER AKADEMIK -->
+    <AdminCalendarManager
+      v-else-if="activeAdminTab === 'calendar'"
       @toast="showToast"
     />
 

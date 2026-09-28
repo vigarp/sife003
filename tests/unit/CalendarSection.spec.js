@@ -1,61 +1,131 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
+
+vi.mock("@fullcalendar/vue3", () => ({
+  default: {
+    name: "FullCalendar",
+    template: "<div class='fullcalendar-mock'></div>",
+    props: ["options"],
+  },
+}));
+
 import CalendarSection from "@/components/calendar/CalendarSection.vue";
 
-describe("CalendarSection.vue", () => {
+describe("CalendarSection.vue (Pure FullCalendar)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-  });
-
-  it("should render section title 'Agenda Kelas'", () => {
-    const wrapper = mount(CalendarSection);
-    expect(wrapper.text()).toContain("Agenda Kelas");
-  });
-
-  it("should switch between Bulan and Agenda views", async () => {
-    const wrapper = mount(CalendarSection);
-    const bulanBtn = wrapper.find('button[aria-label="Tampilan kalender bulan"]');
-    const agendaBtn = wrapper.find('button[aria-label="Tampilan kalender agenda"]');
-
-    expect(bulanBtn.exists()).toBe(true);
-    expect(agendaBtn.exists()).toBe(true);
-
-    await agendaBtn.trigger("click");
-    expect(wrapper.vm.calMode).toBe("AGENDA");
-
-    await bulanBtn.trigger("click");
-    expect(wrapper.vm.calMode).toBe("MONTH");
-  });
-
-  it("should copy calendar link to clipboard on button click", async () => {
-    const writeTextMock = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "clipboard", {
-      value: {
-        writeText: writeTextMock,
-      },
-      configurable: true,
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: [
+          {
+            id: 1,
+            title: "Seminar Teknologi Web",
+            category: "event",
+            start_date: "2026-10-12",
+            end_date: "2026-10-14",
+            color: "#3b82f6",
+            academic_year: "20261",
+            description: "Seminar dan workshop teknologi",
+          },
+          {
+            id: 2,
+            title: "Batas Pengisian KRS",
+            category: "prodi",
+            start_date: "2026-10-05",
+            end_date: "2026-10-05",
+            color: "#8b5cf6",
+            academic_year: "20261",
+            description: "KRS Online Semester Ganjil",
+          },
+          {
+            id: 3,
+            title: "Dies Natalis UNPAM",
+            category: "kampus",
+            start_date: "2026-10-20",
+            end_date: "2026-10-20",
+            color: "#10b981",
+            academic_year: "20261",
+            description: "Perayaan Dies Natalis Universitas Pamulang",
+          },
+        ],
+      }),
     });
-
-    const wrapper = mount(CalendarSection);
-    const copyBtn = wrapper.find('button[aria-label="Salin tautan Google Calendar"]');
-    await copyBtn.trigger("click");
-
-    expect(writeTextMock).toHaveBeenCalled();
   });
 
-  it("should mount iframe when lazy load trigger is clicked", async () => {
-    const wrapper = mount(CalendarSection);
+  const mountOptions = {
+    global: {
+      stubs: {
+        FullCalendar: {
+          name: "FullCalendar",
+          template: '<div class="fc-stub"></div>',
+          props: ["options"],
+        },
+        "router-link": {
+          template: "<a><slot /></a>",
+        },
+      },
+    },
+  };
 
-    // If iframe not loaded yet, placeholder with button exists
-    if (!wrapper.vm.isIframeLoaded) {
-      const loadBtn = wrapper.find("button.bg-primary");
-      expect(loadBtn.exists()).toBe(true);
+  it("should render section title 'Kalender' and subtitle", () => {
+    const wrapper = mount(CalendarSection, mountOptions);
+    expect(wrapper.text()).toContain("Kalender");
+    expect(wrapper.text()).toContain("03SIFE003");
+  });
 
-      await loadBtn.trigger("click");
-      expect(wrapper.vm.isIframeLoaded).toBe(true);
-      expect(wrapper.find("iframe").exists()).toBe(true);
-    } else {
-      expect(wrapper.find("iframe").exists()).toBe(true);
-    }
+  it("should render category legends for Event, Prodi, and Kampus without All/Semua", () => {
+    const wrapper = mount(CalendarSection, mountOptions);
+    expect(wrapper.text()).not.toContain("Semua");
+    expect(wrapper.text()).toContain("Event");
+    expect(wrapper.text()).toContain("Prodi");
+    expect(wrapper.text()).toContain("Kampus");
+  });
+
+  it("should format calendarEvents for FullCalendar with proper date boundaries", async () => {
+    const wrapper = mount(CalendarSection, mountOptions);
+    await wrapper.vm.$nextTick();
+
+    const events = wrapper.vm.calendarEvents;
+    expect(events.length).toBe(3);
+
+    // Multi-day event (start: 2026-10-12, end: 2026-10-14) should have exclusive end: 2026-10-15
+    const multiDay = events.find((e) => e.title === "Seminar Teknologi Web");
+    expect(multiDay.start).toBe("2026-10-12");
+    expect(multiDay.end).toBe("2026-10-15");
+    expect(multiDay.allDay).toBe(true);
+
+    // Single-day event should have undefined end
+    const singleDay = events.find((e) => e.title === "Batas Pengisian KRS");
+    expect(singleDay.start).toBe("2026-10-05");
+    expect(singleDay.end).toBeUndefined();
+  });
+
+  it("should open and close event detail modal when an event is selected", async () => {
+    const wrapper = mount(CalendarSection, mountOptions);
+    await wrapper.vm.$nextTick();
+
+    const sampleEvent = {
+      id: 99,
+      title: "Ujian Tengah Semester",
+      category: "prodi",
+      start_date: "2026-11-01",
+      end_date: "2026-11-07",
+      color: "#8b5cf6",
+      academic_year: "20261",
+      description: "UTS semester ganjil",
+    };
+
+    wrapper.vm.openEventModal(sampleEvent);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.isModalOpen).toBe(true);
+    expect(wrapper.vm.selectedEvent.title).toBe("Ujian Tengah Semester");
+    expect(wrapper.text()).toContain("Ujian Tengah Semester");
+
+    wrapper.vm.closeModal();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.isModalOpen).toBe(false);
   });
 });

@@ -167,6 +167,18 @@ onUnmounted(() => {
               <span>Agenda Kelas</span>
             </a>
 
+            <a
+              href="#kalender"
+              @click="closeDropdown"
+              class="flex items-center gap-2.5 px-3 py-2 text-sm text-text-main dark:text-slate-200 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
+              role="menuitem"
+            >
+              <span class="material-symbols-outlined text-[18px] text-blue-500"
+                >today</span
+              >
+              <span>Kalender</span>
+            </a>
+
             <router-link
               to="/pengurus"
               @click="closeDropdown"

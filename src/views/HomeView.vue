@@ -2,6 +2,7 @@
 import HeroSection from "@/components/hero/HeroSection.vue";
 import ScheduleSection from "@/components/schedule/ScheduleSection.vue";
 import AgendaSection from "@/components/agenda/AgendaSection.vue";
+import CalendarSection from "@/components/calendar/CalendarSection.vue";
 </script>
 
 <template>
@@ -14,5 +15,8 @@ import AgendaSection from "@/components/agenda/AgendaSection.vue";
 
     <!-- Native Agenda Timeline Feed Section -->
     <AgendaSection />
+
+    <!-- Kalender Akademik Section (FullCalendar) -->
+    <CalendarSection />
   </div>
 </template>

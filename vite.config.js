@@ -18,6 +18,8 @@ function apiDevPlugin() {
           let handlerModule = null;
           if (pathname === "/api/agenda") {
             handlerModule = await import("./api/agenda.js");
+          } else if (pathname === "/api/calendar") {
+            handlerModule = await import("./api/calendar.js");
           } else if (pathname === "/api/auth/login") {
             handlerModule = await import("./api/auth/login.js");
           } else if (pathname === "/api/auth/me") {
@@ -95,6 +97,14 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
+    },
+    optimizeDeps: {
+      include: [
+        "@fullcalendar/vue3",
+        "@fullcalendar/core",
+        "@fullcalendar/daygrid",
+        "@fullcalendar/interaction",
+      ],
     },
     test: {
       environment: "happy-dom",

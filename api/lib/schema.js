@@ -122,6 +122,21 @@ async function createTables(db) {
       FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
     );
   `);
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS academic_calendar (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL DEFAULT 'All',
+      start_date TEXT NOT NULL,
+      end_date TEXT,
+      color TEXT DEFAULT '#3b82f6',
+      academic_year TEXT DEFAULT '20261',
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 }
 
 async function ensureAdminUser(db) {
