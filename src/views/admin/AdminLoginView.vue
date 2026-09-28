@@ -2,13 +2,21 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
+import { useTheme } from "@/composables/useTheme";
+import TurnstileWidget from "@/components/common/TurnstileWidget.vue";
 
 const router = useRouter();
 const { login, isAuthenticated, isAdmin, loading, error } = useAdminAuth();
+const { isDark } = useTheme();
 
 const username = ref("");
 const password = ref("");
 const errorMessage = ref("");
+const turnstileToken = ref("");
+const turnstileRef = ref(null);
+
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+const isTurnstileEnabled = Boolean(turnstileSiteKey);
 
 onMounted(() => {
   if (isAuthenticated.value) {
@@ -20,6 +28,19 @@ onMounted(() => {
   }
 });
 
+function onTurnstileVerify(token) {
+  turnstileToken.value = token;
+  errorMessage.value = "";
+}
+
+function onTurnstileExpire() {
+  turnstileToken.value = "";
+}
+
+function onTurnstileError(err) {
+  console.warn("Turnstile widget error:", err);
+}
+
 async function handleLogin() {
   errorMessage.value = "";
   if (!username.value.trim() || !password.value) {
@@ -27,7 +48,12 @@ async function handleLogin() {
     return;
   }
 
-  const result = await login(username.value, password.value);
+  if (isTurnstileEnabled && !turnstileToken.value) {
+    errorMessage.value = "Harap selesaikan verifikasi keamanan (Turnstile) terlebih dahulu.";
+    return;
+  }
+
+  const result = await login(username.value, password.value, turnstileToken.value);
   if (result.success) {
     if (isAdmin.value) {
       router.push("/pengurus");
@@ -36,6 +62,8 @@ async function handleLogin() {
     }
   } else {
     errorMessage.value = result.message || "Gagal masuk. Periksa kembali akun Anda.";
+    turnstileToken.value = "";
+    turnstileRef.value?.reset();
   }
 }
 </script>
@@ -104,9 +132,21 @@ async function handleLogin() {
           />
         </div>
 
+        <!-- Cloudflare Turnstile Widget (aktif jika VITE_TURNSTILE_SITE_KEY diset) -->
+        <TurnstileWidget
+          v-if="isTurnstileEnabled"
+          ref="turnstileRef"
+          :site-key="turnstileSiteKey"
+          :theme="isDark ? 'dark' : 'light'"
+          action="login"
+          @verify="onTurnstileVerify"
+          @expire="onTurnstileExpire"
+          @error="onTurnstileError"
+        />
+
         <button
           type="submit"
-          :disabled="loading"
+          :disabled="loading || (isTurnstileEnabled && !turnstileToken)"
           class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg v-if="loading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">

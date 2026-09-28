@@ -39,14 +39,14 @@ export function useAdminAuth() {
     }
   }
 
-  async function login(username, password) {
+  async function login(username, password, turnstileToken = null) {
     loading.value = true;
     error.value = null;
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, turnstileToken }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {

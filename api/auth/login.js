@@ -89,6 +89,49 @@ async function tryStudentLogin(db, username, password) {
   };
 }
 
+export async function verifyTurnstileToken(token, clientIp = null) {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY;
+  // If no secret key is configured (e.g. dev/test mode), bypass verification
+  if (!secretKey) {
+    return { success: true };
+  }
+
+  if (!token) {
+    return {
+      success: false,
+      message: "Verifikasi keamanan (Turnstile) wajib diselesaikan sebelum masuk.",
+    };
+  }
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append("secret", secretKey);
+    formData.append("response", token);
+    if (clientIp) {
+      formData.append("remoteip", clientIp);
+    }
+
+    const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body: formData,
+    });
+    const outcome = await verifyRes.json();
+    if (outcome.success) {
+      return { success: true };
+    }
+    return {
+      success: false,
+      message: "Verifikasi bot Cloudflare gagal atau kedaluwarsa. Silakan ulangi verifikasi.",
+    };
+  } catch (err) {
+    console.error("Turnstile verification error:", err);
+    return {
+      success: false,
+      message: "Gagal memverifikasi Turnstile ke server Cloudflare.",
+    };
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -106,12 +149,22 @@ export default async function handler(req, res) {
     await ensureSchema();
     const db = getDb();
     const body = parseBody(req);
-    const { username, password } = body;
+    const { username, password, turnstileToken } = body;
 
     if (!username || !password) {
       return res.status(400).json({
         success: false,
         message: "Username/NIM dan kata sandi wajib diisi.",
+      });
+    }
+
+    // Verify Cloudflare Turnstile token if configured
+    const clientIp = String(req.headers["x-forwarded-for"] || req.headers["x-real-ip"] || req.socket?.remoteAddress || "").split(",")[0].trim();
+    const turnstileCheck = await verifyTurnstileToken(turnstileToken, clientIp);
+    if (!turnstileCheck.success) {
+      return res.status(400).json({
+        success: false,
+        message: turnstileCheck.message,
       });
     }
 
