@@ -64,6 +64,7 @@ describe("Navbar.vue", () => {
     const wrapper = mount(Navbar, { global: globalConfig });
     expect(wrapper.text()).toContain("Satu UNPAM");
     expect(wrapper.text()).toContain("LINK-SI");
+    expect(wrapper.text()).toContain("SIMONEV");
     expect(wrapper.text()).not.toContain("Kontak Dosen");
     expect(wrapper.text()).not.toContain("Monitoring Kehadiran Dosen");
     expect(wrapper.text()).not.toContain("Undangan Grup WA");
