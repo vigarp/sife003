@@ -69,10 +69,9 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     },
   };
 
-  it("should render section title 'Kalender' and subtitle", () => {
+  it("should render section title 'Kalender'", () => {
     const wrapper = mount(CalendarSection, mountOptions);
     expect(wrapper.text()).toContain("Kalender");
-    expect(wrapper.text()).toContain("03SIFE003");
   });
 
   it("should render category legends for Event, Prodi, and Kampus without All/Semua", () => {

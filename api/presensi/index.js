@@ -1,5 +1,5 @@
-import { getDb } from "../lib/db.js";
-import { ensureSchema } from "../lib/schema.js";
+import { getDb } from "../_lib/db.js";
+import { ensureSchema } from "../_lib/schema.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

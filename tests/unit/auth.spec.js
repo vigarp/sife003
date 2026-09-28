@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { generateToken, verifyToken } from "../../api/lib/auth.js";
+import { generateToken, verifyToken } from "../../api/_lib/auth.js";
 
-describe("api/lib/auth.js verifyToken", () => {
+describe("api/_lib/auth.js verifyToken", () => {
   const dummyUser = {
     id: 1,
     username: "admin",

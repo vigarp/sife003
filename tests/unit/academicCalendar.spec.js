@@ -14,15 +14,15 @@ const mockDb = {
   execute: vi.fn(),
 };
 
-vi.mock("../../api/lib/schema.js", () => ({
+vi.mock("../../api/_lib/schema.js", () => ({
   ensureSchema: vi.fn().mockResolvedValue(true),
 }));
 
-vi.mock("../../api/lib/db.js", () => ({
+vi.mock("../../api/_lib/db.js", () => ({
   getDb: () => mockDb,
 }));
 
-vi.mock("../../api/lib/auth.js", () => ({
+vi.mock("../../api/_lib/auth.js", () => ({
   verifyToken: vi.fn((req) => {
     const authHeader = req?.headers?.authorization;
     if (authHeader === "Bearer admin-token") {

@@ -1,6 +1,6 @@
-import { verifyToken, comparePassword, hashPassword } from "../lib/auth.js";
-import { getDb } from "../lib/db.js";
-import { ensureSchema } from "../lib/schema.js";
+import { verifyToken, comparePassword, hashPassword } from "../_lib/auth.js";
+import { getDb } from "../_lib/db.js";
+import { ensureSchema } from "../_lib/schema.js";
 
 function parseBody(req) {
   if (!req.body) return {};

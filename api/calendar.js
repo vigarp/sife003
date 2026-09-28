@@ -1,6 +1,6 @@
-import { getDb } from "./lib/db.js";
-import { ensureSchema } from "./lib/schema.js";
-import { verifyToken } from "./lib/auth.js";
+import { getDb } from "./_lib/db.js";
+import { ensureSchema } from "./_lib/schema.js";
+import { verifyToken } from "./_lib/auth.js";
 
 const CATEGORY_COLORS = {
   event: "#3b82f6",
