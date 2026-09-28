@@ -7,6 +7,29 @@ const { isDark, toggleTheme } = useTheme();
 const { user, isAuthenticated, isAdmin, logout } = useAdminAuth();
 const isDropdownOpen = ref(false);
 const dropdownContainer = ref(null);
+const isCopied = ref(false);
+const WA_GROUP_INVITE_URL = "https://chat.whatsapp.com/C2kXOlWaZxmDHzRdKsDJTh";
+
+async function copyWaGroupInvite() {
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(WA_GROUP_INVITE_URL);
+    } else {
+      const input = document.createElement("textarea");
+      input.value = WA_GROUP_INVITE_URL;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+    }
+    isCopied.value = true;
+    setTimeout(() => {
+      isCopied.value = false;
+    }, 2000);
+  } catch (err) {
+    console.error("Gagal menyalin link undangan WA:", err);
+  }
+}
 
 function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -158,66 +181,92 @@ onUnmounted(() => {
 
             <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
 
+            <!-- KAMPUS -->
             <div
               class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-text-subtle dark:text-slate-400"
             >
-              Tautan Akademik
+              Kampus
             </div>
 
             <a
-              href="https://siakad.unpam.ac.id"
+              href="https://satu.unpam.ac.id/"
               target="_blank"
               rel="noopener noreferrer"
               @click="closeDropdown"
               class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
             >
-              <span>SIAKAD UNPAM</span>
+              <span>Satu UNPAM</span>
               <span class="material-symbols-outlined text-[14px]">open_in_new</span>
             </a>
 
+            <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
+
+            <!-- PRODI -->
+            <div
+              class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-text-subtle dark:text-slate-400"
+            >
+              Prodi
+            </div>
+
             <a
-              href="https://mentari.unpam.ac.id"
+              href="https://link.si-unpam.my.id/"
               target="_blank"
               rel="noopener noreferrer"
               @click="closeDropdown"
               class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
             >
-              <span>LMS Mentari</span>
+              <span>LINK-SI</span>
               <span class="material-symbols-outlined text-[14px]">open_in_new</span>
             </a>
 
-            <a
-              href="https://my.unpam.ac.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              @click="closeDropdown"
-              class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
-            >
-              <span>MyUNPAM Presensi</span>
-              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
-            </a>
+            <!-- PENGURUS (Hanya tampil jika login dan admin/pengurus) -->
+            <template v-if="isAuthenticated && isAdmin">
+              <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
 
-            <a
-              href="https://library.unpam.ac.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              @click="closeDropdown"
-              class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
-            >
-              <span>Perpustakaan UNPAM</span>
-              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
-            </a>
+              <div
+                class="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1"
+              >
+                <span>Pengurus</span>
+              </div>
 
-            <a
-              href="https://spm.unpam.ac.id"
-              target="_blank"
-              rel="noopener noreferrer"
-              @click="closeDropdown"
-              class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
-            >
-              <span>SPM UNPAM</span>
-              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
-            </a>
+              <a
+                href="http://bit.ly/RekapData-DosenPengampu"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="closeDropdown"
+                class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
+              >
+                <span>Kontak Dosen</span>
+                <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+              </a>
+
+              <a
+                href="https://forms.gle/uMP9iQ3PF8fSBwJV6"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="closeDropdown"
+                class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
+              >
+                <span>Monitoring Kehadiran Dosen</span>
+                <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+              </a>
+
+              <button
+                type="button"
+                @click="copyWaGroupInvite"
+                class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors cursor-pointer text-left group"
+                role="menuitem"
+                :title="isCopied ? 'Tersalin ke clipboard!' : 'Salin link undangan grup WhatsApp kelas'"
+              >
+                <span>{{ isCopied ? 'Tersalin ke Clipboard!' : 'Undangan Grup WA' }}</span>
+                <span
+                  class="material-symbols-outlined text-[14px] transition-colors"
+                  :class="isCopied ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 group-hover:text-primary dark:group-hover:text-blue-400'"
+                >
+                  {{ isCopied ? 'check' : 'content_copy' }}
+                </span>
+              </button>
+            </template>
 
             <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
 
