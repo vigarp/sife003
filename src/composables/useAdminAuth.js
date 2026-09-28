@@ -1,13 +1,33 @@
 import { ref, computed } from "vue";
 
 const TOKEN_KEY = "03sife003_admin_token";
+const USER_KEY = "03sife003_admin_user";
+
+function loadSavedUser() {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 const token = ref(localStorage.getItem(TOKEN_KEY) || null);
-const user = ref(null);
+const user = ref(loadSavedUser());
 const loading = ref(false);
 const error = ref(null);
 
 export function useAdminAuth() {
   const isAuthenticated = computed(() => !!token.value);
+
+  function setUser(newUser) {
+    user.value = newUser;
+    if (newUser) {
+      localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem(USER_KEY);
+    }
+  }
 
   function setToken(newToken) {
     token.value = newToken;
@@ -15,7 +35,7 @@ export function useAdminAuth() {
       localStorage.setItem(TOKEN_KEY, newToken);
     } else {
       localStorage.removeItem(TOKEN_KEY);
-      user.value = null;
+      setUser(null);
     }
   }
 
@@ -33,7 +53,7 @@ export function useAdminAuth() {
         throw new Error(data.message || "Gagal melakukan login.");
       }
       setToken(data.data.token);
-      user.value = data.data.user;
+      setUser(data.data.user);
       return { success: true };
     } catch (err) {
       error.value = err.message;
@@ -45,7 +65,7 @@ export function useAdminAuth() {
 
   async function checkAuth() {
     if (!token.value) {
-      user.value = null;
+      setUser(null);
       return false;
     }
     try {
@@ -56,13 +76,13 @@ export function useAdminAuth() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        user.value = data.data;
+        setUser(data.data);
         return true;
       }
       setToken(null);
       return false;
     } catch {
-      return false;
+      return Boolean(user.value);
     }
   }
 

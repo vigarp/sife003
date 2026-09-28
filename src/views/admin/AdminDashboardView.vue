@@ -10,7 +10,8 @@ import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue"
 import scheduleData from "@/data/schedule.json";
 
 const router = useRouter();
-const { user, isAuthenticated, logout, changePassword, isAdmin } = useAdminAuth();
+const { user, isAuthenticated, logout, changePassword, isAdmin, checkAuth, token } = useAdminAuth();
+const verifyingAuth = ref(!user.value && isAuthenticated.value);
 const { agendas, loading, fetchAgendas, createAgenda, updateAgenda, deleteAgenda } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
 
@@ -219,6 +220,11 @@ onMounted(async () => {
     router.replace("/pengurus/login");
     return;
   }
+  if (!user.value && token.value) {
+    verifyingAuth.value = true;
+    await checkAuth();
+    verifyingAuth.value = false;
+  }
   if (!isAdmin.value) {
     return;
   }
@@ -228,8 +234,14 @@ onMounted(async () => {
 </script>
 
 <template>
+  <!-- Loading state when token exists but user profile is being fetched -->
+  <div v-if="verifyingAuth" class="max-w-md mx-auto text-center py-20 px-4 space-y-3">
+    <div class="w-9 h-9 mx-auto border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Memverifikasi hak akses pengurus...</p>
+  </div>
+
   <!-- Unauthorized Regular Student Notice -->
-  <div v-if="!isAdmin" class="max-w-md mx-auto text-center py-16 px-4 space-y-4">
+  <div v-else-if="!isAdmin" class="max-w-md mx-auto text-center py-16 px-4 space-y-4">
     <div class="w-16 h-16 mx-auto rounded-3xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center shadow-xs">
       <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />

@@ -33,17 +33,21 @@ describe("useAdminAuth composable", () => {
     expect(user.value.username).toBe("admin");
     expect(isAuthenticated.value).toBe(true);
     expect(localStorage.getItem("03sife003_admin_token")).toBe("mock-jwt-token-123");
+    expect(JSON.parse(localStorage.getItem("03sife003_admin_user")).username).toBe("admin");
   });
 
-  it("should logout and remove token from localStorage", () => {
+  it("should logout and remove token and user from localStorage", () => {
     localStorage.setItem("03sife003_admin_token", "saved-token");
-    const { logout, token, isAuthenticated } = useAdminAuth();
+    localStorage.setItem("03sife003_admin_user", JSON.stringify({ username: "test" }));
+    const { logout, token, user, isAuthenticated } = useAdminAuth();
     token.value = "saved-token";
 
     logout();
     expect(token.value).toBe(null);
+    expect(user.value).toBe(null);
     expect(isAuthenticated.value).toBe(false);
     expect(localStorage.getItem("03sife003_admin_token")).toBe(null);
+    expect(localStorage.getItem("03sife003_admin_user")).toBe(null);
   });
 
   it("should compute isAdmin and isStudent correctly based on user role", () => {
@@ -56,5 +60,24 @@ describe("useAdminAuth composable", () => {
     user.value = { id: "s-2", username: "251011700333", role: "pengurus", isAdmin: true };
     expect(isAdmin.value).toBe(true);
     expect(isStudent.value).toBe(false);
+  });
+
+  it("should checkAuth and update user from /api/auth/me", async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: { id: 10, username: "251011700350", nama_lengkap: "Mahasiswa Admin", role: "pengurus", isAdmin: true },
+      }),
+    });
+
+    const { checkAuth, token, user, isAdmin } = useAdminAuth();
+    token.value = "valid-token";
+    const success = await checkAuth();
+
+    expect(success).toBe(true);
+    expect(user.value.nama_lengkap).toBe("Mahasiswa Admin");
+    expect(isAdmin.value).toBe(true);
+    expect(JSON.parse(localStorage.getItem("03sife003_admin_user")).nama_lengkap).toBe("Mahasiswa Admin");
   });
 });

@@ -2,16 +2,21 @@
 import { onMounted, onUnmounted } from "vue";
 import { useTheme } from "@/composables/useTheme";
 import { useLastVisited } from "@/composables/useLastVisited";
+import { useAdminAuth } from "@/composables/useAdminAuth";
 
 import Navbar from "@/components/layout/Navbar.vue";
 import Footer from "@/components/layout/Footer.vue";
 
 const { initTheme } = useTheme();
 const { initGlobalListeners, cleanupGlobalListeners } = useLastVisited();
+const { token, checkAuth } = useAdminAuth();
 
 onMounted(() => {
   initTheme();
   initGlobalListeners();
+  if (token.value) {
+    checkAuth();
+  }
 });
 
 onUnmounted(() => {
