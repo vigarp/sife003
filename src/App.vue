@@ -31,7 +31,7 @@ onUnmounted(() => {
 
     <!-- Main Content Container with Router View -->
     <main
-      class="w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-10 min-h-[calc(100vh-16rem)] flex-1"
+      class="w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-10 min-h-[calc(100vh-16rem)] flex-1 min-w-0"
     >
       <router-view />
     </main>

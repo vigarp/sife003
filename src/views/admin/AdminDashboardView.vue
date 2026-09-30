@@ -274,23 +274,23 @@ onMounted(async () => {
     </div>
   </div>
 
-  <div v-else class="w-full space-y-6 pb-16">
+  <div v-else class="w-full max-w-full space-y-6 pb-16 min-w-0">
     <!-- Top Action Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-xs">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+        <div class="min-w-0">
+          <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 flex-wrap">
             <span>Zona Pengurus</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 shrink-0">
               03SIFE003
             </span>
           </h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400">
+          <p class="text-xs text-slate-500 dark:text-slate-400 break-words">
             Halo, <strong class="text-slate-800 dark:text-slate-200">{{ user?.nama_lengkap || "Pengurus Kelas" }}</strong>
             <span v-if="user?.nim" class="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-semibold ml-1">({{ user.nim }})</span>
             • Manajemen Agenda & Tugas Mahasiswa
@@ -350,122 +350,124 @@ onMounted(async () => {
     </div>
 
     <!-- Admin Navigation Tabs -->
-    <div class="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 w-fit text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
-      <button
-        @click="activeAdminTab = 'agenda'"
-        :class="[
-          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
-          activeAdminTab === 'agenda'
-            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-        ]"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-        <span>Agenda & Tugas</span>
-      </button>
+    <div class="w-full overflow-x-auto pb-1 max-w-full">
+      <div class="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 min-w-max text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
+        <button
+          @click="activeAdminTab = 'agenda'"
+          :class="[
+            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
+            activeAdminTab === 'agenda'
+              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+          ]"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span>Agenda & Tugas</span>
+        </button>
 
-      <button
-        @click="activeAdminTab = 'students'"
-        :class="[
-          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
-          activeAdminTab === 'students'
-            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-        ]"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <span>Data Mahasiswa</span>
-      </button>
+        <button
+          @click="activeAdminTab = 'students'"
+          :class="[
+            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
+            activeAdminTab === 'students'
+              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+          ]"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>Data Mahasiswa</span>
+        </button>
 
-      <button
-        @click="activeAdminTab = 'courses'"
-        :class="[
-          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
-          activeAdminTab === 'courses'
-            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-        ]"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-        <span>Mata Kuliah</span>
-      </button>
+        <button
+          @click="activeAdminTab = 'courses'"
+          :class="[
+            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
+            activeAdminTab === 'courses'
+              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+          ]"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Mata Kuliah</span>
+        </button>
 
-      <button
-        @click="activeAdminTab = 'lecturers'"
-        :class="[
-          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
-          activeAdminTab === 'lecturers'
-            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-        ]"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-        </svg>
-        <span>Data Dosen</span>
-      </button>
+        <button
+          @click="activeAdminTab = 'lecturers'"
+          :class="[
+            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
+            activeAdminTab === 'lecturers'
+              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+          ]"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+          <span>Data Dosen</span>
+        </button>
 
-      <button
-        @click="activeAdminTab = 'calendar'"
-        :class="[
-          'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer',
-          activeAdminTab === 'calendar'
-            ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-        ]"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <span>Kalender Akademik</span>
-      </button>
+        <button
+          @click="activeAdminTab = 'calendar'"
+          :class="[
+            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
+            activeAdminTab === 'calendar'
+              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+          ]"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>Kalender Akademik</span>
+        </button>
+      </div>
     </div>
 
     <!-- TAB 1: AGENDA & TUGAS -->
     <div v-if="activeAdminTab === 'agenda'" class="space-y-6">
       <!-- Management Controls & Filters -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl w-fit">
+        <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl w-fit max-w-full overflow-x-auto">
+          <button
+            @click="handleFilterChange('active')"
+            :class="[
+              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 whitespace-nowrap',
+              selectedFilter === 'active'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            ]"
+          >
+            Pekan {{ activeWeekNumber }} {{ activeWeekBadgeText }}
+          </button>
+          <button
+            @click="handleFilterChange('all')"
+            :class="[
+              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 whitespace-nowrap',
+              selectedFilter === 'all'
+                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            ]"
+          >
+            Semua Pekan (1–16)
+          </button>
+        </div>
+
         <button
-          @click="handleFilterChange('active')"
-          :class="[
-            'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer',
-            selectedFilter === 'active'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-          ]"
+          @click="openCreateModal"
+          class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer shrink-0"
         >
-          Pekan {{ activeWeekNumber }} {{ activeWeekBadgeText }}
-        </button>
-        <button
-          @click="handleFilterChange('all')"
-          :class="[
-            'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer',
-            selectedFilter === 'all'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
-          ]"
-        >
-          Semua Pekan (1–16)
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Tambah Agenda Tugas</span>
         </button>
       </div>
-
-      <button
-        @click="openCreateModal"
-        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer shrink-0"
-      >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        <span>Tambah Agenda Tugas</span>
-      </button>
-    </div>
 
     <!-- Agenda Table Card -->
     <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">

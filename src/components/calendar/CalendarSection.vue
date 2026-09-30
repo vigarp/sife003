@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -79,7 +79,7 @@ const calendarOptions = computed(() => ({
   firstDay: 1, // Start on Monday (Senin)
   height: "auto",
   headerToolbar: {
-    left: "prev,next today",
+    left: "prev next today",
     center: "title",
     right: "",
   },
@@ -144,7 +144,26 @@ const lastUpdatedTime = computed(() => {
   return formatRelativeTime(latestTimestamp.value, currentTime.value);
 });
 
+function handleKeyDown(e) {
+  if (e.key === "Escape" && isModalOpen.value) {
+    closeModal();
+  }
+}
+
+watch(isModalOpen, (open) => {
+  if (typeof document !== "undefined") {
+    if (open) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+  }
+});
+
 onMounted(async () => {
+  if (typeof window !== "undefined") {
+    window.addEventListener("keydown", handleKeyDown);
+  }
   await fetchEvents();
   timer = setInterval(() => {
     currentTime.value = Date.now();
@@ -153,6 +172,12 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (timer) clearInterval(timer);
+  if (typeof window !== "undefined") {
+    window.removeEventListener("keydown", handleKeyDown);
+  }
+  if (typeof document !== "undefined") {
+    document.body.classList.remove("overflow-hidden");
+  }
 });
 </script>
 
@@ -213,67 +238,79 @@ onUnmounted(() => {
     <!-- Event Detail Modal -->
     <div
       v-if="isModalOpen && selectedEvent"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 transition-opacity"
+      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 transition-opacity"
       @click.self="closeModal"
     >
-      <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-        <div class="flex items-start justify-between gap-3">
-          <div class="space-y-1">
+      <div
+        class="bg-white dark:bg-slate-900 w-full max-w-lg max-h-[85vh] sm:max-h-[80vh] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+      >
+        <!-- Modal Header (Fixed / Non-scrolling) -->
+        <div class="px-5 py-4 sm:px-6 sm:py-4.5 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-3 shrink-0 bg-white dark:bg-slate-900">
+          <div class="space-y-1 min-w-0 pr-1">
             <span
               class="px-2.5 py-0.5 rounded-full text-xs font-bold text-white shadow-2xs inline-block uppercase"
-              :style="{ backgroundColor: selectedEvent.color || CATEGORY_COLORS[selectedEvent.category] || '#3b82f6' }"
+              :style="{ backgroundColor: selectedEvent.color || CATEGORY_COLORS[selectedEvent.category] || '#2563eb' }"
             >
               {{ selectedEvent.category }}
             </span>
-            <h3 class="text-base md:text-lg font-bold text-slate-900 dark:text-white leading-snug">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug break-words">
               {{ selectedEvent.title }}
             </h3>
           </div>
           <button
+            type="button"
             @click="closeModal"
-            class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-lg font-bold p-1 cursor-pointer"
+            aria-label="Tutup modal"
+            class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition-colors cursor-pointer shrink-0"
           >
             ✕
           </button>
         </div>
 
-        <div class="space-y-2.5 text-xs text-slate-600 dark:text-slate-300 border-t border-b border-slate-100 dark:border-slate-800 py-3">
-          <div class="flex items-center justify-between">
-            <span class="text-slate-400">Tanggal Mulai:</span>
-            <strong class="text-slate-900 dark:text-white">{{ formatIndoDate(selectedEvent.start_date) }}</strong>
-          </div>
-          <div v-if="selectedEvent.end_date" class="flex items-center justify-between">
-            <span class="text-slate-400">Tanggal Selesai:</span>
-            <strong class="text-slate-900 dark:text-white">{{ formatIndoDate(selectedEvent.end_date) }}</strong>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-slate-400">Tahun Akademik:</span>
-            <strong class="font-mono text-slate-900 dark:text-white">{{ selectedEvent.academic_year || '20261' }}</strong>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-slate-400">Status:</span>
-            <span
-              :class="[
-                'px-2 py-0.5 rounded-full text-[11px] font-semibold',
-                getEventStatus(selectedEvent).class,
-              ]"
-            >
-              {{ getEventStatus(selectedEvent).label }}
-            </span>
+        <!-- Modal Body (Scrollable Container) -->
+        <div class="p-5 sm:p-6 overflow-y-auto overscroll-contain flex-1 min-h-0 space-y-4 text-xs text-slate-600 dark:text-slate-300">
+          <!-- Metadata List -->
+          <div class="space-y-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-400 shrink-0">Tanggal Mulai:</span>
+              <strong class="text-slate-900 dark:text-white text-right">{{ formatIndoDate(selectedEvent.start_date) }}</strong>
+            </div>
+            <div v-if="selectedEvent.end_date" class="flex items-center justify-between gap-2">
+              <span class="text-slate-400 shrink-0">Tanggal Selesai:</span>
+              <strong class="text-slate-900 dark:text-white text-right">{{ formatIndoDate(selectedEvent.end_date) }}</strong>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-400 shrink-0">Tahun Akademik:</span>
+              <strong class="font-mono text-slate-900 dark:text-white text-right">{{ selectedEvent.academic_year || '20261' }}</strong>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-400 shrink-0">Status:</span>
+              <span
+                :class="[
+                  'px-2 py-0.5 rounded-full text-[11px] font-semibold',
+                  getEventStatus(selectedEvent).class,
+                ]"
+              >
+                {{ getEventStatus(selectedEvent).label }}
+              </span>
+            </div>
           </div>
 
-          <div v-if="selectedEvent.description" class="pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span class="text-slate-400 block mb-1 font-semibold">Keterangan:</span>
-            <p class="whitespace-pre-wrap text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl">
+          <!-- Keterangan (Scrollable Text Area) -->
+          <div v-if="selectedEvent.description" class="space-y-1.5">
+            <span class="text-slate-500 dark:text-slate-400 font-semibold block">Keterangan:</span>
+            <div class="whitespace-pre-wrap text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 leading-relaxed font-normal max-h-48 sm:max-h-64 overflow-y-auto">
               {{ selectedEvent.description }}
-            </p>
+            </div>
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-1">
+        <!-- Modal Footer (Fixed / Non-scrolling) -->
+        <div class="px-5 py-3.5 sm:px-6 sm:py-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2 shrink-0 bg-slate-50/60 dark:bg-slate-900/60">
           <button
+            type="button"
             @click="closeModal"
-            class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors cursor-pointer"
+            class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors cursor-pointer text-center"
           >
             Tutup
           </button>
@@ -307,6 +344,31 @@ onUnmounted(() => {
   --fc-page-bg-color: #0f172a;
 }
 
+.fullcalendar-wrapper .fc-toolbar {
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+.fullcalendar-wrapper .fc-toolbar-chunk {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.fullcalendar-wrapper .fc-button-group {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.fullcalendar-wrapper .fc-button-group > .fc-button,
+.fullcalendar-wrapper .fc-direction-ltr .fc-button-group > .fc-button:not(:first-child),
+.fullcalendar-wrapper .fc-direction-ltr .fc-button-group > .fc-button:not(:last-child) {
+  margin: 0 !important;
+  margin-left: 0 !important;
+  border-radius: 10px !important;
+}
+
 .fullcalendar-wrapper .fc-toolbar-title {
   font-weight: 700 !important;
   font-size: 1.15rem !important;
@@ -328,7 +390,17 @@ onUnmounted(() => {
   font-size: 12px !important;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
   padding: 6px 14px !important;
+  min-height: 34px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   transition: all 0.2s !important;
+}
+
+.fullcalendar-wrapper .fc-prev-button,
+.fullcalendar-wrapper .fc-next-button {
+  width: 34px !important;
+  padding: 0 !important;
 }
 
 .fullcalendar-wrapper .fc-button-primary:hover {

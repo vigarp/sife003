@@ -373,9 +373,9 @@ onMounted(() => {
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in-50"
     >
       <div
-        class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg overflow-hidden transform transition-all"
+        class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden transform transition-all"
       >
-        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
           <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">
               {{ isEditing ? "edit_calendar" : "add_circle" }}
@@ -385,127 +385,130 @@ onMounted(() => {
           <button
             type="button"
             @click="closeModal"
-            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            aria-label="Tutup modal"
+            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer"
           >
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
-        <form @submit.prevent="handleSubmit" class="p-6 space-y-4 text-xs">
-          <!-- Title -->
-          <div>
-            <label for="calendar-event-title" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Judul Agenda <span class="text-rose-500">*</span>
-            </label>
-            <input
-              id="calendar-event-title"
-              v-model="form.title"
-              type="text"
-              required
-              placeholder="Contoh: Pekan UTS Seluruh Program Reguler"
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            />
-          </div>
-
-          <!-- Category & Academic Year -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form @submit.prevent="handleSubmit" class="flex flex-col flex-1 min-h-0 overflow-hidden text-xs">
+          <div class="p-6 space-y-4 overflow-y-auto overscroll-contain flex-1 min-h-0">
+            <!-- Title -->
             <div>
-              <label for="calendar-event-category" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Kategori <span class="text-rose-500">*</span>
-              </label>
-              <select
-                id="calendar-event-category"
-                v-model="form.category"
-                @change="handleCategoryChange"
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              >
-                <option
-                  v-for="cat in CATEGORIES.filter((c) => c.id !== 'Semua')"
-                  :key="cat.id"
-                  :value="cat.id"
-                >
-                  {{ cat.label }}
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label for="calendar-event-year" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tahun Akademik
+              <label for="calendar-event-title" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Judul Agenda <span class="text-rose-500">*</span>
               </label>
               <input
-                id="calendar-event-year"
-                v-model="form.academic_year"
+                id="calendar-event-title"
+                v-model="form.title"
                 type="text"
-                placeholder="20261 (Ganjil 2026/2027)"
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              />
-            </div>
-          </div>
-
-          <!-- Dates: Start & End -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label for="calendar-event-start-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tanggal Mulai <span class="text-rose-500">*</span>
-              </label>
-              <input
-                id="calendar-event-start-date"
-                v-model="form.start_date"
-                type="date"
                 required
+                placeholder="Contoh: Pekan UTS Seluruh Program Reguler"
                 class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
+            <!-- Category & Academic Year -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="calendar-event-category" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Kategori <span class="text-rose-500">*</span>
+                </label>
+                <select
+                  id="calendar-event-category"
+                  v-model="form.category"
+                  @change="handleCategoryChange"
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                >
+                  <option
+                    v-for="cat in CATEGORIES.filter((c) => c.id !== 'Semua')"
+                    :key="cat.id"
+                    :value="cat.id"
+                  >
+                    {{ cat.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label for="calendar-event-year" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Tahun Akademik
+                </label>
+                <input
+                  id="calendar-event-year"
+                  v-model="form.academic_year"
+                  type="text"
+                  placeholder="20261 (Ganjil 2026/2027)"
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <!-- Dates: Start & End -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label for="calendar-event-start-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Tanggal Mulai <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  id="calendar-event-start-date"
+                  v-model="form.start_date"
+                  type="date"
+                  required
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label for="calendar-event-end-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Tanggal Selesai (Opsional)
+                </label>
+                <input
+                  id="calendar-event-end-date"
+                  v-model="form.end_date"
+                  type="date"
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <!-- Color Preview / Override -->
             <div>
-              <label for="calendar-event-end-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tanggal Selesai (Opsional)
+              <label for="calendar-event-color" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Warna Penanda Badge
               </label>
-              <input
-                id="calendar-event-end-date"
-                v-model="form.end_date"
-                type="date"
+              <div class="flex items-center gap-3">
+                <input
+                  id="calendar-event-color"
+                  v-model="form.color"
+                  type="color"
+                  class="w-9 h-9 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white"
+                />
+                <span class="font-mono text-slate-500">{{ form.color }}</span>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label for="calendar-event-description" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Keterangan Tambahan
+              </label>
+              <textarea
+                id="calendar-event-description"
+                v-model="form.description"
+                rows="3"
+                placeholder="Catatan pendukung atau panduan pelaksanaan..."
                 class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              />
+              ></textarea>
             </div>
           </div>
 
-          <!-- Color Preview / Override -->
-          <div>
-            <label for="calendar-event-color" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Warna Penanda Badge
-            </label>
-            <div class="flex items-center gap-3">
-              <input
-                id="calendar-event-color"
-                v-model="form.color"
-                type="color"
-                class="w-9 h-9 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white"
-              />
-              <span class="font-mono text-slate-500">{{ form.color }}</span>
-            </div>
-          </div>
-
-          <!-- Description -->
-          <div>
-            <label for="calendar-event-description" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Keterangan Tambahan
-            </label>
-            <textarea
-              id="calendar-event-description"
-              v-model="form.description"
-              rows="3"
-              placeholder="Catatan pendukung atau panduan pelaksanaan..."
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            ></textarea>
-          </div>
-
-          <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
+          <div class="px-6 py-4 flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-slate-900/50">
             <button
               type="button"
               @click="closeModal"
-              class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Batal
             </button>
