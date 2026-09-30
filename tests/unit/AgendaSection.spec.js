@@ -85,4 +85,37 @@ describe("AgendaSection.vue", () => {
     expect(wrapper.text()).toContain("Latihan Polymorphism");
     expect(wrapper.text()).toContain("Pekan 5");
   });
+
+  it("should display last update relative time based on newest task", async () => {
+    const mockTasks = [
+      {
+        id: 1,
+        pekan: 5,
+        mata_kuliah: "Analisa Proses Bisnis",
+        judul: "Tugas 1",
+        created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      },
+      {
+        id: 2,
+        pekan: 5,
+        mata_kuliah: "PBO",
+        judul: "Tugas 2",
+        created_at: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+      },
+    ];
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: mockTasks,
+      }),
+    });
+
+    const wrapper = mount(AgendaSection, { global: globalConfig });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("Last update: 2 minutes ago");
+    expect(wrapper.text()).not.toContain("Automated synced");
+  });
 });

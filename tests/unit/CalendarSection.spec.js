@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
+import { mount, flushPromises } from "@vue/test-utils";
 
 vi.mock("@fullcalendar/vue3", () => ({
   default: {
@@ -126,5 +126,30 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     wrapper.vm.closeModal();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.isModalOpen).toBe(false);
+  });
+
+  it("should display last update footer inside calendar container", async () => {
+    const threeHoursAgo = new Date(Date.now() - 3 * 3600 * 1000 - 60 * 1000).toISOString();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: [
+          {
+            id: 1,
+            title: "Seminar Teknologi Web",
+            category: "event",
+            start_date: "2026-10-12",
+            created_at: threeHoursAgo,
+          },
+        ],
+      }),
+    });
+
+    const wrapper = mount(CalendarSection, mountOptions);
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("Last update: 3 hours ago");
+    expect(wrapper.text()).toContain("Kelola di Zona Pengurus");
   });
 });

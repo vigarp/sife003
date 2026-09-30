@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import idLocale from "@fullcalendar/core/locales/id";
 import { useAcademicCalendar, CATEGORIES, CATEGORY_COLORS } from "@/composables/useAcademicCalendar";
+import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
 
 // Composable
 const { events, loading, fetchEvents } = useAcademicCalendar();
@@ -134,8 +135,24 @@ function getEventStatus(event) {
   }
 }
 
+const currentTime = ref(Date.now());
+let timer = null;
+
+const latestTimestamp = computed(() => getLatestTimestamp(events.value));
+const lastUpdatedTime = computed(() => {
+  if (!latestTimestamp.value) return "just now";
+  return formatRelativeTime(latestTimestamp.value, currentTime.value);
+});
+
 onMounted(async () => {
   await fetchEvents();
+  timer = setInterval(() => {
+    currentTime.value = Date.now();
+  }, 30000);
+});
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer);
 });
 </script>
 
@@ -170,6 +187,26 @@ onMounted(async () => {
       <!-- FullCalendar Container -->
       <div class="p-4 md:p-6 fullcalendar-wrapper">
         <FullCalendar ref="fullCalendarRef" :options="calendarOptions" />
+      </div>
+
+      <!-- Footer Last Update (Under the calendar, inside the calendar container) -->
+      <div class="px-5 py-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+        <span class="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Last update: {{ lastUpdatedTime }}</span>
+        </span>
+
+        <router-link
+          to="/pengurus"
+          class="font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+        >
+          <span>Kelola di Zona Pengurus</span>
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </router-link>
       </div>
     </div>
 

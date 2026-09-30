@@ -1,10 +1,14 @@
 <script setup>
-import { onMounted, computed } from "vue";
+import { onMounted, onUnmounted, computed, ref } from "vue";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
 import { useSchedule } from "@/composables/useSchedule";
+import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
 
 const { agendas, loading, fetchAgendas } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
+
+const currentTime = ref(Date.now());
+let timer = null;
 
 // Compute active week number
 const activeWeekNumber = computed(() => {
@@ -23,8 +27,21 @@ const weekDateRange = computed(() => {
 
 const isUpcoming = computed(() => activeWeekStatus.value === "upcoming");
 
+const latestTimestamp = computed(() => getLatestTimestamp(agendas.value));
+const lastUpdatedTime = computed(() => {
+  if (!latestTimestamp.value) return "just now";
+  return formatRelativeTime(latestTimestamp.value, currentTime.value);
+});
+
 onMounted(() => {
   fetchAgendas(activeWeekNumber.value);
+  timer = setInterval(() => {
+    currentTime.value = Date.now();
+  }, 30000);
+});
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer);
 });
 </script>
 
@@ -170,11 +187,11 @@ onMounted(() => {
 
     <!-- Section Footer Link to Pengurus Portal -->
     <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-      <span class="inline-flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+      <span class="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Automated synced</span>
+        <span>Last update: {{ lastUpdatedTime }}</span>
       </span>
 
       <router-link
