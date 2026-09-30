@@ -7,14 +7,17 @@ export function parseUtcDate(timeStr) {
   if (typeof timeStr === "string") {
     // If standard SQLite "YYYY-MM-DD HH:MM:SS" without T or timezone, treat as UTC
     const hasTimezone = timeStr.endsWith("Z") || timeStr.includes("+") || (timeStr.includes("T") && /[-+]\d{2}:?\d{2}$/.test(timeStr));
-    const isoStr = timeStr.includes("T")
-      ? (hasTimezone ? timeStr : `${timeStr}Z`)
-      : `${timeStr.replace(" ", "T")}Z`;
+    let isoStr;
+    if (timeStr.includes("T")) {
+      isoStr = hasTimezone ? timeStr : `${timeStr}Z`;
+    } else {
+      isoStr = `${timeStr.replace(" ", "T")}Z`;
+    }
     const d = new Date(isoStr);
-    return isNaN(d.getTime()) ? new Date(timeStr) : d;
+    return Number.isNaN(d.getTime()) ? new Date(timeStr) : d;
   }
   const d = new Date(timeStr);
-  return isNaN(d.getTime()) ? null : d;
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 export function getLatestTimestamp(items) {
@@ -25,7 +28,7 @@ export function getLatestTimestamp(items) {
     for (const timeVal of times) {
       if (!timeVal) continue;
       const parsed = parseUtcDate(timeVal);
-      if (parsed && !isNaN(parsed.getTime()) && parsed.getTime() > maxTime) {
+      if (parsed && !Number.isNaN(parsed.getTime()) && parsed.getTime() > maxTime) {
         maxTime = parsed.getTime();
       }
     }
@@ -35,8 +38,16 @@ export function getLatestTimestamp(items) {
 
 export function formatRelativeTime(date, now = Date.now()) {
   if (!date) return null;
-  const targetDate = typeof date === "number" ? new Date(date) : date instanceof Date ? date : parseUtcDate(date);
-  if (!targetDate || isNaN(targetDate.getTime())) return null;
+  let targetDate;
+  if (typeof date === "number") {
+    targetDate = new Date(date);
+  } else if (date instanceof Date) {
+    targetDate = date;
+  } else {
+    targetDate = parseUtcDate(date);
+  }
+
+  if (!targetDate || Number.isNaN(targetDate.getTime())) return null;
 
   const nowMs = typeof now === "number" ? now : now.getTime();
   const diffSeconds = Math.max(0, Math.floor((nowMs - targetDate.getTime()) / 1000));

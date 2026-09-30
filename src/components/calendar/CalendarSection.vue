@@ -293,8 +293,8 @@ onUnmounted(() => {
   --fc-button-border-color: #e2e8f0;
   --fc-button-hover-bg-color: #f8fafc;
   --fc-button-hover-border-color: #cbd5e1;
-  --fc-button-active-bg-color: #3b82f6;
-  --fc-button-active-border-color: #3b82f6;
+  --fc-button-active-bg-color: #2563eb;
+  --fc-button-active-border-color: #2563eb;
 }
 
 .dark .fullcalendar-wrapper .fc {
@@ -338,9 +338,9 @@ onUnmounted(() => {
 
 .fullcalendar-wrapper .fc-button-primary:not(:disabled).fc-button-active, 
 .fullcalendar-wrapper .fc-button-primary:not(:disabled):active {
-  background-color: #3b82f6 !important;
+  background-color: #2563eb !important;
   color: #ffffff !important;
-  border-color: #3b82f6 !important;
+  border-color: #2563eb !important;
 }
 
 .fullcalendar-wrapper .fc-theme-standard th {
@@ -391,9 +391,9 @@ onUnmounted(() => {
 }
 
 .fullcalendar-wrapper .fc-day-today .fc-daygrid-day-number {
-  background-color: #3b82f6 !important;
+  background-color: #2563eb !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 .fullcalendar-wrapper .fc-event {

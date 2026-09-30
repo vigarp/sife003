@@ -64,12 +64,37 @@ function parsePekanDateRange(dateStr) {
   return null;
 }
 
+// Helpers for active week calculation
+function findOngoingWeek(parsedWeeks, now) {
+  return parsedWeeks.findIndex(({ range }) => range && now >= range.start && now <= range.end);
+}
+
+function findUpcomingBufferWeek(parsedWeeks, now) {
+  for (let i = 0; i < parsedWeeks.length - 1; i++) {
+    const currentEnd = parsedWeeks[i].range?.end;
+    const nextStart = parsedWeeks[i + 1].range?.start;
+    if (currentEnd && nextStart && now > currentEnd && now < nextStart) {
+      return i + 1;
+    }
+  }
+  return -1;
+}
+
+function getSemesterBoundFallback(parsedWeeks, now) {
+  const firstStart = parsedWeeks[0]?.range?.start;
+  const lastEnd = parsedWeeks[parsedWeeks.length - 1]?.range?.end;
+  if (firstStart && now < firstStart) {
+    return { detected: 0, status: "upcoming" };
+  }
+  if (lastEnd && now > lastEnd) {
+    return { detected: parsedWeeks.length - 1, status: "ongoing" };
+  }
+  return { detected: 4, status: "ongoing" };
+}
+
 // Compute active week info with Sunday buffer zone
 function computeActiveWeekInfo() {
   const now = new Date();
-  let detected = -1;
-  let status = "ongoing"; // "ongoing" | "upcoming"
-
   const parsedWeeks = scheduleData.jadwal_per_pekan.map((p, idx) => ({
     idx,
     pekan: p.pekan,
@@ -77,45 +102,19 @@ function computeActiveWeekInfo() {
   }));
 
   // 1. Inside any regular active week (Monday to Saturday)
-  for (let i = 0; i < parsedWeeks.length; i++) {
-    const { range } = parsedWeeks[i];
-    if (range && now >= range.start && now <= range.end) {
-      detected = i;
-      status = "ongoing";
-      break;
-    }
+  const ongoingIdx = findOngoingWeek(parsedWeeks, now);
+  if (ongoingIdx !== -1) {
+    return { detected: ongoingIdx, status: "ongoing" };
   }
 
   // 2. Buffer zone (Sunday between week i and week i+1)
-  if (detected === -1) {
-    for (let i = 0; i < parsedWeeks.length - 1; i++) {
-      const currentEnd = parsedWeeks[i].range?.end;
-      const nextStart = parsedWeeks[i + 1].range?.start;
-      if (currentEnd && nextStart && now > currentEnd && now < nextStart) {
-        detected = i + 1; // Advance to the upcoming week
-        status = "upcoming";
-        break;
-      }
-    }
+  const upcomingIdx = findUpcomingBufferWeek(parsedWeeks, now);
+  if (upcomingIdx !== -1) {
+    return { detected: upcomingIdx, status: "upcoming" };
   }
 
   // 3. Semester bound fallbacks
-  if (detected === -1) {
-    const firstStart = parsedWeeks[0].range?.start;
-    const lastEnd = parsedWeeks[parsedWeeks.length - 1].range?.end;
-    if (firstStart && now < firstStart) {
-      detected = 0;
-      status = "upcoming";
-    } else if (lastEnd && now > lastEnd) {
-      detected = parsedWeeks.length - 1;
-      status = "ongoing";
-    } else {
-      detected = 4;
-      status = "ongoing";
-    }
-  }
-
-  return { detected, status };
+  return getSemesterBoundFallback(parsedWeeks, now);
 }
 
 function getMaster(matkulName) {

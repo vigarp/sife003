@@ -259,7 +259,9 @@ onMounted(() => {
 
       <!-- Search Input -->
       <div class="relative w-full md:w-64">
+        <label for="calendar-search-input" class="sr-only">Cari agenda akademik</label>
         <input
+          id="calendar-search-input"
           v-model="searchQuery"
           type="text"
           placeholder="Cari agenda akademik..."
@@ -392,10 +394,11 @@ onMounted(() => {
         <form @submit.prevent="handleSubmit" class="p-6 space-y-4 text-xs">
           <!-- Title -->
           <div>
-            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="calendar-event-title" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Judul Agenda <span class="text-rose-500">*</span>
             </label>
             <input
+              id="calendar-event-title"
               v-model="form.title"
               type="text"
               required
@@ -407,10 +410,11 @@ onMounted(() => {
           <!-- Category & Academic Year -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="calendar-event-category" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Kategori <span class="text-rose-500">*</span>
               </label>
               <select
+                id="calendar-event-category"
                 v-model="form.category"
                 @change="handleCategoryChange"
                 class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
@@ -426,10 +430,11 @@ onMounted(() => {
             </div>
 
             <div>
-              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="calendar-event-year" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Tahun Akademik
               </label>
               <input
+                id="calendar-event-year"
                 v-model="form.academic_year"
                 type="text"
                 placeholder="20261 (Ganjil 2026/2027)"
@@ -441,10 +446,11 @@ onMounted(() => {
           <!-- Dates: Start & End -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="calendar-event-start-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Tanggal Mulai <span class="text-rose-500">*</span>
               </label>
               <input
+                id="calendar-event-start-date"
                 v-model="form.start_date"
                 type="date"
                 required
@@ -453,10 +459,11 @@ onMounted(() => {
             </div>
 
             <div>
-              <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="calendar-event-end-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Tanggal Selesai (Opsional)
               </label>
               <input
+                id="calendar-event-end-date"
                 v-model="form.end_date"
                 type="date"
                 class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
@@ -466,11 +473,12 @@ onMounted(() => {
 
           <!-- Color Preview / Override -->
           <div>
-            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="calendar-event-color" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Warna Penanda Badge
             </label>
             <div class="flex items-center gap-3">
               <input
+                id="calendar-event-color"
                 v-model="form.color"
                 type="color"
                 class="w-9 h-9 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white"
@@ -481,10 +489,11 @@ onMounted(() => {
 
           <!-- Description -->
           <div>
-            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="calendar-event-description" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Keterangan Tambahan
             </label>
             <textarea
+              id="calendar-event-description"
               v-model="form.description"
               rows="3"
               placeholder="Catatan pendukung atau panduan pelaksanaan..."
