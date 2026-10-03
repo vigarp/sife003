@@ -82,6 +82,11 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     expect(wrapper.text()).toContain("Kampus");
   });
 
+  it("should configure FullCalendar to start on Sunday (firstDay = 0)", () => {
+    const wrapper = mount(CalendarSection, mountOptions);
+    expect(wrapper.vm.calendarOptions.firstDay).toBe(0);
+  });
+
   it("should format calendarEvents for FullCalendar with proper date boundaries", async () => {
     const wrapper = mount(CalendarSection, mountOptions);
     await wrapper.vm.$nextTick();

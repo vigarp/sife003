@@ -76,7 +76,7 @@ const calendarEvents = computed(() => {
 const calendarOptions = computed(() => ({
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: "dayGridMonth",
-  firstDay: 1, // Start on Monday (Senin)
+  firstDay: 0, // Start on Sunday (Minggu)
   height: "auto",
   headerToolbar: {
     left: "prev next today",
