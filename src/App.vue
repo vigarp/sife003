@@ -6,6 +6,7 @@ import { useAdminAuth } from "@/composables/useAdminAuth";
 
 import Navbar from "@/components/layout/Navbar.vue";
 import Footer from "@/components/layout/Footer.vue";
+import ScrollToTop from "@/components/common/ScrollToTop.vue";
 
 const { initTheme } = useTheme();
 const { initGlobalListeners, cleanupGlobalListeners } = useLastVisited();
@@ -38,5 +39,8 @@ onUnmounted(() => {
 
     <!-- Academic Footer -->
     <Footer />
+
+    <!-- Floating Scroll To Top Button -->
+    <ScrollToTop />
   </div>
 </template>
