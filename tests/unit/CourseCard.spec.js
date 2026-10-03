@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import CourseCard from "@/components/schedule/CourseCard.vue";
 import { useLastVisited } from "@/composables/useLastVisited";
+import { useSchedule } from "@/composables/useSchedule";
 
 describe("CourseCard.vue", () => {
   const sampleItem = {
@@ -102,5 +103,34 @@ describe("CourseCard.vue", () => {
 
     expect(mentariBtn.classes()).toContain("btn-last-visited");
     expect(wrapper.classes()).toContain("card-last-visited");
+  });
+
+  it("should render time badge for luring course", () => {
+    const wrapper = mount(CourseCard, {
+      props: {
+        item: { ...sampleItem, jam: "07.40 - 09.20" },
+        master: sampleMaster,
+        isLuring: true,
+        weekIndex: 0,
+      },
+    });
+
+    expect(wrapper.text()).toContain("07.40 - 09.20");
+    const badge = wrapper.find("span.shrink-0");
+    expect(badge.exists()).toBe(true);
+  });
+
+  it("should expose isOngoingSession in component instance", () => {
+    const { activeWeekIndex } = useSchedule();
+    const wrapper = mount(CourseCard, {
+      props: {
+        item: { ...sampleItem, jam: "07.40 - 09.20" },
+        master: sampleMaster,
+        isLuring: true,
+        weekIndex: activeWeekIndex,
+      },
+    });
+
+    expect(wrapper.vm.isOngoingSession !== undefined).toBe(true);
   });
 });

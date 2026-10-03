@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useSchedule } from "@/composables/useSchedule";
 import { useLastVisited } from "@/composables/useLastVisited";
+import { useScheduleTime } from "@/composables/useScheduleTime";
 
 const props = defineProps({
   item: {
@@ -22,8 +23,9 @@ const props = defineProps({
   },
 });
 
-const { getLmsUrl, getPresensiUrl } = useSchedule();
+const { getLmsUrl, getPresensiUrl, activeWeekIndex, isCurrentWeek } = useSchedule();
 const { setVisited, isVisited } = useLastVisited();
+const { currentWib, isScheduleOngoing } = useScheduleTime();
 
 const matkulKey = computed(() =>
   props.master?.kode || props.item.mata_kuliah.replace(/\s+/g, "_")
@@ -51,12 +53,31 @@ const pNum = computed(() => {
 const jam = computed(() => props.item.jam || props.master?.jam || null);
 const lmsUrl = computed(() => getLmsUrl(props.item, props.master));
 const presensiUrl = computed(() => getPresensiUrl(props.master));
+
+const isOngoingSession = computed(() => {
+  if (!props.isLuring || !jam.value) return false;
+  const isCardInActiveWeek = props.weekIndex === activeWeekIndex;
+  if (!isCardInActiveWeek || !isCurrentWeek.value) return false;
+
+  return isScheduleOngoing(jam.value, {
+    isLuring: true,
+    isCurrentWeek: true,
+    wibInfo: currentWib.value,
+  });
+});
+
+defineExpose({
+  isOngoingSession,
+});
 </script>
 
 <template>
   <div
     class="matkul-card p-3.5 rounded-xl bg-surface dark:bg-slate-800/70 border border-border-ui dark:border-slate-700/60 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
-    :class="{ 'card-last-visited': isCardVisited }"
+    :class="{
+      'card-last-visited': isCardVisited,
+      'border-blue-400/70 dark:border-blue-500/70 ring-1 ring-blue-500/20 bg-blue-50/20 dark:bg-slate-800': isOngoingSession,
+    }"
   >
     <!-- Left: Matkul Info -->
     <div class="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -65,8 +86,22 @@ const presensiUrl = computed(() => getPresensiUrl(props.master));
           <!-- Time Badge (Luring) -->
           <span
             v-if="isLuring && jam"
-            class="shrink-0 px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-primary dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 flex items-center gap-1"
+            class="shrink-0 px-2.5 py-0.5 rounded-md text-xs flex items-center gap-1.5 transition-all duration-200"
+            :class="[
+              isOngoingSession
+                ? 'font-extrabold bg-blue-600 text-white border-2 border-blue-600 dark:border-blue-400 shadow-sm ring-2 ring-blue-500/25'
+                : 'font-bold bg-blue-50 dark:bg-blue-950/70 text-primary dark:text-blue-300 border border-blue-200 dark:border-blue-800/60',
+            ]"
+            :title="isOngoingSession ? 'Sesi ini sedang berlangsung sekarang (WIB)' : undefined"
           >
+            <span
+              v-if="isOngoingSession"
+              class="relative flex h-2 w-2"
+              aria-label="Sedang Berlangsung"
+            >
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-200 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
             <span class="material-symbols-outlined text-[14px]">schedule</span>
             <span>{{ jam }}</span>
           </span>
