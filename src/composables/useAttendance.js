@@ -172,7 +172,7 @@ export function useAttendance() {
       saveLocalSessions(sessions.value);
       markSessionPending(sessionId);
       if (isOnline.value && isAuthenticated.value) {
-        syncPendingSessions();
+        void syncPendingSessions();
       }
     }
 
@@ -196,7 +196,7 @@ export function useAttendance() {
 
     // Auto-sync debounce
     if (isOnline.value && isAuthenticated.value) {
-      syncPendingSessions();
+      void syncPendingSessions();
     }
   }
 
@@ -218,7 +218,7 @@ export function useAttendance() {
     markSessionPending(sessionId);
 
     if (isOnline.value && isAuthenticated.value) {
-      syncPendingSessions();
+      void syncPendingSessions();
     }
   }
 
@@ -244,7 +244,7 @@ export function useAttendance() {
       window.addEventListener("online", () => {
         isOnline.value = true;
         if (isAuthenticated.value) {
-          syncPendingSessions();
+          void syncPendingSessions();
         }
       });
       window.addEventListener("offline", () => {
@@ -252,7 +252,7 @@ export function useAttendance() {
       });
     }
 
-    fetchRemoteData();
+    void fetchRemoteData();
   }
 
   return {
