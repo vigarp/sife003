@@ -6,6 +6,7 @@ const CATEGORY_COLORS = {
   event: "#3b82f6",
   prodi: "#8b5cf6",
   kampus: "#10b981",
+  nasional: "#ef4444",
 };
 
 function parseBody(req) {

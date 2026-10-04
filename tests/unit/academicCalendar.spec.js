@@ -43,10 +43,11 @@ describe("useAcademicCalendar composable", () => {
   });
 
   it("should have correct categories and category colors mapped", () => {
-    expect(CATEGORIES.length).toBe(4);
+    expect(CATEGORIES.length).toBe(5);
     expect(CATEGORY_COLORS.event).toBe("#3b82f6");
     expect(CATEGORY_COLORS.prodi).toBe("#8b5cf6");
     expect(CATEGORY_COLORS.kampus).toBe("#10b981");
+    expect(CATEGORY_COLORS.nasional).toBe("#ef4444");
   });
 
   it("should fetch events successfully", async () => {

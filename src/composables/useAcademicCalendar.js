@@ -6,12 +6,14 @@ export const CATEGORIES = [
   { id: "event", label: "Event", color: "#3b82f6" },
   { id: "prodi", label: "Prodi", color: "#8b5cf6" },
   { id: "kampus", label: "Kampus", color: "#10b981" },
+  { id: "nasional", label: "Libur Nasional", color: "#ef4444" },
 ];
 
 export const CATEGORY_COLORS = {
   event: "#3b82f6",
   prodi: "#8b5cf6",
   kampus: "#10b981",
+  nasional: "#ef4444",
 };
 
 const events = ref([]);

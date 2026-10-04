@@ -6,6 +6,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import idLocale from "@fullcalendar/core/locales/id";
 import { useAcademicCalendar, CATEGORIES, CATEGORY_COLORS } from "@/composables/useAcademicCalendar";
 import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
+import holidaysData from "@/data/holidays.json";
 
 // Composable
 const { events, loading, fetchEvents } = useAcademicCalendar();
@@ -45,9 +46,43 @@ function addOneDay(dateStr) {
   return `${nextY}-${nextM}-${nextD}`;
 }
 
-// FullCalendar formatted events (shows all events from CRUD)
+// Indonesian National Holidays from SKB 3 Menteri 2026
+const nationalHolidayEvents = computed(() => {
+  return (holidaysData.data || []).map((h, idx) => {
+    const isCuti = Boolean(h.is_cuti_bersama);
+    const color = isCuti ? "#f87171" : "#ef4444";
+    const title = isCuti ? `Cuti Bersama: ${h.name}` : h.name;
+    const categoryLabel = isCuti ? "Cuti Bersama" : "Libur Nasional";
+    const desc = isCuti
+      ? `Cuti Bersama ${h.name} (Ketetapan SKB 3 Menteri Tahun 2026).`
+      : `Hari Libur Nasional: ${h.name} (Ketetapan SKB 3 Menteri Tahun 2026).`;
+
+    return {
+      id: `holiday-${h.date}-${idx}`,
+      title,
+      start: h.date,
+      allDay: true,
+      backgroundColor: color,
+      borderColor: color,
+      textColor: "#ffffff",
+      extendedProps: {
+        category: "nasional",
+        category_label: categoryLabel,
+        start_date: h.date,
+        end_date: h.date,
+        color,
+        academic_year: "2026",
+        description: desc,
+        is_holiday: true,
+        is_cuti_bersama: isCuti,
+      },
+    };
+  });
+});
+
+// FullCalendar formatted events (combines CRUD academic events & national holidays)
 const calendarEvents = computed(() => {
-  return events.value.map((ev) => {
+  const customEvents = events.value.map((ev) => {
     const isMultiDay = ev.end_date && ev.end_date !== ev.start_date;
     const color = ev.color || CATEGORY_COLORS[ev.category] || "#3b82f6";
 
@@ -62,14 +97,18 @@ const calendarEvents = computed(() => {
       textColor: "#ffffff",
       extendedProps: {
         category: ev.category,
+        category_label: ev.category,
         start_date: ev.start_date,
         end_date: ev.end_date,
         color,
         academic_year: ev.academic_year,
         description: ev.description,
+        is_holiday: false,
       },
     };
   });
+
+  return [...customEvents, ...nationalHolidayEvents.value];
 });
 
 // FullCalendar options
@@ -100,17 +139,24 @@ function handleEventClick(clickInfo) {
     id: clickInfo.event.id,
     title: clickInfo.event.title,
     category: props.category || "event",
+    category_label: props.category_label || (props.category === "nasional" ? "Libur Nasional" : props.category) || "event",
     start_date: props.start_date,
     end_date: props.end_date,
     color: props.color || CATEGORY_COLORS[props.category] || "#3b82f6",
     academic_year: props.academic_year || "20261",
     description: props.description || "",
+    is_holiday: Boolean(props.is_holiday),
+    is_cuti_bersama: Boolean(props.is_cuti_bersama),
   };
   isModalOpen.value = true;
 }
 
 function openEventModal(ev) {
-  selectedEvent.value = ev;
+  selectedEvent.value = {
+    ...ev,
+    category_label: ev.category_label || (ev.category === "nasional" ? "Libur Nasional" : ev.category) || "event",
+    is_holiday: Boolean(ev.is_holiday),
+  };
   isModalOpen.value = true;
 }
 
@@ -251,7 +297,7 @@ onUnmounted(() => {
               class="px-2.5 py-0.5 rounded-full text-xs font-bold text-white shadow-2xs inline-block uppercase"
               :style="{ backgroundColor: selectedEvent.color || CATEGORY_COLORS[selectedEvent.category] || '#2563eb' }"
             >
-              {{ selectedEvent.category }}
+              {{ selectedEvent.category_label || selectedEvent.category }}
             </span>
             <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug break-words">
               {{ selectedEvent.title }}
@@ -275,13 +321,17 @@ onUnmounted(() => {
               <span class="text-slate-400 shrink-0">Tanggal Mulai:</span>
               <strong class="text-slate-900 dark:text-white text-right">{{ formatIndoDate(selectedEvent.start_date) }}</strong>
             </div>
-            <div v-if="selectedEvent.end_date" class="flex items-center justify-between gap-2">
+            <div v-if="selectedEvent.end_date && selectedEvent.end_date !== selectedEvent.start_date" class="flex items-center justify-between gap-2">
               <span class="text-slate-400 shrink-0">Tanggal Selesai:</span>
               <strong class="text-slate-900 dark:text-white text-right">{{ formatIndoDate(selectedEvent.end_date) }}</strong>
             </div>
-            <div class="flex items-center justify-between gap-2">
+            <div v-if="!selectedEvent.is_holiday" class="flex items-center justify-between gap-2">
               <span class="text-slate-400 shrink-0">Tahun Akademik:</span>
               <strong class="font-mono text-slate-900 dark:text-white text-right">{{ selectedEvent.academic_year || '20261' }}</strong>
+            </div>
+            <div v-else class="flex items-center justify-between gap-2">
+              <span class="text-slate-400 shrink-0">Sumber:</span>
+              <strong class="text-slate-900 dark:text-white text-right">SKB 3 Menteri Tahun 2026</strong>
             </div>
             <div class="flex items-center justify-between gap-2">
               <span class="text-slate-400 shrink-0">Status:</span>

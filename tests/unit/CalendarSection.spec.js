@@ -74,12 +74,13 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     expect(wrapper.text()).toContain("Kalender");
   });
 
-  it("should render category legends for Event, Prodi, and Kampus without All/Semua", () => {
+  it("should render category legends for Event, Prodi, Kampus, and Libur Nasional without All/Semua", () => {
     const wrapper = mount(CalendarSection, mountOptions);
     expect(wrapper.text()).not.toContain("Semua");
     expect(wrapper.text()).toContain("Event");
     expect(wrapper.text()).toContain("Prodi");
     expect(wrapper.text()).toContain("Kampus");
+    expect(wrapper.text()).toContain("Libur Nasional");
   });
 
   it("should configure FullCalendar to start on Sunday (firstDay = 0)", () => {
@@ -87,12 +88,13 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     expect(wrapper.vm.calendarOptions.firstDay).toBe(0);
   });
 
-  it("should format calendarEvents for FullCalendar with proper date boundaries", async () => {
+  it("should format calendarEvents for FullCalendar with proper date boundaries and national holidays", async () => {
     const wrapper = mount(CalendarSection, mountOptions);
     await wrapper.vm.$nextTick();
 
     const events = wrapper.vm.calendarEvents;
-    expect(events.length).toBe(3);
+    // 3 mock custom events + 25 national holidays from SKB 3 Menteri 2026
+    expect(events.length).toBe(28);
 
     // Multi-day event (start: 2026-10-12, end: 2026-10-14) should have exclusive end: 2026-10-15
     const multiDay = events.find((e) => e.title === "Seminar Teknologi Web");
@@ -104,6 +106,13 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     const singleDay = events.find((e) => e.title === "Batas Pengisian KRS");
     expect(singleDay.start).toBe("2026-10-05");
     expect(singleDay.end).toBeUndefined();
+
+    // National holiday event check
+    const holidayEvent = events.find((e) => e.title === "Proklamasi Kemerdekaan");
+    expect(holidayEvent).toBeDefined();
+    expect(holidayEvent.start).toBe("2026-08-17");
+    expect(holidayEvent.extendedProps.category).toBe("nasional");
+    expect(holidayEvent.backgroundColor).toBe("#ef4444");
   });
 
   it("should open and close event detail modal when an event is selected", async () => {
