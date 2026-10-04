@@ -2,13 +2,28 @@
 import { onMounted, onUnmounted, computed, ref } from "vue";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
 import { useSchedule } from "@/composables/useSchedule";
+import { useAdminAuth } from "@/composables/useAdminAuth";
 import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
+import { formatAgendaShareText, copyToClipboard } from "@/utils/scheduleShare";
 
 const { agendas, loading, fetchAgendas } = useAgenda();
 const { currentWeek, activeWeekStatus } = useSchedule();
+const { isAdmin } = useAdminAuth();
 
 const currentTime = ref(Date.now());
+const copiedAgenda = ref(false);
 let timer = null;
+
+async function handleCopyAgenda() {
+  const text = formatAgendaShareText(agendas.value);
+  const ok = await copyToClipboard(text);
+  if (ok) {
+    copiedAgenda.value = true;
+    setTimeout(() => {
+      copiedAgenda.value = false;
+    }, 2000);
+  }
+}
 
 // Compute active week number
 const activeWeekNumber = computed(() => {
@@ -85,8 +100,31 @@ onUnmounted(() => {
         </p>
       </div>
 
-      <div class="text-xs text-slate-400 dark:text-slate-500 shrink-0 font-medium">
-        {{ weekDateRange }}
+      <div class="flex items-center gap-2.5 shrink-0">
+        <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">
+          {{ weekDateRange }}
+        </span>
+        <button
+          v-if="isAdmin && agendas.length > 0"
+          type="button"
+          @click="handleCopyAgenda"
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all duration-200 cursor-pointer border shadow-2xs active:scale-95"
+          :class="
+            copiedAgenda
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700'
+          "
+          :title="copiedAgenda ? 'Tersalin ke clipboard!' : 'Salin format tugas pekan ini'"
+          :aria-label="copiedAgenda ? 'Agenda tugas tersalin' : 'Salin format tugas pekan ini'"
+        >
+          <svg v-if="copiedAgenda" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+          <svg v-else class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          <span>{{ copiedAgenda ? 'Tersalin' : 'Salin Tugas' }}</span>
+        </button>
       </div>
     </div>
 

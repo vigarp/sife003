@@ -118,4 +118,75 @@ describe("AgendaSection.vue", () => {
     expect(wrapper.text()).toContain("Last update: 2 minutes ago");
     expect(wrapper.text()).not.toContain("Automated synced");
   });
+
+  it("should not render copy button for non-admin users", async () => {
+    localStorage.clear();
+    const { user } = await import("@/composables/useAdminAuth").then((m) => m.useAdminAuth());
+    user.value = null;
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: [{ id: 1, mata_kuliah: "PBO", judul: "Tugas 1" }],
+      }),
+    });
+
+    const wrapper = mount(AgendaSection, { global: globalConfig });
+    await flushPromises();
+
+    expect(wrapper.find('button[aria-label="Salin format tugas pekan ini"]').exists()).toBe(false);
+  });
+
+  it("should render copy button and copy formatted agendas for admin users", async () => {
+    const { user } = await import("@/composables/useAdminAuth").then((m) => m.useAdminAuth());
+    user.value = { id: 1, role: "admin", isAdmin: true };
+
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: writeTextMock },
+      writable: true,
+      configurable: true,
+    });
+
+    const mockTasks = [
+      {
+        id: 1,
+        mata_kuliah: "Pemrograman Berorientasi Obyek (Java I)",
+        judul: "Tugas Pertemuan 4",
+        keterangan: "Lanjutan pengumpulan tugas.",
+      },
+      {
+        id: 2,
+        mata_kuliah: "Rekayasa Web",
+        judul: "Tugas Pertemuan 4",
+        keterangan: "Push Pertemuan 4 ke github.",
+      },
+    ];
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: mockTasks,
+      }),
+    });
+
+    const wrapper = mount(AgendaSection, { global: globalConfig });
+    await flushPromises();
+
+    const copyBtn = wrapper.find('button[aria-label="Salin format tugas pekan ini"]');
+    expect(copyBtn.exists()).toBe(true);
+
+    await copyBtn.trigger("click");
+    await flushPromises();
+
+    expect(writeTextMock).toHaveBeenCalledWith(
+      `Tugas-Tugas:\n*Pemrograman Berorientasi Obyek (Java I)*\nTugas Pertemuan 4\nLanjutan pengumpulan tugas.\n\n*Rekayasa Web*\nTugas Pertemuan 4\nPush Pertemuan 4 ke github.`
+    );
+    expect(wrapper.text()).toContain("Tersalin");
+
+    // Clean up
+    user.value = null;
+  });
 });

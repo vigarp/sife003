@@ -1,6 +1,8 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useSchedule } from "@/composables/useSchedule";
+import { useAdminAuth } from "@/composables/useAdminAuth";
+import { formatMentariShareText, copyToClipboard } from "@/utils/scheduleShare";
 import WeekNavigator from "./WeekNavigator.vue";
 import CourseCard from "./CourseCard.vue";
 
@@ -14,6 +16,20 @@ const {
   partitionDaring,
   partitionLuring,
 } = useSchedule();
+
+const { isAdmin } = useAdminAuth();
+const copiedMentari = ref(false);
+
+async function handleCopyMentari() {
+  const text = formatMentariShareText(currentWeek.value, viewedWeekIndex.value);
+  const ok = await copyToClipboard(text);
+  if (ok) {
+    copiedMentari.value = true;
+    setTimeout(() => {
+      copiedMentari.value = false;
+    }, 2000);
+  }
+}
 
 const daringData = computed(() =>
   partitionDaring(currentWeek.value, viewedWeekIndex.value)
@@ -131,11 +147,34 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
                 </p>
               </div>
             </div>
-            <span
-              class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200/90 border border-amber-200 dark:border-amber-800/40 text-[11px] font-bold"
-            >
-              {{ daringCount }} Matkul
-            </span>
+            <div class="flex flex-col items-end gap-1.5 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200/90 border border-amber-200 dark:border-amber-800/40 text-[11px] font-bold"
+              >
+                {{ daringCount }} Matkul
+              </span>
+              <button
+                v-if="isAdmin"
+                type="button"
+                @click="handleCopyMentari"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all duration-200 cursor-pointer border shadow-2xs active:scale-95"
+                :class="
+                  copiedMentari
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:text-amber-700 dark:hover:text-amber-300 hover:border-amber-300 dark:hover:border-amber-700'
+                "
+                :title="copiedMentari ? 'Tersalin ke clipboard!' : 'Salin format jadwal Mentari pekan ini'"
+                :aria-label="copiedMentari ? 'Jadwal Mentari tersalin' : 'Salin jadwal Mentari pekan ini'"
+              >
+                <svg v-if="copiedMentari" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+                <svg v-else class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                <span>{{ copiedMentari ? 'Tersalin' : 'Salin' }}</span>
+              </button>
+            </div>
           </div>
 
           <!-- Daring Items List -->
