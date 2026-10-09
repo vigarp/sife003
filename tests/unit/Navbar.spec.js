@@ -63,6 +63,7 @@ describe("Navbar.vue", () => {
   it("should render Kampus and Prodi links, and hide Pengurus links and WA invite button for unauthenticated user", () => {
     const wrapper = mount(Navbar, { global: globalConfig });
     expect(wrapper.text()).toContain("Satu UNPAM");
+    expect(wrapper.text()).toContain("Kredensia");
     expect(wrapper.text()).toContain("LINK-SI");
     expect(wrapper.text()).toContain("SIMONEV");
     expect(wrapper.text()).not.toContain("Kontak Dosen");

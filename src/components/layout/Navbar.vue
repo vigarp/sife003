@@ -211,6 +211,17 @@ onUnmounted(() => {
               <span class="material-symbols-outlined text-[14px]">open_in_new</span>
             </a>
 
+            <a
+              href="https://kredensia.id/"
+              target="_blank"
+              rel="noopener noreferrer"
+              @click="closeDropdown"
+              class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
+            >
+              <span>Kredensia</span>
+              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+            </a>
+
             <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
 
             <!-- PRODI -->
