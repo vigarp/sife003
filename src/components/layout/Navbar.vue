@@ -222,6 +222,17 @@ onUnmounted(() => {
               <span class="material-symbols-outlined text-[14px]">open_in_new</span>
             </a>
 
+            <a
+              href="https://mentari.unpam.ac.id/u-courses/KALENDER-AKADEMIK-20261?accord_pertemuan=KALENDER_AKADEMIK"
+              target="_blank"
+              rel="noopener noreferrer"
+              @click="closeDropdown"
+              class="flex items-center justify-between px-3 py-1.5 text-xs text-text-muted dark:text-slate-300 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-primary dark:hover:text-blue-400 transition-colors"
+            >
+              <span>Kalender Akademik</span>
+              <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+            </a>
+
             <div class="my-1.5 border-t border-border-ui dark:border-slate-800"></div>
 
             <!-- PRODI -->

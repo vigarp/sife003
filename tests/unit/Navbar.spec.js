@@ -64,6 +64,7 @@ describe("Navbar.vue", () => {
     const wrapper = mount(Navbar, { global: globalConfig });
     expect(wrapper.text()).toContain("Satu UNPAM");
     expect(wrapper.text()).toContain("Kredensia");
+    expect(wrapper.text()).toContain("Kalender Akademik");
     expect(wrapper.text()).toContain("LINK-SI");
     expect(wrapper.text()).toContain("SIMONEV");
     expect(wrapper.text()).not.toContain("Kontak Dosen");
