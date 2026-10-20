@@ -3,7 +3,7 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
-import { useSchedule } from "@/composables/useSchedule";
+import { useSchedule, getPekanNumber } from "@/composables/useSchedule";
 import AdminStudentsManager from "@/components/admin/AdminStudentsManager.vue";
 import AdminCoursesManager from "@/components/admin/AdminCoursesManager.vue";
 import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue";
@@ -18,15 +18,8 @@ const { currentWeek, activeWeekStatus } = useSchedule();
 
 const activeAdminTab = ref("agenda"); // 'agenda' | 'students' | 'courses' | 'lecturers' | 'calendar'
 
-// Compute active week number
-const activeWeekNumber = computed(() => {
-  const roman = currentWeek.value?.pekan;
-  const romanMap = {
-    I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8,
-    IX: 9, X: 10, XI: 11, XII: 12, XIII: 13, XIV: 14, XV: 15, XVI: 16,
-  };
-  return romanMap[roman] || 5;
-});
+// Compute active week number based on schedule configuration
+const activeWeekNumber = computed(() => getPekanNumber(currentWeek.value));
 
 const isUpcoming = computed(() => activeWeekStatus.value === "upcoming");
 const activeWeekBadgeText = computed(() =>
@@ -62,7 +55,7 @@ const editingId = ref(null);
 const submitting = ref(false);
 
 const form = reactive({
-  pekan: 5,
+  pekan: activeWeekNumber.value,
   pertemuan: null,
   mata_kuliah: masterMatkulList[0] || "Analisa Proses Bisnis",
   judul: "",

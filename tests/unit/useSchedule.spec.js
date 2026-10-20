@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useSchedule } from "@/composables/useSchedule";
+import { useSchedule, getPekanNumber, PEKAN_TO_NUMBER_MAP } from "@/composables/useSchedule";
 
 describe("useSchedule composable", () => {
   let schedule;
@@ -132,5 +132,30 @@ describe("useSchedule composable", () => {
 
   it("should have activeWeekStatus defined as upcoming or ongoing", () => {
     expect(["upcoming", "ongoing"]).toContain(schedule.activeWeekStatus.value);
+  });
+
+  it("should correctly map all weeks including UTS and UAS to 1-based week numbers", () => {
+    expect(PEKAN_TO_NUMBER_MAP.I).toBe(1);
+    expect(PEKAN_TO_NUMBER_MAP.VII).toBe(7);
+    expect(PEKAN_TO_NUMBER_MAP.UTS).toBe(8);
+    expect(PEKAN_TO_NUMBER_MAP.VIII).toBe(9);
+    expect(PEKAN_TO_NUMBER_MAP.XIV).toBe(15);
+    expect(PEKAN_TO_NUMBER_MAP.UAS).toBe(16);
+
+    expect(getPekanNumber("UTS")).toBe(8);
+    expect(getPekanNumber("UAS")).toBe(16);
+    expect(getPekanNumber("VIII")).toBe(9);
+    expect(getPekanNumber({ pekan: "UTS" })).toBe(8);
+    expect(getPekanNumber({ pekan: "VIII" })).toBe(9);
+    expect(getPekanNumber(8)).toBe(8);
+    expect(getPekanNumber(null)).toBe(1);
+    expect(getPekanNumber("unknown")).toBe(1);
+  });
+
+  it("should compute activeWeekNumber and currentWeekNumber properly", () => {
+    expect(schedule.activeWeekNumber.value).toBe(schedule.activeWeekIndex + 1);
+    schedule.setWeek(7); // Index 7 is UTS
+    expect(schedule.currentWeekNumber.value).toBe(8);
+    expect(schedule.currentWeek.value.pekan).toBe("UTS");
   });
 });

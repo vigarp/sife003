@@ -138,6 +138,48 @@ function getPresensiUrl(master) {
   return `https://my.unpam.ac.id/presensi/pertemuan/${master.kode}/${kelasCode}/${semesterCode}`;
 }
 
+// Mapping from pekan name to 1-based semester week number (1 to 16)
+export const PEKAN_TO_NUMBER_MAP = {
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+  V: 5,
+  VI: 6,
+  VII: 7,
+  UTS: 8,
+  VIII: 9,
+  IX: 10,
+  X: 11,
+  XI: 12,
+  XII: 13,
+  XIII: 14,
+  XIV: 15,
+  UAS: 16,
+};
+
+export function getPekanNumber(pekanOrWeek) {
+  if (pekanOrWeek === null || pekanOrWeek === undefined) return 1;
+  if (typeof pekanOrWeek === "number") {
+    return pekanOrWeek >= 1 && pekanOrWeek <= 16 ? pekanOrWeek : 1;
+  }
+  const str = typeof pekanOrWeek === "object" ? pekanOrWeek?.pekan : pekanOrWeek;
+  if (typeof str === "number") {
+    return str >= 1 && str <= 16 ? str : 1;
+  }
+  if (!str) return 1;
+  const trimmed = String(str).trim();
+  if (PEKAN_TO_NUMBER_MAP[trimmed] !== undefined) {
+    return PEKAN_TO_NUMBER_MAP[trimmed];
+  }
+  const parsedNum = Number.parseInt(trimmed, 10);
+  if (!Number.isNaN(parsedNum) && parsedNum >= 1 && parsedNum <= 16) {
+    return parsedNum;
+  }
+  const idx = scheduleData.jadwal_per_pekan.findIndex((p) => p.pekan === trimmed);
+  return idx !== -1 ? idx + 1 : 1;
+}
+
 const activeInfo = computeActiveWeekInfo();
 const activeWeekIndex = activeInfo.detected;
 const activeWeekStatus = ref(activeInfo.status);
@@ -146,6 +188,9 @@ const viewedWeekIndex = ref(activeWeekIndex);
 export function useSchedule() {
   const allWeeks = scheduleData.jadwal_per_pekan;
   const currentWeek = computed(() => allWeeks[viewedWeekIndex.value]);
+
+  const activeWeekNumber = computed(() => activeWeekIndex + 1);
+  const currentWeekNumber = computed(() => viewedWeekIndex.value + 1);
 
   const isCurrentWeek = computed(
     () => viewedWeekIndex.value === activeWeekIndex
@@ -240,6 +285,8 @@ export function useSchedule() {
     activeWeekStatus,
     viewedWeekIndex,
     currentWeek,
+    activeWeekNumber,
+    currentWeekNumber,
     isCurrentWeek,
     isPastWeek,
     isFutureWeek,

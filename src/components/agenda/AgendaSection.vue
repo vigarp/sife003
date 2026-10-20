@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, onUnmounted, computed, ref } from "vue";
+import { onMounted, onUnmounted, computed, ref, watch } from "vue";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
-import { useSchedule } from "@/composables/useSchedule";
+import { useSchedule, getPekanNumber } from "@/composables/useSchedule";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
 import { formatAgendaShareText, copyToClipboard } from "@/utils/scheduleShare";
@@ -25,15 +25,8 @@ async function handleCopyAgenda() {
   }
 }
 
-// Compute active week number
-const activeWeekNumber = computed(() => {
-  const roman = currentWeek.value?.pekan;
-  const romanMap = {
-    I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8,
-    IX: 9, X: 10, XI: 11, XII: 12, XIII: 13, XIV: 14, XV: 15, XVI: 16,
-  };
-  return romanMap[roman] || 5;
-});
+// Compute active week number based on schedule configuration
+const activeWeekNumber = computed(() => getPekanNumber(currentWeek.value));
 
 // Format range for display
 const weekDateRange = computed(() => {
@@ -46,6 +39,11 @@ const latestTimestamp = computed(() => getLatestTimestamp(agendas.value));
 const lastUpdatedTime = computed(() => {
   if (!latestTimestamp.value) return "just now";
   return formatRelativeTime(latestTimestamp.value, currentTime.value);
+});
+
+// Watch activeWeekNumber to automatically re-fetch agendas if navigated
+watch(activeWeekNumber, (newWeek) => {
+  fetchAgendas(newWeek);
 });
 
 onMounted(() => {

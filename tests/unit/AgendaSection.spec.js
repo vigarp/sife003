@@ -30,6 +30,32 @@ describe("AgendaSection.vue", () => {
     expect(wrapper.text()).toContain("Target tugas yang");
   });
 
+  it("should fetch agendas for pekan 8 during UTS week and update when navigating", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: [],
+      }),
+    });
+    global.fetch = fetchMock;
+
+    const { useSchedule } = await import("@/composables/useSchedule");
+    const { setWeek, resetToCurrentWeek } = useSchedule();
+    resetToCurrentWeek();
+
+    mount(AgendaSection, { global: globalConfig });
+    await flushPromises();
+
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("pekan=8"));
+
+    setWeek(8); // Index 8 is Pekan VIII (Week 9)
+    await flushPromises();
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("pekan=9"));
+
+    resetToCurrentWeek();
+  });
+
   it("should display empty state when no tasks exist for the week", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
