@@ -277,14 +277,47 @@ export function generateBrowserScript(targetCourseKode = "", targetPertemuanNum 
 
 /**
  * Standardized API client for calling Mentari proxy
+ * Tries the dedicated residential gateway (https://telescope.vigarp.web.id/api) first,
+ * with automatic graceful fallback to the local / serverless proxy (/api/mentari).
  */
 async function apiFetch(path, params = {}) {
   if (!token.value) {
     throw new Error("Token Mentari belum dimasukkan. Silakan atur token terlebih dahulu.");
   }
 
-  const query = new URLSearchParams({ path, ...params });
-  const res = await fetch(`/api/mentari?${query.toString()}`, {
+  const cleanPath = String(path).replace(/^\/+/, "");
+  const query = new URLSearchParams(params).toString();
+  const querySuffix = query ? `?${query}` : "";
+
+  // 1. Try dedicated residential gateway if on production browser
+  const isBrowser = typeof window !== "undefined" && window.location?.hostname !== "localhost";
+  if (isBrowser) {
+    try {
+      const res = await fetch(`https://telescope.vigarp.web.id/api/${cleanPath}${querySuffix}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.value.trim()}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (res.status === 401) {
+        throw new Error("Sesi token Mentari telah kadaluarsa (401). Silakan perbarui token Anda.");
+      }
+
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (gatewayErr) {
+      // If 401, rethrow
+      if (gatewayErr.message.includes("401")) throw gatewayErr;
+      // Otherwise fall through to fallback proxy
+    }
+  }
+
+  // 2. Fallback to /api/mentari
+  const fallbackQuery = new URLSearchParams({ path: cleanPath, ...params });
+  const res = await fetch(`/api/mentari?${fallbackQuery.toString()}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token.value.trim()}`,
