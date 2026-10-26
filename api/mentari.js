@@ -15,8 +15,18 @@ function requestMentariHttp2(targetUrl, authHeader) {
       authorization: authHeader.startsWith("Bearer ")
         ? authHeader
         : `Bearer ${authHeader}`,
-      "user-agent": "PostmanRuntime/2.12.0",
+      "user-agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
       accept: "application/json, text/plain, */*",
+      "accept-language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+      "sec-ch-ua":
+        '"Chromium";v="131", "Google Chrome";v="131", "Not_A Brand";v="24"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      referer: "https://mentari.unpam.ac.id/",
       "cache-control": "no-cache",
     });
 
@@ -104,9 +114,20 @@ export default async function handler(req, res) {
       const data = JSON.parse(mentariRes.text);
       return res.status(mentariRes.status).json(data);
     } catch {
-      return res.status(mentariRes.status).json({
+      const isCloudflare =
+        mentariRes.text.includes("<title>Just a moment...</title>") ||
+        mentariRes.text.includes("cf-mitigated") ||
+        mentariRes.text.includes("challenge-error") ||
+        mentariRes.text.includes("_cf_chl_opt");
+
+      return res.status(mentariRes.status || 502).json({
         success: false,
-        message: mentariRes.text || "Respons tidak terduga dari Mentari UNPAM",
+        isCloudflare,
+        message: isCloudflare
+          ? "Cloudflare WAF memblokir server Vercel (Managed Challenge). Silakan gunakan Mode Script Browser di tab Mentari untuk memindai data secara langsung tanpa blokir."
+          : (mentariRes.text.length > 300
+              ? mentariRes.text.slice(0, 300) + "..."
+              : mentariRes.text) || "Respons tidak terduga dari Mentari UNPAM",
       });
     }
   } catch (error) {

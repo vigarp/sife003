@@ -180,6 +180,100 @@ const loading = ref(false);
 const scanning = ref(false);
 const error = ref(null);
 const statusMessage = ref("");
+const isCloudflareBlocked = ref(false);
+
+/**
+ * Generates an automated browser scanner script that can be executed in the Console
+ * of mentari.unpam.ac.id to completely bypass Cloudflare WAF and CORS restrictions.
+ */
+export function generateBrowserScript(targetCourseKode = "", targetPertemuanNum = 8) {
+  return `(async function() {
+  console.log("🔭 Menjalankan Teleskop Mentari...");
+  try {
+    const raw = localStorage.getItem("access");
+    if (!raw) {
+      alert("❌ Anda belum login ke Mentari UNPAM!");
+      return;
+    }
+    const access = JSON.parse(raw);
+    const mhs = access.find(i => i.role === "MAHASISWA" && i.token) || access[0];
+    const token = mhs?.token;
+    if (!token) {
+      alert("❌ Token sesi tidak ditemukan di Mentari!");
+      return;
+    }
+    const headers = { Authorization: "Bearer " + token, Accept: "application/json" };
+
+    let nim = "", fullname = "";
+    try {
+      const p = JSON.parse(decodeURIComponent(escape(atob(token.split(".")[1]))));
+      nim = p.username || "";
+      fullname = p.fullname || "";
+    } catch {}
+
+    console.log("📚 Mengambil daftar mata kuliah...");
+    const cRes = await fetch("/api/user-course?page=1&limit=100", { headers }).then(r => r.json());
+    const courses = cRes.data || [];
+
+    let targetCourse = "${targetCourseKode}";
+    if (!targetCourse) {
+      const path = window.location.pathname;
+      const found = courses.find(c => path.includes(c.kode_course));
+      targetCourse = found ? found.kode_course : (courses[0]?.kode_course || "");
+    }
+
+    const selectedPertemuanNum = ${targetPertemuanNum || 8};
+    console.log("🎯 Memindai Course:", targetCourse, "Pertemuan:", selectedPertemuanNum);
+
+    const detail = await fetch("/api/user-course/" + targetCourse, { headers }).then(r => r.json());
+    const sec = detail.data?.find(s => s.kode_section === "PERTEMUAN_" + selectedPertemuanNum);
+    const forum = sec?.sub_section?.find(sub => sub.kode_template === "FORUM_DISKUSI");
+
+    let forumTopics = [];
+    let topicReplies = [];
+
+    if (forum && forum.id && !forum.warningAlert) {
+      console.log("💬 Mengambil topik diskusi...");
+      const topicRes = await fetch("/api/forum/topic/" + forum.id, { headers }).then(r => r.json());
+      forumTopics = topicRes.topics || [];
+
+      for (const t of forumTopics) {
+        try {
+          const repRes = await fetch("/api/forum/topic/" + forum.id + "/replies?id_topic=" + t.id, { headers }).then(r => r.json());
+          if (Array.isArray(repRes)) {
+            repRes.forEach(r => {
+              r._topicJudul = t.judul;
+              topicReplies.push(r);
+            });
+          }
+        } catch (e) {
+          console.warn("Gagal mengambil replies:", t.judul, e);
+        }
+      }
+    }
+
+    const snapshot = {
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      userNim: nim,
+      userName: fullname,
+      selectedCourseKode: targetCourse,
+      selectedPertemuanNum,
+      courses,
+      courseDetail: detail,
+      forumTopics,
+      topicReplies,
+    };
+
+    copy(JSON.stringify(snapshot));
+    console.log("%c✅ SCAN SELESAI & TERSALIN KE CLIPBOARD!", "color: #10b981; font-weight: bold; font-size: 14px;");
+    alert("✅ Data Telemetri berhasil dipindai & disalin ke clipboard!\\n\\nSilakan kembali ke tab Telemetri dan klik tombol 'Tempel Data Hasil Scan'.");
+  } catch (err) {
+    console.error("❌ Terjadi kesalahan:", err);
+    alert("❌ Terjadi kesalahan: " + err.message);
+  }
+})();`;
+}
 
 /**
  * Standardized API client for calling Mentari proxy
@@ -204,7 +298,18 @@ async function apiFetch(path, params = {}) {
 
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.message || `Gagal memuat data dari Mentari (${res.status}).`);
+    let msg = errData.message || `Gagal memuat data dari Mentari (${res.status}).`;
+    if (
+      errData.isCloudflare ||
+      msg.includes("Just a moment") ||
+      msg.includes("Cloudflare") ||
+      msg.includes("challenge-error")
+    ) {
+      isCloudflareBlocked.value = true;
+      msg =
+        "Cloudflare WAF memblokir server cloud Vercel (Managed Challenge). Silakan gunakan Mode Script Browser di tab Mentari untuk memindai data secara langsung tanpa blokir.";
+    }
+    throw new Error(msg);
   }
 
   return await res.json();
@@ -549,6 +654,51 @@ export function useTelemetri() {
     return lines.join("\n");
   }
 
+  function importSnapshot(snapshotData) {
+    let data = snapshotData;
+    if (typeof data === "string") {
+      try {
+        data = JSON.parse(data);
+      } catch {
+        throw new Error("Data yang ditempel bukan format JSON yang valid.");
+      }
+    }
+
+    if (!data || typeof data !== "object") {
+      throw new Error("Struktur data snapshot tidak valid.");
+    }
+
+    if (Array.isArray(data.courses) && data.courses.length > 0) {
+      courses.value = sortCourses(data.courses);
+    }
+    if (data.selectedCourseKode) {
+      selectedCourseKode.value = data.selectedCourseKode;
+    }
+    if (data.selectedPertemuanNum) {
+      selectedPertemuanNum.value = Number(data.selectedPertemuanNum);
+    }
+    if (data.courseDetail) {
+      courseDetail.value = data.courseDetail;
+    }
+    if (Array.isArray(data.forumTopics)) {
+      forumTopics.value = data.forumTopics;
+    }
+    if (Array.isArray(data.topicReplies)) {
+      topicReplies.value = data.topicReplies;
+    }
+    if (data.userNim) {
+      saveUserNim(data.userNim);
+    }
+    if (data.userName) {
+      saveUserName(data.userName);
+    }
+
+    error.value = null;
+    isCloudflareBlocked.value = false;
+    statusMessage.value = "Data berhasil dimuat dari browser Mentari!";
+    return true;
+  }
+
   return {
     token,
     userNim,
@@ -559,6 +709,9 @@ export function useTelemetri() {
     saveUserNim,
     saveUserName,
     parseMentariAuth,
+    importSnapshot,
+    generateBrowserScript,
+    isCloudflareBlocked,
     courses,
     selectedCourseKode,
     selectedPertemuanNum,

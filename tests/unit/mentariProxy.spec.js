@@ -120,8 +120,8 @@ describe("api/mentari.js proxy handler", () => {
       ":method": "GET",
       ":path": "/api/user-course?page=1&limit=100",
       authorization: "Bearer valid_jwt_token",
-      "user-agent": "PostmanRuntime/2.12.0",
     });
+    expect(spy.getReqHeaders()["user-agent"]).toContain("Mozilla/5.0");
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual(mockMentariData);
   });

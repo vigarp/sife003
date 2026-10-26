@@ -9,6 +9,8 @@ import TelemetriClassMonitor from "@/components/telemetri/TelemetriClassMonitor.
 import TelemetriTokenModal from "@/components/telemetri/TelemetriTokenModal.vue";
 
 const isModalOpen = ref(false);
+const scriptCopied = ref(false);
+const importSuccessMessage = ref("");
 
 const {
   hasToken,
@@ -17,8 +19,13 @@ const {
   error,
   statusMessage,
   courseDetail,
+  selectedCourseKode,
+  selectedPertemuanNum,
+  isCloudflareBlocked,
   loadCourses,
   scanForum,
+  importSnapshot,
+  generateBrowserScript,
 } = useTelemetri();
 
 onMounted(async () => {
@@ -36,6 +43,49 @@ async function handleTokenSaved() {
   await loadCourses();
   await scanForum();
 }
+
+async function handleCopyScript() {
+  const script = generateBrowserScript(
+    selectedCourseKode.value,
+    selectedPertemuanNum.value
+  );
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(script);
+    } else {
+      window.prompt("Salin script berikut:", script);
+    }
+    scriptCopied.value = true;
+    setTimeout(() => {
+      scriptCopied.value = false;
+    }, 2500);
+  } catch {
+    window.prompt("Salin script berikut:", script);
+  }
+}
+
+async function handlePasteSnapshot() {
+  try {
+    let text = "";
+    if (navigator?.clipboard?.readText) {
+      text = await navigator.clipboard.readText();
+    }
+    if (!text || !text.includes("courseDetail")) {
+      text = window.prompt(
+        "Tempel data snapshot JSON hasil scan browser di sini:"
+      );
+    }
+    if (text) {
+      importSnapshot(text);
+      importSuccessMessage.value = "Data berhasil dimuat dari browser Mentari!";
+      setTimeout(() => {
+        importSuccessMessage.value = "";
+      }, 4000);
+    }
+  } catch (err) {
+    alert("Gagal membaca data: " + err.message);
+  }
+}
 </script>
 
 <template>
@@ -43,9 +93,67 @@ async function handleTokenSaved() {
     <!-- Header -->
     <TelemetriHeader @open-token-modal="isModalOpen = true" />
 
-    <!-- Error Banner -->
+    <!-- Import Success Banner -->
     <div
-      v-if="error"
+      v-if="importSuccessMessage"
+      class="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center gap-2.5 text-xs font-semibold animate-in fade-in duration-200"
+    >
+      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[20px]">verified</span>
+      <span>{{ importSuccessMessage }}</span>
+    </div>
+
+    <!-- Cloudflare Warning & 100% Anti-Blokir Browser Scanner Helper -->
+    <div
+      v-if="isCloudflareBlocked || (error && error.includes('Cloudflare'))"
+      class="p-4 md:p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 border border-amber-300 dark:border-amber-700/80 space-y-3 text-xs shadow-xs"
+    >
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+          <span class="material-symbols-outlined text-[22px]">shield_lock</span>
+        </div>
+        <div class="space-y-1 flex-1">
+          <h2 class="text-sm font-bold text-amber-900 dark:text-amber-200">
+            Terdeteksi Proteksi Cloudflare WAF di Server Vercel
+          </h2>
+          <p class="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
+            Cloudflare Mentari membatasi akses dari IP cloud serverless Vercel. Gunakan <strong>Mode Script Browser</strong> untuk memindai langsung dari browser Anda (100% lolos WAF & bebas kendala CORS) lalu tempel hasilnya ke sini:
+          </p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-200/80 dark:border-amber-800/60 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+          <span class="font-bold text-slate-900 dark:text-white">Langkah 1-Klik:</span>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">
+            1. Salin Script &rarr; 2. Buka Console tab Mentari (<kbd class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono text-[9px]">F12</kbd>) &rarr; Paste & Enter &rarr; 3. Klik tombol tempel di samping.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            @click="handleCopyScript"
+            class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-95 text-xs"
+          >
+            <span class="material-symbols-outlined text-[15px] text-amber-400">content_copy</span>
+            <span>{{ scriptCopied ? 'Script Tersalin!' : '1. Salin Script Scanner' }}</span>
+          </button>
+
+          <button
+            type="button"
+            @click="handlePasteSnapshot"
+            class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 active:scale-95 text-xs"
+          >
+            <span class="material-symbols-outlined text-[15px]">content_paste</span>
+            <span>2. Tempel Data Hasil Scan</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Banner (if not already handled by Cloudflare banner) -->
+    <div
+      v-else-if="error"
       class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 flex items-start gap-3 text-xs"
     >
       <span class="material-symbols-outlined text-rose-500 text-[20px] shrink-0 mt-0.5">error</span>
@@ -67,6 +175,8 @@ async function handleTokenSaved() {
     <TelemetriControls
       @open-token-modal="isModalOpen = true"
       @scan="scanForum"
+      @copy-script="handleCopyScript"
+      @paste-snapshot="handlePasteSnapshot"
     />
 
     <!-- Scanning Loading State -->
