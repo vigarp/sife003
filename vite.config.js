@@ -36,6 +36,8 @@ function apiDevPlugin() {
             handlerModule = await import("./api/presensi/courses.js");
           } else if (pathname === "/api/presensi/lecturers") {
             handlerModule = await import("./api/presensi/lecturers.js");
+          } else if (pathname === "/api/mentari") {
+            handlerModule = await import("./api/mentari.js");
           }
 
           if (!handlerModule) {
@@ -46,6 +48,13 @@ function apiDevPlugin() {
 
           res.status = (code) => {
             res.statusCode = code;
+            return res;
+          };
+          res.send = (body) => {
+            if (typeof body === "object" && body !== null && !Buffer.isBuffer(body)) {
+              return res.json(body);
+            }
+            res.end(body);
             return res;
           };
           res.json = (data) => {
@@ -88,7 +97,7 @@ function apiDevPlugin() {
 }
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
+  const env = loadEnv(mode, process.cwd(), ["VITE_", "TURSO_", "JWT_", "TURNSTILE_"]);
   Object.assign(process.env, env);
 
   return {

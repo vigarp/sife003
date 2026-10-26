@@ -12,6 +12,12 @@ const routes = [
     meta: { title: "03SIFE003 - Portal Akademik & Jadwal Kuliah" },
   },
   {
+    path: "/telemetri",
+    name: "telemetri",
+    component: () => import("@/views/TelemetriView.vue"),
+    meta: { title: "Telemetri (Teleskop Mentari) - 03SIFE003" },
+  },
+  {
     path: "/pengurus/login",
     name: "admin-login",
     component: AdminLoginView,

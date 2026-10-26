@@ -42,7 +42,7 @@ describe("AgendaSection.vue", () => {
 
     const { useSchedule } = await import("@/composables/useSchedule");
     const { setWeek, resetToCurrentWeek } = useSchedule();
-    resetToCurrentWeek();
+    setWeek(7); // Index 7 is UTS (Week 8)
 
     mount(AgendaSection, { global: globalConfig });
     await flushPromises();

@@ -105,6 +105,16 @@ onUnmounted(() => {
           <span class="max-w-[110px] truncate">{{ user?.nama_lengkap?.split(' ')[0] || "Mahasiswa" }}</span>
         </div>
 
+        <!-- Telemetri Quick Link -->
+        <router-link
+          to="/telemetri"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors shadow-2xs"
+          title="Telemetri (Teleskop Mentari)"
+        >
+          <span class="material-symbols-outlined text-[16px] text-indigo-600 dark:text-indigo-400">explore</span>
+          <span class="hidden min-[420px]:inline">Telemetri</span>
+        </router-link>
+
         <!-- Links Dropdown -->
         <div class="relative" ref="dropdownContainer">
           <button
@@ -178,6 +188,18 @@ onUnmounted(() => {
               >
               <span>Kalender</span>
             </a>
+
+            <router-link
+              to="/telemetri"
+              @click="closeDropdown"
+              class="flex items-center gap-2.5 px-3 py-2 text-sm text-text-main dark:text-slate-200 hover:bg-surface-alt dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+              role="menuitem"
+            >
+              <span class="material-symbols-outlined text-[18px] text-indigo-500"
+                >explore</span
+              >
+              <span>Telemetri (Mentari)</span>
+            </router-link>
 
             <router-link
               to="/pengurus"
