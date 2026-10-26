@@ -29,6 +29,24 @@ const {
 } = useTelemetri();
 
 onMounted(async () => {
+  // 1. Check if opened via Bookmarklet / URL hash snapshot (#snapshot=...)
+  if (typeof window !== "undefined" && window.location.hash.includes("snapshot=")) {
+    try {
+      const hashStr = window.location.hash.substring(1);
+      const params = new URLSearchParams(hashStr);
+      const snapData = params.get("snapshot");
+      if (snapData) {
+        importSnapshot(decodeURIComponent(snapData));
+        importSuccessMessage.value = "Data berhasil dimuat otomatis via Bookmarklet Mentari!";
+        history.replaceState(null, "", window.location.pathname);
+        return;
+      }
+    } catch (e) {
+      console.warn("Gagal membaca snapshot dari URL hash:", e);
+    }
+  }
+
+  // 2. Fallback to normal token API scan
   if (hasToken.value) {
     await loadCourses();
     // Auto scan initial course & pertemuan
