@@ -59,39 +59,6 @@ describe("useTelemetri composable", () => {
     expect(telemetri.hasToken.value).toBe(true);
   });
 
-  it("should import data snapshot smoothly via importSnapshot", () => {
-    const telemetri = useTelemetri();
-    const snapshot = {
-      userNim: "251011700088",
-      userName: "VIGAR RIVAI PUTRA",
-      selectedCourseKode: "20261-03SIFE003-22SIF0142",
-      selectedPertemuanNum: 8,
-      courses: [{ kode_course: "20261-03SIFE003-22SIF0142", coursename: "Arsitektur IT" }],
-      courseDetail: { data: [] },
-      forumTopics: [{ id: "top1", judul: "Topik 1" }],
-      topicReplies: [{ id: "r1", nim: "251011700088" }],
-    };
-
-    telemetri.importSnapshot(snapshot);
-    expect(telemetri.userNim.value).toBe("251011700088");
-    expect(telemetri.userName.value).toBe("VIGAR RIVAI PUTRA");
-    expect(telemetri.selectedCourseKode.value).toBe("20261-03SIFE003-22SIF0142");
-    expect(telemetri.selectedPertemuanNum.value).toBe(8);
-    expect(telemetri.courses.value.length).toBe(1);
-    expect(telemetri.forumTopics.value.length).toBe(1);
-    expect(telemetri.topicReplies.value.length).toBe(1);
-    expect(telemetri.isCloudflareBlocked.value).toBe(false);
-  });
-
-  it("should generate browser console script with target course & pertemuan", () => {
-    const telemetri = useTelemetri();
-    const script = telemetri.generateBrowserScript("20261-03SIFE003-22SIF0142", 8);
-    expect(script).toContain("20261-03SIFE003-22SIF0142");
-    expect(script).toContain("8");
-    expect(script).toContain('localStorage.getItem("access")');
-    expect(script).toContain("copy(JSON.stringify(snapshot))");
-  });
-
   it("should detect closed forum when warningAlert is present", () => {
     const telemetri = useTelemetri();
     telemetri.selectedPertemuanNum.value = 1;

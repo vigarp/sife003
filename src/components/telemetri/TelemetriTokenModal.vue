@@ -18,10 +18,8 @@ const inputNim = ref(userNim.value);
 const showManualNim = ref(false);
 const saveSuccess = ref(false);
 const scriptCopied = ref(false);
-const bookmarkletCopied = ref(false);
 
 const SCRIPT_COMMAND = "copy(localStorage.getItem('access'))";
-const BOOKMARKLET_CODE = `javascript:(async function(){try{const raw=localStorage.getItem("access");if(!raw)return alert("❌ Silakan login ke Mentari terlebih dahulu!");const access=JSON.parse(raw);const token=(access.find(i=>i.role==="MAHASISWA"&&i.token)||access[0])?.token;if(!token)return alert("❌ Token tidak ditemukan!");const headers={Authorization:"Bearer "+token,Accept:"application/json"};const notif=document.createElement("div");notif.style="position:fixed;top:20px;right:20px;z-index:999999;background:#4f46e5;color:white;padding:12px 20px;border-radius:12px;font-family:sans-serif;font-size:13px;font-weight:bold;box-shadow:0 10px 25px rgba(0,0,0,0.3);";notif.innerHTML="🔭 Sedang memindai forum kelas...";document.body.appendChild(notif);const courses=(await fetch("/api/user-course?page=1&limit=100",{headers}).then(r=>r.json())).data||[];const path=window.location.pathname;const matchCourse=courses.find(c=>path.includes(c.kode_course))||courses.find(c=>(c.coursename||"").includes("ARSITEKTUR"))||courses[0];const targetCourse=matchCourse?.kode_course;const pertNum=8;const detail=await fetch("/api/user-course/"+targetCourse,{headers}).then(r=>r.json());const sec=detail.data?.find(s=>s.kode_section==="PERTEMUAN_"+pertNum);const forum=sec?.sub_section?.find(s=>s.kode_template==="FORUM_DISKUSI");let forumTopics=[],topicReplies=[];if(forum?.id&&!forum.warningAlert){const topicRes=await fetch("/api/forum/topic/"+forum.id,{headers}).then(r=>r.json());forumTopics=topicRes.topics||[];for(const t of forumTopics){const reps=await fetch("/api/forum/topic/"+forum.id+"/replies?id_topic="+t.id,{headers}).then(r=>r.json());if(Array.isArray(reps)){reps.forEach(r=>{r._topicJudul=t.judul;topicReplies.push(r);});}}}notif.innerHTML="✅ Selesai! Membuka Telemetri...";const snap={courses,selectedCourseKode:targetCourse,selectedPertemuanNum:pertNum,courseDetail:detail,forumTopics,topicReplies};const encoded=encodeURIComponent(JSON.stringify(snap));window.open("https://sife003.vercel.app/telemetri#snapshot="+encoded,"_blank");setTimeout(()=>notif.remove(),2000);}catch(e){alert("❌ Error: "+e.message);}})();`;
 
 const parsedPreview = computed(() => parseMentariAuth(inputSession.value));
 
@@ -54,20 +52,6 @@ async function handleCopyScript() {
       scriptCopied.value = true;
       setTimeout(() => {
         scriptCopied.value = false;
-      }, 2000);
-    }
-  } catch {
-    // fallback
-  }
-}
-
-async function handleCopyBookmarklet() {
-  try {
-    if (navigator?.clipboard?.writeText) {
-      await navigator.clipboard.writeText(BOOKMARKLET_CODE);
-      bookmarkletCopied.value = true;
-      setTimeout(() => {
-        bookmarkletCopied.value = false;
       }, 2000);
     }
   } catch {
@@ -176,19 +160,6 @@ function handleClear() {
               {{ scriptCopied ? 'check' : 'content_copy' }}
             </span>
             <span>{{ scriptCopied ? 'Tersalin!' : 'Salin Perintah' }}</span>
-          </button>
-        </div>
-
-        <!-- Or 1-Click Bookmarklet (No DevTools needed) -->
-        <div class="pt-1 border-t border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
-          <span class="text-slate-500 dark:text-slate-400">Atau gunakan Bookmarklet (Tanpa buka F12):</span>
-          <button
-            type="button"
-            @click="handleCopyBookmarklet"
-            class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-          >
-            <span class="material-symbols-outlined text-[14px]">bookmark</span>
-            <span>{{ bookmarkletCopied ? 'Kode Bookmarklet Tersalin!' : 'Salin Kode Bookmarklet' }}</span>
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 <script setup>
 import { useTelemetri } from "@/composables/useTelemetri";
 
-const emit = defineEmits(["scan", "open-token-modal", "copy-script", "paste-snapshot"]);
+const emit = defineEmits(["scan", "open-token-modal"]);
 
 const {
   courses,
@@ -88,33 +88,6 @@ function handleScan() {
           ></span>
           <span v-else class="material-symbols-outlined text-[18px]">radar</span>
           <span>{{ scanning ? 'Memindai...' : 'Pindai Telemetri' }}</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Quick Browser Scanner Sub-Bar (Cloudflare Bypass) -->
-    <div class="flex flex-wrap items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[11px] gap-2">
-      <div class="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[15px] text-amber-500">bolt</span>
-        <span>Kena blokir Cloudflare di Vercel? Gunakan Mode Script Browser:</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          @click="$emit('copy-script')"
-          class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-        >
-          <span class="material-symbols-outlined text-[14px]">content_copy</span>
-          <span>Salin Script Scanner</span>
-        </button>
-        <span class="text-slate-300 dark:text-slate-700">•</span>
-        <button
-          type="button"
-          @click="$emit('paste-snapshot')"
-          class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-        >
-          <span class="material-symbols-outlined text-[14px]">content_paste</span>
-          <span>Tempel Data Scan</span>
         </button>
       </div>
     </div>
