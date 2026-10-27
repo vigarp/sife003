@@ -17,12 +17,17 @@ function parseBody(req) {
 async function handleGet(req, res, db) {
   const { pekan, all } = req.query || {};
 
-  let sql = "SELECT * FROM agenda ORDER BY pekan ASC, id ASC";
+  let sql = `SELECT * FROM agenda ORDER BY
+    CASE
+      WHEN UPPER(CAST(pekan AS TEXT)) = 'UTS' THEN 7.5
+      WHEN UPPER(CAST(pekan AS TEXT)) = 'UAS' THEN 14.5
+      ELSE CAST(pekan AS REAL)
+    END ASC, id ASC`;
   let args = [];
 
   if (pekan && !all) {
-    sql = "SELECT * FROM agenda WHERE pekan = ? ORDER BY id ASC";
-    args = [Number.parseInt(pekan, 10)];
+    sql = "SELECT * FROM agenda WHERE CAST(pekan AS TEXT) = ? ORDER BY id ASC";
+    args = [String(pekan).trim()];
   }
 
   const result = await db.execute({ sql, args });
@@ -57,11 +62,17 @@ async function handlePost(req, res, db, user) {
       ? Number.parseInt(pertemuan, 10)
       : null;
 
+  const pekanUpper = String(pekan).trim().toUpperCase();
+  const pekanVal =
+    pekanUpper === "UTS" || pekanUpper === "UAS"
+      ? pekanUpper
+      : Number.parseInt(pekan, 10) || pekan;
+
   const result = await db.execute({
     sql: `INSERT INTO agenda (pekan, pertemuan, mata_kuliah, judul, keterangan, tipe_deadline, tanggal, jam, created_by)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [
-      Number.parseInt(pekan, 10),
+      pekanVal,
       parsedPertemuan,
       mata_kuliah.trim(),
       judul.trim(),
@@ -110,6 +121,15 @@ async function handlePut(req, res, db) {
       ? Number.parseInt(pertemuan, 10)
       : null;
 
+  let pekanVal = null;
+  if (pekan !== undefined && pekan !== null && pekan !== "") {
+    const pekanUpper = String(pekan).trim().toUpperCase();
+    pekanVal =
+      pekanUpper === "UTS" || pekanUpper === "UAS"
+        ? pekanUpper
+        : Number.parseInt(pekan, 10) || pekan;
+  }
+
   await db.execute({
     sql: `UPDATE agenda SET
             pekan = COALESCE(?, pekan),
@@ -124,7 +144,7 @@ async function handlePut(req, res, db) {
             updated_at = CURRENT_TIMESTAMP
           WHERE id = ?`,
     args: [
-      pekan ? Number.parseInt(pekan, 10) : null,
+      pekanVal,
       parsedPertemuan,
       mata_kuliah ? mata_kuliah.trim() : null,
       judul ? judul.trim() : null,

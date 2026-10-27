@@ -138,7 +138,7 @@ function getPresensiUrl(master) {
   return `https://my.unpam.ac.id/presensi/pertemuan/${master.kode}/${kelasCode}/${semesterCode}`;
 }
 
-// Mapping from pekan name to 1-based semester week number (1 to 16)
+// Mapping from pekan name to 1-based semester week number (1 to 14) or exam names
 export const PEKAN_TO_NUMBER_MAP = {
   I: 1,
   II: 2,
@@ -147,37 +147,61 @@ export const PEKAN_TO_NUMBER_MAP = {
   V: 5,
   VI: 6,
   VII: 7,
-  UTS: 8,
-  VIII: 9,
-  IX: 10,
-  X: 11,
-  XI: 12,
-  XII: 13,
-  XIII: 14,
-  XIV: 15,
-  UAS: 16,
+  UTS: "UTS",
+  VIII: 8,
+  IX: 9,
+  X: 10,
+  XI: 11,
+  XII: 12,
+  XIII: 13,
+  XIV: 14,
+  UAS: "UAS",
 };
 
 export function getPekanNumber(pekanOrWeek) {
   if (pekanOrWeek === null || pekanOrWeek === undefined) return 1;
   if (typeof pekanOrWeek === "number") {
-    return pekanOrWeek >= 1 && pekanOrWeek <= 16 ? pekanOrWeek : 1;
+    return pekanOrWeek;
   }
   const str = typeof pekanOrWeek === "object" ? pekanOrWeek?.pekan : pekanOrWeek;
   if (typeof str === "number") {
-    return str >= 1 && str <= 16 ? str : 1;
+    return str;
   }
   if (!str) return 1;
   const trimmed = String(str).trim();
+  const upper = trimmed.toUpperCase();
+
+  if (upper === "UTS" || upper === "PEKAN UTS") return "UTS";
+  if (upper === "UAS" || upper === "PEKAN UAS") return "UAS";
+
   if (PEKAN_TO_NUMBER_MAP[trimmed] !== undefined) {
     return PEKAN_TO_NUMBER_MAP[trimmed];
   }
-  const parsedNum = Number.parseInt(trimmed, 10);
-  if (!Number.isNaN(parsedNum) && parsedNum >= 1 && parsedNum <= 16) {
+  if (PEKAN_TO_NUMBER_MAP[upper] !== undefined) {
+    return PEKAN_TO_NUMBER_MAP[upper];
+  }
+
+  const cleanNum = upper.replace(/^PEKAN\s*/i, "");
+  const parsedNum = Number.parseInt(cleanNum, 10);
+  if (!Number.isNaN(parsedNum)) {
     return parsedNum;
   }
-  const idx = scheduleData.jadwal_per_pekan.findIndex((p) => p.pekan === trimmed);
-  return idx !== -1 ? idx + 1 : 1;
+
+  const idx = scheduleData.jadwal_per_pekan.findIndex(
+    (p) => p.pekan.toUpperCase() === upper || p.pekan === trimmed
+  );
+  if (idx !== -1) {
+    const item = scheduleData.jadwal_per_pekan[idx];
+    return PEKAN_TO_NUMBER_MAP[item.pekan] ?? (idx + 1);
+  }
+  return 1;
+}
+
+export function getPekanLabel(pekanOrWeek) {
+  const p = getPekanNumber(pekanOrWeek);
+  if (p === "UTS") return "Pekan UTS";
+  if (p === "UAS") return "Pekan UAS";
+  return `Pekan ${p}`;
 }
 
 const activeInfo = computeActiveWeekInfo();
@@ -189,8 +213,12 @@ export function useSchedule() {
   const allWeeks = scheduleData.jadwal_per_pekan;
   const currentWeek = computed(() => allWeeks[viewedWeekIndex.value]);
 
-  const activeWeekNumber = computed(() => activeWeekIndex + 1);
-  const currentWeekNumber = computed(() => viewedWeekIndex.value + 1);
+  const activeWeekNumber = computed(() =>
+    getPekanNumber(allWeeks[activeWeekIndex])
+  );
+  const currentWeekNumber = computed(() =>
+    getPekanNumber(allWeeks[viewedWeekIndex.value])
+  );
 
   const isCurrentWeek = computed(
     () => viewedWeekIndex.value === activeWeekIndex
@@ -296,6 +324,8 @@ export function useSchedule() {
     setWeek,
     prevWeek,
     nextWeek,
+    getPekanNumber,
+    getPekanLabel,
     resetToCurrentWeek,
     partitionDaring,
     partitionLuring,

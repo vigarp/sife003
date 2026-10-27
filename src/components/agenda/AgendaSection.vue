@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, computed, ref, watch } from "vue";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
-import { useSchedule, getPekanNumber } from "@/composables/useSchedule";
+import { useSchedule, getPekanNumber, getPekanLabel } from "@/composables/useSchedule";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
 import { formatAgendaShareText, copyToClipboard } from "@/utils/scheduleShare";
@@ -82,7 +82,7 @@ onUnmounted(() => {
             class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 text-[11px] font-bold border border-amber-300 dark:border-amber-800 flex items-center gap-1"
           >
             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            <span>Pekan {{ activeWeekNumber }} (Upcoming)</span>
+            <span>{{ getPekanLabel(activeWeekNumber) }} (Upcoming)</span>
           </span>
           <!-- Ongoing Badge (Mon-Sat Active Week) -->
           <span
@@ -90,7 +90,7 @@ onUnmounted(() => {
             class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold border border-emerald-300 dark:border-emerald-800 flex items-center gap-1"
           >
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Pekan {{ activeWeekNumber }} (Ongoing)</span>
+            <span>{{ getPekanLabel(activeWeekNumber) }} (Ongoing)</span>
           </span>
         </div>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">

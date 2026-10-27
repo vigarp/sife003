@@ -26,11 +26,11 @@ describe("AgendaSection.vue", () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain("Agenda Kelas");
-    expect(wrapper.text()).toMatch(/Pekan \d+ \((Upcoming|Ongoing)\)/);
+    expect(wrapper.text()).toMatch(/Pekan (\d+|UTS|UAS) \((Upcoming|Ongoing)\)/);
     expect(wrapper.text()).toContain("Target tugas yang");
   });
 
-  it("should fetch agendas for pekan 8 during UTS week and update when navigating", async () => {
+  it("should fetch agendas for pekan UTS during UTS week and update when navigating", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -42,16 +42,16 @@ describe("AgendaSection.vue", () => {
 
     const { useSchedule } = await import("@/composables/useSchedule");
     const { setWeek, resetToCurrentWeek } = useSchedule();
-    setWeek(7); // Index 7 is UTS (Week 8)
+    setWeek(7); // Index 7 is UTS
 
     mount(AgendaSection, { global: globalConfig });
     await flushPromises();
 
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("pekan=8"));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("pekan=UTS"));
 
-    setWeek(8); // Index 8 is Pekan VIII (Week 9)
+    setWeek(8); // Index 8 is Pekan VIII (Week 8)
     await flushPromises();
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("pekan=9"));
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("pekan=8"));
 
     resetToCurrentWeek();
   });

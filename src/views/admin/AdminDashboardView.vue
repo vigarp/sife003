@@ -3,7 +3,7 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
-import { useSchedule, getPekanNumber } from "@/composables/useSchedule";
+import { useSchedule, getPekanNumber, getPekanLabel } from "@/composables/useSchedule";
 import AdminStudentsManager from "@/components/admin/AdminStudentsManager.vue";
 import AdminCoursesManager from "@/components/admin/AdminCoursesManager.vue";
 import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue";
@@ -31,6 +31,17 @@ const selectedFilter = ref("active");
 
 // Subjects list from schedule data
 const masterMatkulList = scheduleData.master_mata_kuliah.map((m) => m.nama);
+
+// Available weeks for agenda dropdown options
+const weekOptions = computed(() => {
+  return scheduleData.jadwal_per_pekan.map((p) => {
+    const val = getPekanNumber(p);
+    return {
+      value: val,
+      label: getPekanLabel(p),
+    };
+  });
+});
 
 // Notification banner state
 const toast = reactive({
@@ -134,7 +145,10 @@ async function handleSubmit() {
   submitting.value = true;
   try {
     const payload = {
-      pekan: Number.parseInt(form.pekan, 10),
+      pekan:
+        form.pekan === "UTS" || form.pekan === "UAS"
+          ? form.pekan
+          : Number.parseInt(form.pekan, 10) || form.pekan,
       pertemuan:
         form.pertemuan !== null && form.pertemuan !== "" && !Number.isNaN(Number(form.pertemuan))
           ? Number.parseInt(form.pertemuan, 10)
@@ -436,7 +450,7 @@ onMounted(async () => {
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
             ]"
           >
-            Pekan {{ activeWeekNumber }} {{ activeWeekBadgeText }}
+            {{ getPekanLabel(activeWeekNumber) }} {{ activeWeekBadgeText }}
           </button>
           <button
             @click="handleFilterChange('all')"
@@ -447,7 +461,7 @@ onMounted(async () => {
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
             ]"
           >
-            Semua Pekan (1–16)
+            Semua Pekan
           </button>
         </div>
 
@@ -494,7 +508,7 @@ onMounted(async () => {
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
             <tr v-for="item in agendas" :key="item.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-850/50 transition-colors">
               <td class="p-4 font-semibold text-slate-800 dark:text-slate-200">
-                Pekan {{ item.pekan }}
+                {{ getPekanLabel(item.pekan) }}
                 <div v-if="item.pertemuan" class="text-[11px] font-normal text-slate-400">
                   Pert. {{ item.pertemuan }}
                 </div>
@@ -617,15 +631,15 @@ onMounted(async () => {
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label for="agenda-pekan" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Target Pekan (1–16)
+                Target Pekan
               </label>
               <select
                 id="agenda-pekan"
                 v-model="form.pekan"
                 class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
               >
-                <option v-for="w in 16" :key="w" :value="w">
-                  Pekan {{ w }} {{ w === activeWeekNumber ? activeWeekBadgeText : '' }}
+                <option v-for="item in weekOptions" :key="item.value" :value="item.value">
+                  {{ item.label }} {{ item.value === activeWeekNumber ? activeWeekBadgeText : '' }}
                 </option>
               </select>
             </div>
@@ -701,7 +715,7 @@ onMounted(async () => {
                   />
                   <span class="font-bold">By Pekan</span>
                 </div>
-                <span class="text-[10px] opacity-75 mt-1">Cukup "Pekan {{ form.pekan }}"</span>
+                <span class="text-[10px] opacity-75 mt-1">Cukup "{{ getPekanLabel(form.pekan) }}"</span>
               </label>
 
               <label

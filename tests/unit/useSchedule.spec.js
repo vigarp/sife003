@@ -134,28 +134,32 @@ describe("useSchedule composable", () => {
     expect(["upcoming", "ongoing"]).toContain(schedule.activeWeekStatus.value);
   });
 
-  it("should correctly map all weeks including UTS and UAS to 1-based week numbers", () => {
+  it("should correctly map all weeks including UTS and UAS to numbers or exam strings", () => {
     expect(PEKAN_TO_NUMBER_MAP.I).toBe(1);
     expect(PEKAN_TO_NUMBER_MAP.VII).toBe(7);
-    expect(PEKAN_TO_NUMBER_MAP.UTS).toBe(8);
-    expect(PEKAN_TO_NUMBER_MAP.VIII).toBe(9);
-    expect(PEKAN_TO_NUMBER_MAP.XIV).toBe(15);
-    expect(PEKAN_TO_NUMBER_MAP.UAS).toBe(16);
+    expect(PEKAN_TO_NUMBER_MAP.UTS).toBe("UTS");
+    expect(PEKAN_TO_NUMBER_MAP.VIII).toBe(8);
+    expect(PEKAN_TO_NUMBER_MAP.XIV).toBe(14);
+    expect(PEKAN_TO_NUMBER_MAP.UAS).toBe("UAS");
 
-    expect(getPekanNumber("UTS")).toBe(8);
-    expect(getPekanNumber("UAS")).toBe(16);
-    expect(getPekanNumber("VIII")).toBe(9);
-    expect(getPekanNumber({ pekan: "UTS" })).toBe(8);
-    expect(getPekanNumber({ pekan: "VIII" })).toBe(9);
+    expect(getPekanNumber("UTS")).toBe("UTS");
+    expect(getPekanNumber("UAS")).toBe("UAS");
+    expect(getPekanNumber("VIII")).toBe(8);
+    expect(getPekanNumber({ pekan: "UTS" })).toBe("UTS");
+    expect(getPekanNumber({ pekan: "VIII" })).toBe(8);
     expect(getPekanNumber(8)).toBe(8);
     expect(getPekanNumber(null)).toBe(1);
     expect(getPekanNumber("unknown")).toBe(1);
   });
 
   it("should compute activeWeekNumber and currentWeekNumber properly", () => {
-    expect(schedule.activeWeekNumber.value).toBe(schedule.activeWeekIndex + 1);
+    expect(schedule.activeWeekNumber.value).toBe(getPekanNumber(schedule.allWeeks[schedule.activeWeekIndex]));
     schedule.setWeek(7); // Index 7 is UTS
-    expect(schedule.currentWeekNumber.value).toBe(8);
+    expect(schedule.currentWeekNumber.value).toBe("UTS");
     expect(schedule.currentWeek.value.pekan).toBe("UTS");
+
+    schedule.setWeek(8); // Index 8 is Pekan VIII (Week 8)
+    expect(schedule.currentWeekNumber.value).toBe(8);
+    expect(schedule.currentWeek.value.pekan).toBe("VIII");
   });
 });
