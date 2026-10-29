@@ -51,6 +51,45 @@ export function sortCourses(courseList) {
   return [...courseList].sort((a, b) => getCourseSortRank(a) - getCourseSortRank(b));
 }
 
+function getSksFromProperty(course) {
+  if (typeof course.sks === "number" && course.sks > 0) return course.sks;
+  if (typeof course.jml_sks === "number" && course.jml_sks > 0) return course.jml_sks;
+  return null;
+}
+
+function getSksFromNameBracket(name) {
+  const match = name.match(/^\[(\d+)\]/);
+  if (!match) return null;
+  const val = Number.parseInt(match[1], 10);
+  return Number.isNaN(val) || val <= 0 ? null : val;
+}
+
+function getSksFromMasterSchedule(code, cleanName) {
+  if (!Array.isArray(scheduleData?.master_mata_kuliah)) return null;
+  for (const master of scheduleData.master_mata_kuliah) {
+    if (code?.includes(master.kode)) {
+      return master.sks;
+    }
+    const masterName = master.nama.toLowerCase();
+    if (cleanName && (cleanName.includes(masterName) || masterName.includes(cleanName))) {
+      return master.sks;
+    }
+  }
+  return null;
+}
+
+function getSksFromCodeSuffix(code) {
+  const match = code.match(/22[A-Z]{3}\d{3}(\d)/i);
+  if (!match) return null;
+  const val = Number.parseInt(match[1], 10);
+  return Number.isNaN(val) || val <= 0 ? null : val;
+}
+
+function is3SksByKeyword(name) {
+  const upper = name.toUpperCase();
+  return upper.includes("JAVA") || upper.includes("DESIGN GRAFIS") || upper.includes("DESAIN GRAFIS");
+}
+
 /**
  * Detect SKS count for a given course object.
  * Returns 3 for 3 SKS courses, or 2 for regular 2 SKS courses.
@@ -58,56 +97,22 @@ export function sortCourses(courseList) {
 export function getCourseSks(course) {
   if (!course) return 2;
 
-  // 1. Explicit sks properties if present
-  if (typeof course.sks === "number" && course.sks > 0) {
-    return course.sks;
-  }
-  if (typeof course.jml_sks === "number" && course.jml_sks > 0) {
-    return course.jml_sks;
-  }
+  const propSks = getSksFromProperty(course);
+  if (propSks) return propSks;
 
-  // 2. Mentari coursename format: e.g. "[3] PEMROGRAMAN BERORIENTASI OBYEK (JAVA I) # ..."
   const name = course.coursename || course.nama_mata_kuliah || course.nama || "";
-  const bracketMatch = name.match(/^\[(\d+)\]/);
-  if (bracketMatch) {
-    const val = Number.parseInt(bracketMatch[1], 10);
-    if (!Number.isNaN(val) && val > 0) {
-      return val;
-    }
-  }
+  const bracketSks = getSksFromNameBracket(name);
+  if (bracketSks) return bracketSks;
 
-  // 3. Match code or name against scheduleData master_mata_kuliah
   const code = (course.id_mata_kuliah || course.kode || course.kode_course || "").trim();
   const cleanName = name.trim().toLowerCase();
+  const masterSks = getSksFromMasterSchedule(code, cleanName);
+  if (masterSks) return masterSks;
 
-  if (Array.isArray(scheduleData?.master_mata_kuliah)) {
-    for (const master of scheduleData.master_mata_kuliah) {
-      if (code && code.includes(master.kode)) {
-        return master.sks;
-      }
-      const masterName = master.nama.toLowerCase();
-      if (cleanName && (cleanName.includes(masterName) || masterName.includes(cleanName))) {
-        return master.sks;
-      }
-    }
-  }
+  const suffixSks = getSksFromCodeSuffix(code);
+  if (suffixSks) return suffixSks;
 
-  // 4. Code suffix heuristic (e.g. 22SIF0103 -> last digit 3, 22SIF0132 -> last digit 2)
-  const codeSuffixMatch = code.match(/22[A-Z]{3}\d{3}(\d)/i);
-  if (codeSuffixMatch) {
-    const val = Number.parseInt(codeSuffixMatch[1], 10);
-    if (!Number.isNaN(val) && val > 0) {
-      return val;
-    }
-  }
-
-  // 5. Keyword fallback for known 3 SKS courses in class 03SIFE003
-  const upper = name.toUpperCase();
-  if (upper.includes("JAVA") || upper.includes("DESIGN GRAFIS") || upper.includes("DESAIN GRAFIS")) {
-    return 3;
-  }
-
-  return 2;
+  return is3SksByKeyword(name) ? 3 : 2;
 }
 
 /**
@@ -118,6 +123,64 @@ export function getCourseSks(course) {
 export function getMaxPertemuan(course) {
   const sks = getCourseSks(course);
   return sks === 3 ? 21 : 14;
+}
+
+function extractTokenFromStorageJson(text) {
+  if (!text.startsWith("[") && !text.startsWith("{")) return text;
+  try {
+    const parsed = JSON.parse(text);
+    if (Array.isArray(parsed)) {
+      const mhs =
+        parsed.find((item) => item?.role === "MAHASISWA" && item?.token) ||
+        parsed.find((item) => item?.token);
+      return mhs?.token ? String(mhs.token).trim() : text;
+    }
+    if (parsed && typeof parsed === "object") {
+      const found = parsed.token || parsed.access_token;
+      return found ? String(found).trim() : text;
+    }
+  } catch {
+    // not valid JSON, proceed as raw text
+  }
+  return text;
+}
+
+function stripWrappingQuotes(text) {
+  if (
+    (text.startsWith('"') && text.endsWith('"')) ||
+    (text.startsWith("'") && text.endsWith("'"))
+  ) {
+    return text.slice(1, -1).trim();
+  }
+  return text;
+}
+
+function decodeJwtPayload(jwtToken) {
+  const parts = jwtToken.split(".");
+  if (parts.length !== 3) return null;
+
+  try {
+    let base64Url = parts[1];
+    while (base64Url.length % 4) {
+      base64Url += "=";
+    }
+    const base64 = base64Url.replaceAll("-", "+").replaceAll("_", "/");
+    const decoded = atob(base64);
+
+    try {
+      const jsonPayload = decodeURIComponent(
+        decoded
+          .split("")
+          .map((c) => "%" + ("00" + c.codePointAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return JSON.parse(decoded);
+    }
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -133,80 +196,23 @@ export function parseMentariAuth(rawInput) {
   }
 
   let text = rawInput.trim();
-
-  // Strip 'Bearer ' if present
   if (text.startsWith("Bearer ")) {
     text = text.slice(7).trim();
   }
 
-  // Handle JSON array or object from localStorage "access"
-  if (text.startsWith("[") || text.startsWith("{")) {
-    try {
-      const parsed = JSON.parse(text);
-      if (Array.isArray(parsed)) {
-        const mhs =
-          parsed.find((item) => item?.role === "MAHASISWA" && item?.token) ||
-          parsed.find((item) => item?.token);
-        if (mhs?.token) {
-          text = String(mhs.token).trim();
-        }
-      } else if (parsed && typeof parsed === "object") {
-        if (parsed.token) {
-          text = String(parsed.token).trim();
-        } else if (parsed.access_token) {
-          text = String(parsed.access_token).trim();
-        }
-      }
-    } catch {
-      // not valid JSON, proceed as raw text
-    }
+  text = extractTokenFromStorageJson(text);
+  text = stripWrappingQuotes(text);
+
+  const payload = decodeJwtPayload(text);
+  if (!payload) {
+    return { token: text, nim: "", fullname: "", role: "", exp: null, valid: false };
   }
 
-  // Strip wrapping double or single quotes
-  if (
-    (text.startsWith('"') && text.endsWith('"')) ||
-    (text.startsWith("'") && text.endsWith("'"))
-  ) {
-    text = text.slice(1, -1).trim();
-  }
-
-  let nim = "";
-  let fullname = "";
-  let role = "";
-  let exp = null;
-  let valid = false;
-
-  try {
-    const parts = text.split(".");
-    if (parts.length === 3) {
-      let base64Url = parts[1];
-      while (base64Url.length % 4) {
-        base64Url += "=";
-      }
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const decoded = atob(base64);
-      let payload;
-      try {
-        const jsonPayload = decodeURIComponent(
-          decoded
-            .split("")
-            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-            .join("")
-        );
-        payload = JSON.parse(jsonPayload);
-      } catch {
-        payload = JSON.parse(decoded);
-      }
-
-      if (payload.username) nim = String(payload.username).trim();
-      if (payload.fullname) fullname = String(payload.fullname).trim();
-      if (payload.role) role = String(payload.role).trim();
-      if (payload.exp) exp = payload.exp;
-      valid = Boolean(nim || fullname || payload.id);
-    }
-  } catch {
-    valid = false;
-  }
+  const nim = payload.username ? String(payload.username).trim() : "";
+  const fullname = payload.fullname ? String(payload.fullname).trim() : "";
+  const role = payload.role ? String(payload.role).trim() : "";
+  const exp = payload.exp || null;
+  const valid = Boolean(nim || fullname || payload.id);
 
   return {
     token: text,
