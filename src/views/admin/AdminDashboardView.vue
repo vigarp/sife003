@@ -653,7 +653,7 @@ onMounted(async () => {
                 v-model.number="form.pertemuan"
                 type="number"
                 min="1"
-                max="16"
+                max="21"
                 placeholder="Contoh: 4 (Opsional)"
                 class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               />

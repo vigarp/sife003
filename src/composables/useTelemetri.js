@@ -1,4 +1,5 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
+import scheduleData from "@/data/schedule.json";
 
 export const STORAGE_TOKEN_KEY = "telemetri_mentari_jwt";
 export const STORAGE_NIM_KEY = "telemetri_user_nim";
@@ -48,6 +49,75 @@ export function getCourseSortRank(course) {
 export function sortCourses(courseList) {
   if (!Array.isArray(courseList)) return [];
   return [...courseList].sort((a, b) => getCourseSortRank(a) - getCourseSortRank(b));
+}
+
+/**
+ * Detect SKS count for a given course object.
+ * Returns 3 for 3 SKS courses, or 2 for regular 2 SKS courses.
+ */
+export function getCourseSks(course) {
+  if (!course) return 2;
+
+  // 1. Explicit sks properties if present
+  if (typeof course.sks === "number" && course.sks > 0) {
+    return course.sks;
+  }
+  if (typeof course.jml_sks === "number" && course.jml_sks > 0) {
+    return course.jml_sks;
+  }
+
+  // 2. Mentari coursename format: e.g. "[3] PEMROGRAMAN BERORIENTASI OBYEK (JAVA I) # ..."
+  const name = course.coursename || course.nama_mata_kuliah || course.nama || "";
+  const bracketMatch = name.match(/^\[(\d+)\]/);
+  if (bracketMatch) {
+    const val = Number.parseInt(bracketMatch[1], 10);
+    if (!Number.isNaN(val) && val > 0) {
+      return val;
+    }
+  }
+
+  // 3. Match code or name against scheduleData master_mata_kuliah
+  const code = (course.id_mata_kuliah || course.kode || course.kode_course || "").trim();
+  const cleanName = name.trim().toLowerCase();
+
+  if (Array.isArray(scheduleData?.master_mata_kuliah)) {
+    for (const master of scheduleData.master_mata_kuliah) {
+      if (code && code.includes(master.kode)) {
+        return master.sks;
+      }
+      const masterName = master.nama.toLowerCase();
+      if (cleanName && (cleanName.includes(masterName) || masterName.includes(cleanName))) {
+        return master.sks;
+      }
+    }
+  }
+
+  // 4. Code suffix heuristic (e.g. 22SIF0103 -> last digit 3, 22SIF0132 -> last digit 2)
+  const codeSuffixMatch = code.match(/22[A-Z]{3}\d{3}(\d)/i);
+  if (codeSuffixMatch) {
+    const val = Number.parseInt(codeSuffixMatch[1], 10);
+    if (!Number.isNaN(val) && val > 0) {
+      return val;
+    }
+  }
+
+  // 5. Keyword fallback for known 3 SKS courses in class 03SIFE003
+  const upper = name.toUpperCase();
+  if (upper.includes("JAVA") || upper.includes("DESIGN GRAFIS") || upper.includes("DESAIN GRAFIS")) {
+    return 3;
+  }
+
+  return 2;
+}
+
+/**
+ * Determine maximum pertemuan based on SKS:
+ * 3 SKS -> 21 pertemuan
+ * 2 SKS -> 14 pertemuan
+ */
+export function getMaxPertemuan(course) {
+  const sks = getCourseSks(course);
+  return sks === 3 ? 21 : 14;
 }
 
 /**
@@ -304,6 +374,38 @@ export function useTelemetri() {
   const selectedCourse = computed(() => {
     return courses.value.find((c) => c.kode_course === selectedCourseKode.value) || null;
   });
+
+  // Available meeting count for currently selected course:
+  // 3 SKS courses have 21 pertemuan, 2 SKS courses have 14 pertemuan.
+  const availableMeetingCount = computed(() => {
+    let maxFromDetail = 0;
+    const isMatchingDetail =
+      courseDetail.value?.kode_course === selectedCourseKode.value ||
+      courseDetail.value?.kode === selectedCourseKode.value;
+
+    if (isMatchingDetail && courseDetail.value?.data && Array.isArray(courseDetail.value.data)) {
+      for (const s of courseDetail.value.data) {
+        const m = s.kode_section?.match(/^PERTEMUAN_(\d+)$/);
+        if (m) {
+          const num = Number.parseInt(m[1], 10);
+          if (num > maxFromDetail) maxFromDetail = num;
+        }
+      }
+    }
+    const maxFromConfig = getMaxPertemuan(selectedCourse.value);
+    return Math.max(maxFromDetail, maxFromConfig);
+  });
+
+  // Clamp selected pertemuan if it exceeds available meeting count
+  watch(
+    availableMeetingCount,
+    (newMax) => {
+      if (selectedPertemuanNum.value > newMax) {
+        selectedPertemuanNum.value = newMax;
+      }
+    },
+    { flush: "sync" }
+  );
 
   // Current selected section (e.g. PERTEMUAN_8)
   const currentSection = computed(() => {
@@ -594,7 +696,10 @@ export function useTelemetri() {
     courses,
     selectedCourseKode,
     selectedPertemuanNum,
+    availableMeetingCount,
     selectedCourse,
+    getCourseSks,
+    getMaxPertemuan,
     courseDetail,
     currentSection,
     forumSubsection,

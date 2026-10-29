@@ -7,6 +7,7 @@ const {
   courses,
   selectedCourseKode,
   selectedPertemuanNum,
+  availableMeetingCount,
   scanning,
   hasToken,
   scanForum,
@@ -64,7 +65,7 @@ function handleScan() {
             v-model="selectedPertemuanNum"
             class="w-full appearance-none bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-semibold rounded-xl pl-3 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs cursor-pointer"
           >
-            <option v-for="p in 14" :key="p" :value="p">
+            <option v-for="p in availableMeetingCount" :key="p" :value="p">
               Pertemuan {{ p }}
             </option>
           </select>

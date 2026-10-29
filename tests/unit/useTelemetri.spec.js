@@ -227,5 +227,62 @@ describe("useTelemetri composable", () => {
       "22SIF0092", // PEMB (E-2)
     ]);
   });
+
+  it("should determine SKS and max meetings (21 for 3 SKS, 14 for 2 SKS)", async () => {
+    const telemetri = useTelemetri();
+
+    const course3SksJava = {
+      id_mata_kuliah: "22SIF0103",
+      kode_course: "20261-03SIFE003-22SIF0103",
+      coursename: "[3] PEMROGRAMAN BERORIENTASI OBYEK (JAVA I) # 03SIFE003 (Sabtu) [E-1]",
+    };
+    const course3SksDg = {
+      id_mata_kuliah: "22SIF0123",
+      kode_course: "20261-03SIFE003-22SIF0123",
+      coursename: "[3] DESIGN GRAFIS # 03SIFE003 (Sabtu) [E-1]",
+    };
+    const course2SksWeb = {
+      id_mata_kuliah: "22SIF0132",
+      kode_course: "20261-03SIFE003-22SIF0132",
+      coursename: "[2] REKAYASA WEB # 03SIFE003 (Sabtu) [E-1]",
+    };
+    const course2SksAiit = {
+      id_mata_kuliah: "22SIF0142",
+      kode_course: "20261-03SIFE003-22SIF0142",
+      coursename: "[2] ARSITEKTUR DAN INFRASTRUKTUR IT # 03SIFE003 (Sabtu) [E-2]",
+    };
+
+    expect(telemetri.getCourseSks(course3SksJava)).toBe(3);
+    expect(telemetri.getMaxPertemuan(course3SksJava)).toBe(21);
+
+    expect(telemetri.getCourseSks(course3SksDg)).toBe(3);
+    expect(telemetri.getMaxPertemuan(course3SksDg)).toBe(21);
+
+    expect(telemetri.getCourseSks(course2SksWeb)).toBe(2);
+    expect(telemetri.getMaxPertemuan(course2SksWeb)).toBe(14);
+
+    expect(telemetri.getCourseSks(course2SksAiit)).toBe(2);
+    expect(telemetri.getMaxPertemuan(course2SksAiit)).toBe(14);
+
+    // Setup courses in telemetri state
+    telemetri.courses.value = [course3SksJava, course2SksWeb];
+
+    // Select 3 SKS course -> availableMeetingCount should be 21
+    telemetri.selectedCourseKode.value = course3SksJava.kode_course;
+    expect(telemetri.availableMeetingCount.value).toBe(21);
+
+    // User can set meeting up to 21
+    telemetri.selectedPertemuanNum.value = 21;
+    expect(telemetri.selectedPertemuanNum.value).toBe(21);
+
+    // Switch to 2 SKS course -> availableMeetingCount should become 14
+    telemetri.selectedCourseKode.value = course2SksWeb.kode_course;
+    expect(telemetri.availableMeetingCount.value).toBe(14);
+
+    // The watcher should clamp meeting number to 14
+    const { nextTick } = await import("vue");
+    await nextTick();
+    expect(telemetri.selectedPertemuanNum.value).toBe(14);
+  });
 });
 
