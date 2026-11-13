@@ -22,11 +22,23 @@ const {
 
 const {
   hasToken,
+  scanning,
+  scanningForum,
   selectedCourseKode,
   selectedPertemuanNum,
-  scanForum,
+  loadCourseDetail,
   resolveCourseKode,
 } = useTelemetri();
+
+function openMentariLms(course, pertemuan) {
+  const base = "https://mentari.unpam.ac.id/u-courses";
+  const url = course?.kodeCourse
+    ? `${base}/${encodeURIComponent(String(course.kodeCourse))}?accord_pertemuan=PERTEMUAN_${encodeURIComponent(String(pertemuan))}`
+    : base;
+  if (typeof window !== "undefined" && url.startsWith("https://mentari.unpam.ac.id/")) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
 
 const expandedCourseKey = ref(null);
 const expandedSessionKey = ref(null);
@@ -146,7 +158,7 @@ async function triggerScan(course, session, forceRefresh = false) {
     emit("open-token-modal");
     return;
   }
-  await scanForum(course.kodeCourse, session.pertemuan, { forceRefresh });
+  await loadCourseDetail(course.kodeCourse, session.pertemuan, { forceRefresh });
 }
 
 async function toggleCourse(course) {
@@ -386,66 +398,81 @@ function handleResetWeek() {
               </span>
             </button>
 
-            <!-- Level 1 Body -->
+            <!-- Level 1 Body: Pertemuan Accordions (Level 2) -->
             <div
               v-if="isCourseExpanded(course.key)"
               class="border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 p-3 sm:p-4 space-y-3"
             >
-              <!-- Case A: 2+ sessions (e.g. 3 SKS -> Sub-Accordion per Pertemuan) -->
-              <template v-if="course.sessions.length > 1">
+              <div
+                v-for="session in course.sessions"
+                :key="session.pertemuan"
+                class="rounded-xl border bg-white dark:bg-slate-900 overflow-hidden transition-colors"
+                :class="
+                  isSessionExpanded(course.key, session.pertemuan)
+                    ? 'border-indigo-300 dark:border-indigo-700'
+                    : 'border-slate-200 dark:border-slate-800'
+                "
+              >
+                <!-- Level 2: Pertemuan Header + Actions (Pindai Ulang & Buka di Mentari) -->
                 <div
-                  v-for="session in course.sessions"
-                  :key="session.pertemuan"
-                  class="rounded-xl border bg-white dark:bg-slate-900 overflow-hidden transition-colors"
-                  :class="
-                    isSessionExpanded(course.key, session.pertemuan)
-                      ? 'border-indigo-300 dark:border-indigo-700'
-                      : 'border-slate-200 dark:border-slate-800'
-                  "
+                  role="button"
+                  tabindex="0"
+                  @click="toggleSession(course, session)"
+                  @keydown.enter.prevent="toggleSession(course, session)"
+                  @keydown.space.prevent="toggleSession(course, session)"
+                  :aria-expanded="isSessionExpanded(course.key, session.pertemuan)"
+                  class="w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
                 >
-                  <!-- Level 2: Sub-Accordion Header -->
-                  <button
-                    type="button"
-                    @click="toggleSession(course, session)"
-                    :aria-expanded="isSessionExpanded(course.key, session.pertemuan)"
-                    class="w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-                  >
-                    <span class="text-xs font-bold text-slate-900 dark:text-white">
-                      Pertemuan {{ session.pertemuan }}
-                    </span>
+                  <span class="text-xs font-bold text-slate-900 dark:text-white">
+                    Pertemuan {{ session.pertemuan }}
+                  </span>
+
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      @click.stop="triggerScan(course, session, true)"
+                      :disabled="scanning || scanningForum"
+                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      <span
+                        class="material-symbols-outlined text-[14px]"
+                        :class="{ 'animate-spin': (scanning || scanningForum) && isActiveTarget(course, session.pertemuan) }"
+                      >
+                        refresh
+                      </span>
+                      <span class="hidden sm:inline">Pindai Ulang</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      @click.stop="openMentariLms(course, session.pertemuan)"
+                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-[11px] font-bold transition-colors cursor-pointer"
+                    >
+                      <span class="hidden sm:inline">Buka di Mentari</span>
+                      <span class="sm:hidden">Mentari</span>
+                      <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                    </button>
 
                     <span
-                      class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200"
+                      class="material-symbols-outlined text-[20px] text-slate-400 transition-transform duration-200 ml-0.5"
                       :class="{ 'rotate-180 text-indigo-500': isSessionExpanded(course.key, session.pertemuan) }"
                     >
                       expand_more
                     </span>
-                  </button>
-
-                  <!-- Level 2: Leaf Content -->
-                  <div
-                    v-if="isSessionExpanded(course.key, session.pertemuan)"
-                    class="border-t border-slate-100 dark:border-slate-800 p-3 sm:p-4"
-                  >
-                    <TelemetriScanResult
-                      :is-active="isActiveTarget(course, session.pertemuan)"
-                      :show-toolbar="true"
-                      @refresh="triggerScan(course, session, true)"
-                      @open-token-modal="emit('open-token-modal')"
-                    />
                   </div>
                 </div>
-              </template>
 
-              <!-- Case B: Single session in this week (2 SKS -> direct leaf content) -->
-              <template v-else-if="course.sessions.length === 1">
-                <TelemetriScanResult
-                  :is-active="isActiveTarget(course, course.sessions[0].pertemuan)"
-                  :show-toolbar="true"
-                  @refresh="triggerScan(course, course.sessions[0], true)"
-                  @open-token-modal="emit('open-token-modal')"
-                />
-              </template>
+                <!-- Level 2 Body: Level 3 Sub-Accordions -->
+                <div
+                  v-if="isSessionExpanded(course.key, session.pertemuan)"
+                  class="border-t border-slate-100 dark:border-slate-800 p-3 sm:p-4"
+                >
+                  <TelemetriScanResult
+                    :is-active="isActiveTarget(course, session.pertemuan)"
+                    @open-token-modal="emit('open-token-modal')"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

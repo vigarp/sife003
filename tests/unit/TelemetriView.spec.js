@@ -16,10 +16,22 @@ function createMockMentariFetch() {
         kode_section: "PERTEMUAN_14",
         sub_section: [
           {
+            id: "pre-14",
+            kode_template: "PRE_TEST",
+            judul: "Pre Test P14",
+            completion: true,
+          },
+          {
             id: "forum-uuid-14",
             kode_template: "FORUM_DISKUSI",
             konten: "<p>Wajib reply 2x</p>",
             warningAlert: null,
+          },
+          {
+            id: "post-14",
+            kode_template: "POST_TEST",
+            judul: "Post Test P14",
+            completion: false,
           },
         ],
       },
@@ -151,18 +163,47 @@ describe("TelemetriView.vue", () => {
 
     // Sub-accordions should be visible, and NO extra API calls should have been made yet
     const p14Btn = wrapper
-      .findAll("button")
-      .find((b) => b.text().includes("Pertemuan 14") && !b.text().includes("Java I"));
+      .findAll("[role='button']")
+      .find((b) => b.text().includes("Pertemuan 14"));
     const p15Btn = wrapper
-      .findAll("button")
-      .find((b) => b.text().includes("Pertemuan 15") && !b.text().includes("Java I"));
+      .findAll("[role='button']")
+      .find((b) => b.text().includes("Pertemuan 15"));
     expect(p14Btn).toBeTruthy();
     expect(p15Btn).toBeTruthy();
     expect(global.fetch.mock.calls.length).toBe(callsAfterMount);
 
-    // 2. Click Pertemuan 14 sub-accordion
+    // 2. Click Pertemuan 14 sub-accordion -> fetches ONLY user-course/:kode (no forum/topic yet)
     await p14Btn.trigger("click");
     await flushPromises();
+
+    // Level 2 header actions
+    expect(wrapper.text()).toContain("Pindai Ulang");
+    expect(wrapper.text()).toContain("Buka di Mentari");
+
+    // Level 3 stages: Pre-Test (Selesai), Forum Diskusi (Aktif), Post-Test (Belum Selesai), Kuesioner (Terkunci)
+    expect(wrapper.text()).toContain("Pre-Test");
+    expect(wrapper.text()).toContain("Selesai");
+    expect(wrapper.text()).toContain("Forum Diskusi");
+    expect(wrapper.text()).toContain("Post-Test");
+    expect(wrapper.text()).toContain("Belum Selesai");
+    expect(wrapper.text()).toContain("Kuesioner");
+    expect(wrapper.text()).toContain("Terkunci");
+
+    // Forum Diskusi is CLOSED by default, so forum/topic should NOT have been called yet
+    const urlsAfterPertemuan = global.fetch.mock.calls.map((c) => String(c[0]));
+    expect(urlsAfterPertemuan.some((u) => u.includes("forum"))).toBe(false);
+    expect(wrapper.text()).not.toContain("Forum Diskusi Pertemuan 14 Terbuka");
+
+    // 3. Click Forum Diskusi Level 3 accordion -> NOW fetches forum/topic and forum/reply
+    const forumBtn = wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Forum Diskusi") && b.text().includes("Aktif"));
+    expect(forumBtn).toBeTruthy();
+    await forumBtn.trigger("click");
+    await flushPromises();
+
+    const urlsAfterForum = global.fetch.mock.calls.map((c) => String(c[0]));
+    expect(urlsAfterForum.some((u) => u.includes("forum"))).toBe(true);
 
     expect(wrapper.text()).toContain("Forum Diskusi Pertemuan 14 Terbuka");
     expect(wrapper.text()).toContain("Absen");

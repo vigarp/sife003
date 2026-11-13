@@ -254,6 +254,7 @@ const topicReplies = ref([]); // Flattened array of all replies across all topic
 
 const loading = ref(false);
 const scanning = ref(false);
+const scanningForum = ref(false);
 const error = ref(null);
 const statusMessage = ref("");
 const isFromCache = ref(false);
@@ -446,6 +447,29 @@ export function useTelemetri() {
     );
   });
 
+  const preTestSubsection = computed(() => {
+    if (!currentSection.value?.sub_section) return null;
+    return (
+      currentSection.value.sub_section.find((sub) => sub.kode_template === "PRE_TEST") || null
+    );
+  });
+
+  const postTestSubsection = computed(() => {
+    if (!currentSection.value?.sub_section) return null;
+    return (
+      currentSection.value.sub_section.find((sub) => sub.kode_template === "POST_TEST") || null
+    );
+  });
+
+  const kuesionerSubsection = computed(() => {
+    if (!currentSection.value?.sub_section) return null;
+    return (
+      currentSection.value.sub_section.find(
+        (sub) => sub.kode_template === "KUESIONER" || sub.kode_template === "QUESIONER"
+      ) || null
+    );
+  });
+
   // Check if forum is open (has valid ID and no warning alert)
   const isForumOpen = computed(() => {
     const f = forumSubsection.value;
@@ -606,10 +630,20 @@ export function useTelemetri() {
     return forumScanCache.has(getScanCacheKey(kodeCourse, pertemuanNum));
   }
 
+  function resolveTargetCourse(kodeCourse) {
+    let targetCourse = kodeCourse || selectedCourseKode.value;
+    if (!targetCourse && courses.value.length > 0) {
+      targetCourse = courses.value[0].kode_course;
+    }
+    return targetCourse || "";
+  }
+
   /**
-   * Scan forum for selected course and pertemuan
+   * Step 1 (Lazy on Pertemuan expand): Fetch only user-course/:kodeCourse
+   * so Pre-Test, Forum status, Post-Test, and Kuesioner can be shown without
+   * hitting forum/topic or forum/reply yet.
    */
-  async function scanForum(
+  async function loadCourseDetail(
     kodeCourse = selectedCourseKode.value,
     pertemuanNum = selectedPertemuanNum.value,
     options = {}
@@ -621,14 +655,71 @@ export function useTelemetri() {
       return;
     }
 
-    let targetCourse = kodeCourse || selectedCourseKode.value;
-    if (!targetCourse) {
-      if (courses.value.length > 0) {
-        targetCourse = courses.value[0].kode_course;
-      } else {
-        return;
-      }
+    const targetCourse = resolveTargetCourse(kodeCourse);
+    if (!targetCourse) return;
+
+    selectedCourseKode.value = targetCourse;
+    selectedPertemuanNum.value = pertemuanNum;
+    error.value = null;
+
+    const cacheKey = getScanCacheKey(targetCourse, pertemuanNum);
+    if (forceRefresh) {
+      courseDetailCache.delete(targetCourse);
+      forumScanCache.delete(cacheKey);
     }
+
+    if (courseDetailCache.has(targetCourse)) {
+      courseDetail.value = courseDetailCache.get(targetCourse);
+      if (forumScanCache.has(cacheKey)) {
+        const cached = forumScanCache.get(cacheKey);
+        forumTopics.value = cached.forumTopics;
+        topicReplies.value = cached.topicReplies;
+        statusMessage.value = cached.statusMessage;
+        isFromCache.value = true;
+      } else {
+        forumTopics.value = [];
+        topicReplies.value = [];
+        statusMessage.value = "";
+        isFromCache.value = false;
+      }
+      return;
+    }
+
+    isFromCache.value = false;
+    scanning.value = true;
+    statusMessage.value = "Mengambil modul perkuliahan...";
+    forumTopics.value = [];
+    topicReplies.value = [];
+
+    try {
+      const detailRes = await apiFetch(`user-course/${targetCourse}`);
+      courseDetailCache.set(targetCourse, detailRes);
+      courseDetail.value = detailRes;
+    } catch (err) {
+      error.value = err.message;
+    } finally {
+      scanning.value = false;
+    }
+  }
+
+  /**
+   * Step 2 (Lazy on Forum Diskusi expand): Fetch forum/topic and forum/reply
+   * for the currently loaded course detail & pertemuan.
+   */
+  async function scanForumDetails(
+    kodeCourse = selectedCourseKode.value,
+    pertemuanNum = selectedPertemuanNum.value,
+    options = {}
+  ) {
+    const { forceRefresh = false, skipCourseDetailRefresh = false } = options;
+
+    if (!hasToken.value) {
+      error.value = "Silakan masukkan token Mentari terlebih dahulu.";
+      return;
+    }
+
+    const targetCourse = resolveTargetCourse(kodeCourse);
+    if (!targetCourse) return;
 
     selectedCourseKode.value = targetCourse;
     selectedPertemuanNum.value = pertemuanNum;
@@ -646,25 +737,21 @@ export function useTelemetri() {
     }
 
     isFromCache.value = false;
-    scanning.value = true;
-    statusMessage.value = "Mengambil modul perkuliahan...";
+    scanningForum.value = true;
+    statusMessage.value = "Memeriksa topik forum...";
 
     try {
-      // 1. Fetch Course Detail (reuse cached detail unless forceRefresh)
-      let detailRes = !forceRefresh ? courseDetailCache.get(targetCourse) : null;
-      if (!detailRes) {
-        detailRes = await apiFetch(`user-course/${targetCourse}`);
-        courseDetailCache.set(targetCourse, detailRes);
+      if (!courseDetailCache.has(targetCourse) || (forceRefresh && !skipCourseDetailRefresh)) {
+        await loadCourseDetail(targetCourse, pertemuanNum, { forceRefresh });
+        if (error.value) return;
       }
-      courseDetail.value = detailRes;
 
-      // 2. Identify target section & forum sub_section
+      const detailRes = courseDetail.value;
       const targetSectionCode = `PERTEMUAN_${pertemuanNum}`;
-      const sec = detailRes.data?.find((s) => s.kode_section === targetSectionCode);
+      const sec = detailRes?.data?.find((s) => s.kode_section === targetSectionCode);
       const forum = sec?.sub_section?.find((sub) => sub.kode_template === "FORUM_DISKUSI");
 
       if (!forum?.id || forum.warningAlert) {
-        // Forum is closed or not available
         forumTopics.value = [];
         topicReplies.value = [];
         statusMessage.value = forum?.warningAlert || "Forum diskusi belum dibuka oleh dosen.";
@@ -677,8 +764,6 @@ export function useTelemetri() {
         return;
       }
 
-      // 3. Fetch Forum Topics
-      statusMessage.value = "Memeriksa topik forum...";
       const topicsRes = await apiFetch(`forum/topic/${forum.id}`);
       const topics = topicsRes.topics || [];
       forumTopics.value = topics;
@@ -695,7 +780,6 @@ export function useTelemetri() {
         return;
       }
 
-      // 4. Fetch Replies for all topics in parallel
       statusMessage.value = `Mengumpulkan balasan dari ${topics.length} topik...`;
       const allFetchedReplies = [];
 
@@ -726,7 +810,24 @@ export function useTelemetri() {
     } catch (err) {
       error.value = err.message;
     } finally {
-      scanning.value = false;
+      scanningForum.value = false;
+    }
+  }
+
+  /**
+   * Scan both course detail and forum details in one call
+   */
+  async function scanForum(
+    kodeCourse = selectedCourseKode.value,
+    pertemuanNum = selectedPertemuanNum.value,
+    options = {}
+  ) {
+    await loadCourseDetail(kodeCourse, pertemuanNum, options);
+    if (!error.value) {
+      await scanForumDetails(kodeCourse, pertemuanNum, {
+        ...options,
+        skipCourseDetailRefresh: true,
+      });
     }
   }
 
@@ -794,6 +895,9 @@ export function useTelemetri() {
     courseDetail,
     currentSection,
     forumSubsection,
+    preTestSubsection,
+    postTestSubsection,
+    kuesionerSubsection,
     isForumOpen,
     forumWarning,
     forumTopics,
@@ -802,10 +906,13 @@ export function useTelemetri() {
     classStats,
     loading,
     scanning,
+    scanningForum,
     error,
     statusMessage,
     isFromCache,
     loadCourses,
+    loadCourseDetail,
+    scanForumDetails,
     scanForum,
     clearScanCache,
     hasCachedScan,

@@ -113,30 +113,19 @@ const sanitizedForumKonten = computed(() =>
       v-if="isForumOpen"
       class="bg-emerald-50/80 dark:bg-emerald-950/40 rounded-2xl border border-emerald-300 dark:border-emerald-800/80 p-5 space-y-4"
     >
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-[18px]">forum</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <h2 class="text-sm font-bold text-emerald-950 dark:text-emerald-200">
-              Forum Diskusi Pertemuan {{ selectedPertemuanNum }} Terbuka
-            </h2>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span>
-              <span>AKTIF</span>
-            </span>
-          </div>
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">forum</span>
         </div>
-
-        <button
-          type="button"
-          @click="openLms"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-750 text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
-        >
-          <span>Buka di Mentari LMS</span>
-          <span class="material-symbols-outlined text-[15px]">open_in_new</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <h2 class="text-sm font-bold text-emerald-950 dark:text-emerald-200">
+            Forum Diskusi Pertemuan {{ selectedPertemuanNum }} Terbuka
+          </h2>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span>
+            <span>AKTIF</span>
+          </span>
+        </div>
       </div>
 
       <!-- Interactive Topics Selector Pills -->
