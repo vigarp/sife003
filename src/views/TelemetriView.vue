@@ -2,41 +2,27 @@
 import { ref, onMounted } from "vue";
 import { useTelemetri } from "@/composables/useTelemetri";
 import TelemetriHeader from "@/components/telemetri/TelemetriHeader.vue";
-import TelemetriControls from "@/components/telemetri/TelemetriControls.vue";
-import TelemetriForumBanner from "@/components/telemetri/TelemetriForumBanner.vue";
-import TelemetriPersonalCard from "@/components/telemetri/TelemetriPersonalCard.vue";
-import TelemetriClassMonitor from "@/components/telemetri/TelemetriClassMonitor.vue";
+import TelemetriWeekAccordion from "@/components/telemetri/TelemetriWeekAccordion.vue";
 import TelemetriTokenModal from "@/components/telemetri/TelemetriTokenModal.vue";
 
 const isModalOpen = ref(false);
 
 const {
   hasToken,
-  loading,
-  scanning,
-  error,
-  statusMessage,
-  courseDetail,
-  selectedCourseKode,
-  selectedPertemuanNum,
   loadCourses,
-  scanForum,
 } = useTelemetri();
 
 onMounted(async () => {
   if (hasToken.value) {
+    // Hanya muat daftar mata kuliah; pemindaian fordis dilakukan lazy saat user klik accordion
     await loadCourses();
-    // Auto scan initial course & pertemuan
-    await scanForum();
   } else {
-    // Prompt token modal if not configured
     isModalOpen.value = true;
   }
 });
 
 async function handleTokenSaved() {
   await loadCourses();
-  await scanForum();
 }
 </script>
 
@@ -45,61 +31,9 @@ async function handleTokenSaved() {
     <!-- Header -->
     <TelemetriHeader @open-token-modal="isModalOpen = true" />
 
-    <!-- Error Banner -->
+    <!-- Empty State when no token is configured -->
     <div
-      v-if="error"
-      class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 flex items-start gap-3 text-xs"
-    >
-      <span class="material-symbols-outlined text-rose-500 text-[20px] shrink-0 mt-0.5">error</span>
-      <div class="space-y-1">
-        <p class="font-bold">Terjadi Kendala Pemindaian</p>
-        <p class="leading-relaxed">{{ error }}</p>
-        <button
-          v-if="error.includes('token') || error.includes('401')"
-          type="button"
-          @click="isModalOpen = true"
-          class="underline font-bold mt-1 inline-block cursor-pointer"
-        >
-          Perbarui Token Mentari Sekarang &rarr;
-        </button>
-      </div>
-    </div>
-
-    <!-- Controls Selector -->
-    <TelemetriControls
-      @open-token-modal="isModalOpen = true"
-      @scan="scanForum"
-    />
-
-    <!-- Scanning Loading State -->
-    <div
-      v-if="scanning"
-      class="py-14 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3"
-    >
-      <div class="w-10 h-10 mx-auto border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-sm font-bold text-slate-900 dark:text-white">
-        Sedang Meneropong Mentari...
-      </p>
-      <p class="text-xs text-slate-500 dark:text-slate-400">
-        {{ statusMessage || 'Menghubungkan ke API Mentari UNPAM' }}
-      </p>
-    </div>
-
-    <!-- Main Content when course detail is loaded -->
-    <div v-else-if="courseDetail" class="space-y-6">
-      <!-- 1. Forum Status Banner -->
-      <TelemetriForumBanner />
-
-      <!-- 2. Personal Insight Card -->
-      <TelemetriPersonalCard @edit-nim="isModalOpen = true" />
-
-      <!-- 3. Class Participation Monitor -->
-      <TelemetriClassMonitor />
-    </div>
-
-    <!-- Empty State when no scan has run yet -->
-    <div
-      v-else-if="!hasToken"
+      v-if="!hasToken"
       class="py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 px-4"
     >
       <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/80 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -123,6 +57,12 @@ async function handleTokenSaved() {
       </button>
     </div>
 
+    <!-- Main Telemetri Workspace (Week Accordion, Lazy-Load on Expand) -->
+    <TelemetriWeekAccordion
+      v-else
+      @open-token-modal="isModalOpen = true"
+    />
+
     <!-- Token Settings Modal -->
     <TelemetriTokenModal
       :is-open="isModalOpen"
@@ -131,4 +71,3 @@ async function handleTokenSaved() {
     />
   </div>
 </template>
-

@@ -118,19 +118,14 @@ const sanitizedForumKonten = computed(() =>
           <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
             <span class="material-symbols-outlined text-[18px]">forum</span>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-sm font-bold text-emerald-950 dark:text-emerald-200">
-                Forum Diskusi Pertemuan {{ selectedPertemuanNum }} Terbuka
-              </h2>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span>
-                <span>AKTIF</span>
-              </span>
-            </div>
-            <p class="text-xs text-emerald-700 dark:text-emerald-300/80 mt-0.5">
-              Ditemukan {{ forumTopics.length }} topik diskusi yang dapat ditanggapi
-            </p>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-emerald-950 dark:text-emerald-200">
+              Forum Diskusi Pertemuan {{ selectedPertemuanNum }} Terbuka
+            </h2>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300 text-[10px] font-extrabold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse"></span>
+              <span>AKTIF</span>
+            </span>
           </div>
         </div>
 
@@ -144,28 +139,12 @@ const sanitizedForumKonten = computed(() =>
         </button>
       </div>
 
-      <!-- Info Sesi / Catatan Jadwal Forum (jika ada) -->
-      <div
-        v-if="sanitizedForumKonten"
-        class="flex items-start gap-2.5 px-3 py-2.5 rounded-xl bg-emerald-100/70 dark:bg-emerald-900/40 border border-emerald-200/90 dark:border-emerald-800/60 text-xs text-emerald-900 dark:text-emerald-200"
-      >
-        <span class="material-symbols-outlined text-[17px] text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5">
-          info
-        </span>
-        <div class="leading-relaxed whitespace-pre-line font-medium">
-          <span class="font-bold">Info Sesi: </span>{{ sanitizedForumKonten }}
-        </div>
-      </div>
-
       <!-- Interactive Topics Selector Pills -->
       <div v-if="forumTopics.length > 0" class="space-y-2 pt-1">
-        <div class="flex items-center justify-between gap-2 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] text-emerald-600 dark:text-emerald-400">topic</span>
             <span>Topik Diskusi ({{ forumTopics.length }} Topik):</span>
-          </span>
-          <span class="text-[11px] text-emerald-700/80 dark:text-emerald-300/70">
-            Klik topik untuk menampilkan soal / instruksi dosen
           </span>
         </div>
 

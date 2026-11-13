@@ -284,5 +284,50 @@ describe("useTelemetri composable", () => {
     await nextTick();
     expect(telemetri.selectedPertemuanNum.value).toBe(14);
   });
+
+  it("should cache scanForum results and bypass cache only when forceRefresh is true", async () => {
+    const telemetri = useTelemetri();
+    telemetri.clearToken();
+    telemetri.saveToken("sample_jwt_token_for_telemetri_12345");
+
+    global.fetch = vi.fn().mockImplementation(async (url) => {
+      const u = String(url);
+      if (u.includes("forum/topic") || u.includes("forum%2Ftopic")) {
+        return { ok: true, status: 200, json: async () => ({ topics: [{ id: "t1", judul: "Soal" }] }) };
+      }
+      if (u.includes("forum/reply") || u.includes("forum%2Freply")) {
+        return { ok: true, status: 200, json: async () => ({ data: [] }) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          kode_course: "20261-03SIFE003-22SIF0132",
+          peserta: [],
+          data: [
+            {
+              kode_section: "PERTEMUAN_10",
+              sub_section: [{ id: "f1", kode_template: "FORUM_DISKUSI", warningAlert: null }],
+            },
+          ],
+        }),
+      };
+    });
+
+    await telemetri.scanForum("20261-03SIFE003-22SIF0132", 10);
+    const firstCallCount = global.fetch.mock.calls.length;
+    expect(firstCallCount).toBe(3);
+    expect(telemetri.isFromCache.value).toBe(false);
+
+    // Second call with same args should hit cache (0 new fetch calls)
+    await telemetri.scanForum("20261-03SIFE003-22SIF0132", 10);
+    expect(global.fetch.mock.calls.length).toBe(firstCallCount);
+    expect(telemetri.isFromCache.value).toBe(true);
+
+    // forceRefresh: true should re-fetch
+    await telemetri.scanForum("20261-03SIFE003-22SIF0132", 10, { forceRefresh: true });
+    expect(global.fetch.mock.calls.length).toBe(firstCallCount + 3);
+    expect(telemetri.isFromCache.value).toBe(false);
+  });
 });
 

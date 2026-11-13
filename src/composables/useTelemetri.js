@@ -256,6 +256,15 @@ const loading = ref(false);
 const scanning = ref(false);
 const error = ref(null);
 const statusMessage = ref("");
+const isFromCache = ref(false);
+
+// In-memory caches to prevent redundant API hits when toggling accordions
+const courseDetailCache = new Map();
+const forumScanCache = new Map();
+
+function getScanCacheKey(kodeCourse, pertemuanNum) {
+  return `${kodeCourse}::${pertemuanNum}`;
+}
 
 /**
  * Standardized API client for calling Mentari proxy
@@ -354,6 +363,12 @@ export function useTelemetri() {
     }
   }
 
+  function clearScanCache() {
+    courseDetailCache.clear();
+    forumScanCache.clear();
+    isFromCache.value = false;
+  }
+
   function clearToken() {
     saveToken("");
     saveUserName("");
@@ -362,6 +377,7 @@ export function useTelemetri() {
     courseDetail.value = null;
     forumTopics.value = [];
     topicReplies.value = [];
+    clearScanCache();
   }
 
   function saveUserNim(newNim) {
@@ -563,9 +579,43 @@ export function useTelemetri() {
   }
 
   /**
+   * Resolve a master_mata_kuliah entry to the user's Mentari kode_course.
+   * Falls back to `${semesterCode}-${kelasCode}-${master.kode}` if courses list is not loaded.
+   */
+  function resolveCourseKode(masterCourse, semesterCode = "20261", kelasCode = "03SIFE003") {
+    if (!masterCourse) return "";
+    const targetCode = masterCourse.kode || "";
+    const targetName = (masterCourse.nama || "").trim().toLowerCase();
+
+    const matched = courses.value.find((c) => {
+      const cCode = c.id_mata_kuliah || c.kode || "";
+      const cFull = c.kode_course || "";
+      const cName = (c.coursename || c.nama_mata_kuliah || "").trim().toLowerCase();
+      return (
+        (targetCode && (cCode === targetCode || cFull.includes(targetCode))) ||
+        (targetName && (cName.includes(targetName) || targetName.includes(cName)))
+      );
+    });
+
+    if (matched?.kode_course) return matched.kode_course;
+    return targetCode ? `${semesterCode}-${kelasCode}-${targetCode}` : "";
+  }
+
+  function hasCachedScan(kodeCourse, pertemuanNum) {
+    if (!kodeCourse || !pertemuanNum) return false;
+    return forumScanCache.has(getScanCacheKey(kodeCourse, pertemuanNum));
+  }
+
+  /**
    * Scan forum for selected course and pertemuan
    */
-  async function scanForum(kodeCourse = selectedCourseKode.value, pertemuanNum = selectedPertemuanNum.value) {
+  async function scanForum(
+    kodeCourse = selectedCourseKode.value,
+    pertemuanNum = selectedPertemuanNum.value,
+    options = {}
+  ) {
+    const { forceRefresh = false } = options;
+
     if (!hasToken.value) {
       error.value = "Silakan masukkan token Mentari terlebih dahulu.";
       return;
@@ -582,13 +632,30 @@ export function useTelemetri() {
 
     selectedCourseKode.value = targetCourse;
     selectedPertemuanNum.value = pertemuanNum;
-    scanning.value = true;
     error.value = null;
+
+    const cacheKey = getScanCacheKey(targetCourse, pertemuanNum);
+    if (!forceRefresh && forumScanCache.has(cacheKey)) {
+      const cached = forumScanCache.get(cacheKey);
+      courseDetail.value = cached.courseDetail;
+      forumTopics.value = cached.forumTopics;
+      topicReplies.value = cached.topicReplies;
+      statusMessage.value = cached.statusMessage;
+      isFromCache.value = true;
+      return;
+    }
+
+    isFromCache.value = false;
+    scanning.value = true;
     statusMessage.value = "Mengambil modul perkuliahan...";
 
     try {
-      // 1. Fetch Course Detail
-      const detailRes = await apiFetch(`user-course/${targetCourse}`);
+      // 1. Fetch Course Detail (reuse cached detail unless forceRefresh)
+      let detailRes = !forceRefresh ? courseDetailCache.get(targetCourse) : null;
+      if (!detailRes) {
+        detailRes = await apiFetch(`user-course/${targetCourse}`);
+        courseDetailCache.set(targetCourse, detailRes);
+      }
       courseDetail.value = detailRes;
 
       // 2. Identify target section & forum sub_section
@@ -601,6 +668,12 @@ export function useTelemetri() {
         forumTopics.value = [];
         topicReplies.value = [];
         statusMessage.value = forum?.warningAlert || "Forum diskusi belum dibuka oleh dosen.";
+        forumScanCache.set(cacheKey, {
+          courseDetail: detailRes,
+          forumTopics: [],
+          topicReplies: [],
+          statusMessage: statusMessage.value,
+        });
         return;
       }
 
@@ -613,6 +686,12 @@ export function useTelemetri() {
       if (topics.length === 0) {
         topicReplies.value = [];
         statusMessage.value = "Forum telah dibuat namun belum ada topik dari dosen.";
+        forumScanCache.set(cacheKey, {
+          courseDetail: detailRes,
+          forumTopics: [],
+          topicReplies: [],
+          statusMessage: statusMessage.value,
+        });
         return;
       }
 
@@ -638,6 +717,12 @@ export function useTelemetri() {
 
       topicReplies.value = allFetchedReplies;
       statusMessage.value = "Pemindaian Telemetri selesai!";
+      forumScanCache.set(cacheKey, {
+        courseDetail: detailRes,
+        forumTopics: topics,
+        topicReplies: allFetchedReplies,
+        statusMessage: statusMessage.value,
+      });
     } catch (err) {
       error.value = err.message;
     } finally {
@@ -719,8 +804,12 @@ export function useTelemetri() {
     scanning,
     error,
     statusMessage,
+    isFromCache,
     loadCourses,
     scanForum,
+    clearScanCache,
+    hasCachedScan,
+    resolveCourseKode,
     formatWhatsAppSummary,
     sortCourses,
   };
