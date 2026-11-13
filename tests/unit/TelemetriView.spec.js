@@ -210,6 +210,8 @@ describe("TelemetriView.vue", () => {
     expect(wrapper.text()).toContain("Soal");
     expect(wrapper.text()).toContain("Radar Pribadi Anda");
     expect(wrapper.text()).toContain("MEMENUHI SYARAT");
+    expect(wrapper.text()).toContain("Balasan Anda di Pertemuan Ini");
+    expect(wrapper.text()).toContain("Hadir");
     expect(wrapper.text()).toContain("Radar Keaktifan Kelas (03SIFE003)");
     expect(wrapper.text()).toContain("VIGAR RIVAI PUTRA");
   });

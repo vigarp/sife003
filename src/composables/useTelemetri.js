@@ -493,10 +493,41 @@ export function useTelemetri() {
       topicBreakdown[topicTitle] = (topicBreakdown[topicTitle] || 0) + 1;
     });
 
-    // Detect if lecturer replied to student's answer (reply_level: 2, id_parent matches student's reply ID)
-    const lecturerReplies = topicReplies.value.filter(
-      (r) => myReplyIds.has(r.id_parent) && (r.id_dosen !== null || r.dosen)
-    );
+    // Build NIM -> Name lookup from course peserta for student child replies
+    const pesertaNameMap = new Map();
+    (courseDetail.value?.peserta || []).forEach((p) => {
+      if (p.nim && p.nama_mahasiswa) {
+        pesertaNameMap.set(String(p.nim).trim(), p.nama_mahasiswa);
+      }
+    });
+
+    // Detect all replies (both lecturer and other students) targeting any of my replies
+    const childReplies = topicReplies.value
+      .filter((r) => myReplyIds.has(r.id_parent))
+      .map((cr) => {
+        const isLecturer = (cr.id_dosen !== null && cr.id_dosen !== undefined) || Boolean(cr.dosen);
+        const nimStr = cr.nim ? String(cr.nim).trim() : "";
+        const author = isLecturer
+          ? cr.dosen?.nama_gelar || cr.dosen?.nama_dosen || "Dosen Pengampu"
+          : cr.mahasiswa?.nama_mahasiswa ||
+            cr.nama_mahasiswa ||
+            pesertaNameMap.get(nimStr) ||
+            nimStr ||
+            "Mahasiswa";
+
+        return {
+          id: cr.id,
+          id_parent: cr.id_parent,
+          isLecturer,
+          isSelf: Boolean(nimStr && nimStr === nimTarget),
+          nim: nimStr || null,
+          author,
+          konten: cr.konten,
+          createdAt: cr.createdAt || cr.created_at || cr.tanggal || cr.updatedAt || null,
+        };
+      });
+
+    const lecturerReplies = childReplies.filter((cr) => cr.isLecturer);
 
     return {
       nim: nimTarget,
@@ -505,10 +536,12 @@ export function useTelemetri() {
       isEligible: myReplies.length >= 2,
       topicBreakdown,
       hasLecturerFeedback: lecturerReplies.length > 0,
+      childReplies,
       lecturerReplies: lecturerReplies.map((lr) => ({
         id: lr.id,
+        id_parent: lr.id_parent,
         konten: lr.konten,
-        dosen: lr.dosen?.nama_gelar || lr.dosen?.nama_dosen || "Dosen Pengampu",
+        dosen: lr.author,
         createdAt: lr.createdAt,
       })),
     };

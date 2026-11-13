@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useTelemetri } from "@/composables/useTelemetri";
+import { formatHtmlToText } from "@/utils/htmlText";
 
 const {
   selectedPertemuanNum,
@@ -75,34 +76,13 @@ function openTopicLms(topicId = activeTopic.value?.id) {
   }
 }
 
-function formatKontenText(rawHtml) {
-  if (!rawHtml) return "";
-  if (typeof DOMParser !== "undefined") {
-    try {
-      const doc = new DOMParser().parseFromString(rawHtml, "text/html");
-      doc.querySelectorAll("br").forEach((el) => el.replaceWith("\n"));
-      doc.querySelectorAll("p").forEach((el) => el.append("\n\n"));
-      doc.querySelectorAll("li").forEach((el) => {
-        el.prepend("• ");
-        el.append("\n");
-      });
-      return (doc.body.textContent || "")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim();
-    } catch {
-      // Fallback
-    }
-  }
-  return String(rawHtml).trim();
-}
-
 const activeTopicKonten = computed(() => {
   if (!activeTopic.value?.konten) return "";
-  return formatKontenText(activeTopic.value.konten);
+  return formatHtmlToText(activeTopic.value.konten);
 });
 
 const sanitizedForumKonten = computed(() =>
-  formatKontenText(forumSubsection.value?.konten)
+  formatHtmlToText(forumSubsection.value?.konten)
 );
 </script>
 

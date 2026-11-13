@@ -27,7 +27,7 @@ const monthMap = {
   desember: 11,
 };
 
-function parsePekanDateRange(dateStr) {
+export function parsePekanDateRange(dateStr) {
   if (!dateStr) return null;
   const clean = dateStr.trim();
 

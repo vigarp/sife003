@@ -171,6 +171,31 @@ describe("useTelemetri composable", () => {
     expect(personal.lecturerReplies.length).toBe(1);
     expect(personal.lecturerReplies[0].dosen).toContain("Ghema Nusa Persada");
     expect(personal.lecturerReplies[0].konten).toContain("Apakah perlu cloud computing");
+    expect(personal.childReplies.length).toBe(1);
+    expect(personal.childReplies[0].isLecturer).toBe(true);
+  });
+
+  it("should also include other students' replies targeting my reply in childReplies", () => {
+    const telemetri = useTelemetri();
+    telemetri.saveUserNim("251011700088");
+    telemetri.courseDetail.value = {
+      peserta: [
+        { nim: "251011700088", nama_mahasiswa: "VIGAR RIVAI PUTRA" },
+        { nim: "251011700826", nama_mahasiswa: "MUHAMMAD RIZKY" },
+      ],
+    };
+
+    telemetri.topicReplies.value = [
+      { id: "my-reply-1", id_parent: "topic-1", nim: "251011700088", konten: "Jawaban saya" },
+      { id: "peer-reply-1", id_parent: "my-reply-1", nim: "251011700826", konten: "Setuju dengan pendapatnya!" },
+    ];
+
+    const personal = telemetri.personalStats.value;
+    expect(personal.hasLecturerFeedback).toBe(false);
+    expect(personal.childReplies.length).toBe(1);
+    expect(personal.childReplies[0].isLecturer).toBe(false);
+    expect(personal.childReplies[0].author).toBe("MUHAMMAD RIZKY");
+    expect(personal.childReplies[0].konten).toBe("Setuju dengan pendapatnya!");
   });
 
   it("should generate WhatsApp reminder summary cleanly", () => {

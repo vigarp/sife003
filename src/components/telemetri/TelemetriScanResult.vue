@@ -2,6 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { useTelemetri } from "@/composables/useTelemetri";
 import TelemetriForumBanner from "@/components/telemetri/TelemetriForumBanner.vue";
+import TelemetriActivityChart from "@/components/telemetri/TelemetriActivityChart.vue";
 import TelemetriPersonalCard from "@/components/telemetri/TelemetriPersonalCard.vue";
 import TelemetriClassMonitor from "@/components/telemetri/TelemetriClassMonitor.vue";
 
@@ -230,6 +231,7 @@ const stageItems = computed(() => {
             <div v-else class="space-y-5">
               <TelemetriForumBanner />
               <TelemetriPersonalCard @edit-nim="emit('open-token-modal')" />
+              <TelemetriActivityChart />
               <TelemetriClassMonitor />
             </div>
           </template>
