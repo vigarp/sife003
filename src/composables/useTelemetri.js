@@ -267,6 +267,11 @@ function getScanCacheKey(kodeCourse, pertemuanNum) {
   return `${kodeCourse}::${pertemuanNum}`;
 }
 
+function hasCachedScan(kodeCourse, pertemuanNum) {
+  if (!kodeCourse || !pertemuanNum) return false;
+  return forumScanCache.has(getScanCacheKey(kodeCourse, pertemuanNum));
+}
+
 /**
  * Standardized API client for calling Mentari proxy
  * Tries the dedicated residential gateway (https://telescope.vigarp.web.id/api) first,
@@ -656,11 +661,6 @@ export function useTelemetri() {
 
     if (matched?.kode_course) return matched.kode_course;
     return targetCode ? `${semesterCode}-${kelasCode}-${targetCode}` : "";
-  }
-
-  function hasCachedScan(kodeCourse, pertemuanNum) {
-    if (!kodeCourse || !pertemuanNum) return false;
-    return forumScanCache.has(getScanCacheKey(kodeCourse, pertemuanNum));
   }
 
   function resolveTargetCourse(kodeCourse) {

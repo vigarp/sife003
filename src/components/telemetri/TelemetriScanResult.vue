@@ -70,7 +70,6 @@ function getCompletionStageMeta(key, title, icon, sub, lockedFallbackMsg = null)
     description = lockedFallbackMsg;
   } else if (sub?.warningAlert) {
     badge = "Terkunci";
-    badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300";
     description = sub.warningAlert;
   } else if (!sub) {
     badge = "Belum Tersedia";

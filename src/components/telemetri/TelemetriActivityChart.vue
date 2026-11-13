@@ -18,20 +18,17 @@ function toLocalDateKey(dateInput) {
   return `${y}-${m}-${day}`;
 }
 
-const chartData = computed(() => {
-  const range = parsePekanDateRange(currentWeek.value?.tanggal_daring);
-  if (!range) {
-    return { days: [], maxTotal: 1, totalStudent: 0, totalLecturer: 0, totalAll: 0 };
-  }
-
+function buildWeekDayBuckets(range) {
   const todayKey = toLocalDateKey(new Date());
   const dayMap = new Map();
   const days = [];
 
-  const cursor = new Date(range.start.getFullYear(), range.start.getMonth(), range.start.getDate());
-  const endDay = new Date(range.end.getFullYear(), range.end.getMonth(), range.end.getDate());
+  const startDate = new Date(range.start.getFullYear(), range.start.getMonth(), range.start.getDate());
+  const endDate = new Date(range.end.getFullYear(), range.end.getMonth(), range.end.getDate());
+  const totalDays = Math.round((endDate.getTime() - startDate.getTime()) / 86_400_000);
 
-  while (cursor <= endDay) {
+  for (let offset = 0; offset <= totalDays; offset++) {
+    const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + offset);
     const key = toLocalDateKey(cursor);
     const entry = {
       key,
@@ -45,50 +42,67 @@ const chartData = computed(() => {
     };
     dayMap.set(key, entry);
     days.push(entry);
-    cursor.setDate(cursor.getDate() + 1);
   }
 
+  return { dayMap, days };
+}
+
+function classifyAndAccumulateReply(reply, idx, dayMap, seenStudentIds, seenLecturerIds) {
+  const isLecturer = !reply.nim && ((reply.id_dosen !== null && reply.id_dosen !== undefined) || Boolean(reply.dosen));
+  const isStudent = Boolean(reply.nim);
+  if (!isLecturer && !isStudent) return { studentDelta: 0, lecturerDelta: 0 };
+
+  const uniqueKey = reply.id ? String(reply.id) : `idx-${idx}`;
+  const seenSet = isStudent ? seenStudentIds : seenLecturerIds;
+  if (seenSet.has(uniqueKey)) return { studentDelta: 0, lecturerDelta: 0 };
+  seenSet.add(uniqueKey);
+
+  const dateKey = toLocalDateKey(reply.createdAt || reply.created_at || reply.tanggal || reply.updatedAt);
+  const bucket = dateKey ? dayMap.get(dateKey) : null;
+  if (!bucket) return { studentDelta: 0, lecturerDelta: 0 };
+
+  const topicTitle = reply._topicJudul || "Diskusi";
+  if (!bucket.topicCounts[topicTitle]) {
+    bucket.topicCounts[topicTitle] = { student: 0, lecturer: 0 };
+  }
+
+  if (isStudent) {
+    bucket.studentCount += 1;
+    bucket.topicCounts[topicTitle].student += 1;
+  } else {
+    bucket.lecturerCount += 1;
+    bucket.topicCounts[topicTitle].lecturer += 1;
+  }
+  bucket.total = bucket.studentCount + bucket.lecturerCount;
+
+  return {
+    studentDelta: isStudent ? 1 : 0,
+    lecturerDelta: isLecturer ? 1 : 0,
+  };
+}
+
+const chartData = computed(() => {
+  const range = parsePekanDateRange(currentWeek.value?.tanggal_daring);
+  if (!range) {
+    return { days: [], maxTotal: 1, totalStudent: 0, totalLecturer: 0, totalAll: 0 };
+  }
+
+  const { dayMap, days } = buildWeekDayBuckets(range);
   const seenStudentIds = new Set();
   const seenLecturerIds = new Set();
   let totalStudent = 0;
   let totalLecturer = 0;
 
-  topicReplies.value.forEach((r, idx) => {
-    const isLecturer = !r.nim && ((r.id_dosen !== null && r.id_dosen !== undefined) || Boolean(r.dosen));
-    const isStudent = Boolean(r.nim);
-    if (!isLecturer && !isStudent) return;
-
-    const uniqueKey = r.id ? String(r.id) : `idx-${idx}`;
-    if (isStudent) {
-      if (seenStudentIds.has(uniqueKey)) return;
-      seenStudentIds.add(uniqueKey);
-    } else {
-      if (seenLecturerIds.has(uniqueKey)) return;
-      seenLecturerIds.add(uniqueKey);
-    }
-
-    const dateKey = toLocalDateKey(r.createdAt || r.created_at || r.tanggal || r.updatedAt);
-    const bucket = dateKey ? dayMap.get(dateKey) : null;
-    if (!bucket) return;
-
-    if (isStudent) {
-      bucket.studentCount += 1;
-      totalStudent += 1;
-    } else {
-      bucket.lecturerCount += 1;
-      totalLecturer += 1;
-    }
-
-    const topicTitle = r._topicJudul || "Diskusi";
-    if (!bucket.topicCounts[topicTitle]) {
-      bucket.topicCounts[topicTitle] = { student: 0, lecturer: 0 };
-    }
-    if (isStudent) {
-      bucket.topicCounts[topicTitle].student += 1;
-    } else {
-      bucket.topicCounts[topicTitle].lecturer += 1;
-    }
-    bucket.total = bucket.studentCount + bucket.lecturerCount;
+  topicReplies.value.forEach((reply, idx) => {
+    const { studentDelta, lecturerDelta } = classifyAndAccumulateReply(
+      reply,
+      idx,
+      dayMap,
+      seenStudentIds,
+      seenLecturerIds
+    );
+    totalStudent += studentDelta;
+    totalLecturer += lecturerDelta;
   });
 
   const maxTotal = Math.max(1, ...days.map((d) => d.total));
