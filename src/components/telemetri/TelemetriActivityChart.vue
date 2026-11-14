@@ -132,7 +132,7 @@ function getTooltipAlignClass(idx, totalDays) {
 <template>
   <div
     v-if="isForumOpen && chartData.days.length > 0"
-    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-4"
+    class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-5 shadow-xs space-y-3 sm:space-y-4"
   >
     <!-- Header & Legend -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

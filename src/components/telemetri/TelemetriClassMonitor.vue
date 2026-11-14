@@ -30,18 +30,10 @@ const filteredStudents = computed(() => {
 });
 
 async function copyWhatsAppText() {
+  if (!navigator?.clipboard?.writeText) return;
   const text = formatWhatsAppSummary();
   try {
-    if (navigator?.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      const input = document.createElement("textarea");
-      input.value = text;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      input.remove();
-    }
+    await navigator.clipboard.writeText(text);
     isCopied.value = true;
     setTimeout(() => {
       isCopied.value = false;
@@ -55,7 +47,7 @@ async function copyWhatsAppText() {
 <template>
   <div
     v-if="isForumOpen && classStats.totalStudents > 0"
-    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-xs space-y-5"
+    class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-5 md:p-6 shadow-xs space-y-4 sm:space-y-5"
   >
     <!-- Section Header & WhatsApp Copy Button -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">

@@ -163,11 +163,11 @@ describe("TelemetriView.vue", () => {
 
     // Sub-accordions should be visible, and NO extra API calls should have been made yet
     const p14Btn = wrapper
-      .findAll("[role='button']")
-      .find((b) => b.text().includes("Pertemuan 14"));
+      .findAll("button")
+      .find((b) => b.text().trim() === "Pertemuan 14");
     const p15Btn = wrapper
-      .findAll("[role='button']")
-      .find((b) => b.text().includes("Pertemuan 15"));
+      .findAll("button")
+      .find((b) => b.text().trim() === "Pertemuan 15");
     expect(p14Btn).toBeTruthy();
     expect(p15Btn).toBeTruthy();
     expect(global.fetch.mock.calls.length).toBe(callsAfterMount);

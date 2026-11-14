@@ -52,11 +52,11 @@ function formatReplyTime(reply) {
 <template>
   <div
     v-if="isForumOpen"
-    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-xs space-y-4"
+    class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-5 md:p-6 shadow-xs space-y-3 sm:space-y-4"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-      <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
         <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[20px]">person_check</span>
         <h2 class="text-base font-bold text-slate-900 dark:text-white">
           Radar Pribadi Anda {{ userName ? `(${userName})` : '' }}
@@ -187,7 +187,7 @@ function formatReplyTime(reply) {
           :key="reply.id || idx"
           class="space-y-2"
         >
-          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+          <div class="p-2.5 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
             <div class="flex items-center justify-between gap-2 text-[11px]">
               <span class="font-bold text-indigo-600 dark:text-indigo-400">
                 Balasan #{{ idx + 1 }}
@@ -204,12 +204,12 @@ function formatReplyTime(reply) {
           <!-- Nested Child Replies (Dosen & Mahasiswa lain) directly under the matched reply -->
           <div
             v-if="getChildRepliesForReply(reply.id).length > 0"
-            class="ml-4 sm:ml-6 pl-3 border-l-2 border-slate-300 dark:border-slate-700 space-y-2"
+            class="ml-2.5 sm:ml-6 pl-2.5 sm:pl-3 border-l-2 border-slate-300 dark:border-slate-700 space-y-2"
           >
             <div
               v-for="child in getChildRepliesForReply(reply.id)"
               :key="child.id"
-              class="p-3 rounded-xl border space-y-1"
+              class="p-2.5 sm:p-3 rounded-xl border space-y-1"
               :class="
                 child.isLecturer
                   ? 'bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border-purple-200 dark:border-purple-800/70'

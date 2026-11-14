@@ -27,7 +27,7 @@ async function handleTokenSaved() {
 </script>
 
 <template>
-  <div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-6 space-y-6">
+  <div class="max-w-[1440px] mx-auto lg:px-margin py-4 sm:py-6 space-y-4 sm:space-y-6">
     <!-- Header -->
     <TelemetriHeader @open-token-modal="isModalOpen = true" />
 

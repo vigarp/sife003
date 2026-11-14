@@ -91,7 +91,7 @@ const sanitizedForumKonten = computed(() =>
     <!-- 1. FORUM TERBUKA (OPEN) -->
     <div
       v-if="isForumOpen"
-      class="bg-emerald-50/80 dark:bg-emerald-950/40 rounded-2xl border border-emerald-300 dark:border-emerald-800/80 p-5 space-y-4"
+      class="bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl sm:rounded-2xl border border-emerald-300 dark:border-emerald-800/80 p-2.5 sm:p-5 space-y-3 sm:space-y-4"
     >
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center">
@@ -151,7 +151,7 @@ const sanitizedForumKonten = computed(() =>
       <!-- Detail Konten Topik yang Terpilih -->
       <div
         v-if="activeTopic"
-        class="bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-900/80 p-4 space-y-2.5 shadow-2xs"
+        class="bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-900/80 p-2.5 sm:p-4 space-y-2 sm:space-y-2.5 shadow-2xs"
       >
         <div class="flex items-center justify-between gap-2 border-b border-emerald-100 dark:border-slate-800 pb-2 flex-wrap">
           <div class="flex items-center gap-2">
@@ -180,7 +180,7 @@ const sanitizedForumKonten = computed(() =>
 
         <div
           v-if="activeTopicKonten"
-          class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-sans whitespace-pre-line bg-slate-50/70 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800"
+          class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-sans whitespace-pre-line bg-slate-50/70 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-lg border border-slate-100 dark:border-slate-800"
         >
           {{ activeTopicKonten }}
         </div>
@@ -196,7 +196,7 @@ const sanitizedForumKonten = computed(() =>
     <!-- 2. FORUM BELUM DIBUKA / TERKUNCI (CLOSED) -->
     <div
       v-else
-      class="bg-amber-50/80 dark:bg-amber-950/40 rounded-2xl border border-amber-300 dark:border-amber-800/80 p-5 space-y-3"
+      class="bg-amber-50/80 dark:bg-amber-950/40 rounded-xl sm:rounded-2xl border border-amber-300 dark:border-amber-800/80 p-3 sm:p-5 space-y-3"
     >
       <div class="flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
