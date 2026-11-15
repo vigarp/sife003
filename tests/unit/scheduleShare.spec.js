@@ -132,7 +132,7 @@ Tugas Pertemuan 5`;
       expect(writeTextMock).toHaveBeenCalledWith("Hello World");
     });
 
-    it("should fallback to execCommand when navigator.clipboard fails", async () => {
+    it("should return false when navigator.clipboard.writeText fails", async () => {
       Object.defineProperty(navigator, "clipboard", {
         value: {
           writeText: vi.fn().mockRejectedValue(new Error("Denied")),
@@ -141,12 +141,8 @@ Tugas Pertemuan 5`;
         configurable: true,
       });
 
-      const execMock = vi.fn().mockReturnValue(true);
-      document.execCommand = execMock;
-
       const ok = await copyToClipboard("Fallback text");
-      expect(ok).toBe(true);
-      expect(execMock).toHaveBeenCalledWith("copy");
+      expect(ok).toBe(false);
     });
   });
 });

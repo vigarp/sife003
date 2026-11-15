@@ -27,15 +27,19 @@ async function upsertSessionRecords(db, sessionId, records) {
   if (!records || typeof records !== "object") return;
 
   const validStatuses = new Set(["present", "permit", "sick", "absent"]);
-  for (const [studentId, status] of Object.entries(records)) {
-    if (validStatuses.has(status)) {
-      await db.execute({
+  const validEntries = Object.entries(records).filter(([, status]) =>
+    validStatuses.has(status)
+  );
+
+  await Promise.all(
+    validEntries.map(([studentId, status]) =>
+      db.execute({
         sql: `INSERT OR IGNORE INTO attendance_records (session_id, student_id, status)
               VALUES (?, ?, ?)`,
         args: [sessionId, studentId, status],
-      });
-    }
-  }
+      })
+    )
+  );
 }
 
 async function upsertSession(db, sess, user) {
@@ -123,9 +127,9 @@ export default async function handler(req, res) {
   const incomingSessions = Array.isArray(body.sessions) ? body.sessions : [];
 
   try {
-    for (const sess of incomingSessions) {
-      await upsertSession(db, sess, user);
-    }
+    await Promise.all(
+      incomingSessions.map((sess) => upsertSession(db, sess, user))
+    );
 
     const latestSessions = await fetchAllLatestSessions(db);
 

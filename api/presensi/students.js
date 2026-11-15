@@ -33,24 +33,29 @@ async function handleGet(res, db) {
 }
 
 async function handleBulkPost(students, res, db) {
-  let inserted = 0;
-  for (const s of students) {
-    if (!s.nim || !s.name) continue;
-    const id = s.id || `s-${Date.now()}-${Date.now().toString(36)}-${inserted}`;
-    await db.execute({
-      sql: `INSERT OR REPLACE INTO students (id, nim, name, phone, is_guest, course_ids, is_admin) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      args: [
-        id,
-        String(s.nim).trim(),
-        String(s.name).trim(),
-        s.phone ? String(s.phone).trim() : null,
-        s.isGuest ? 1 : 0,
-        s.courseIds?.length ? JSON.stringify(s.courseIds) : null,
-        s.isAdmin ? 1 : 0,
-      ],
-    });
-    inserted++;
-  }
+  const validStudents = students.filter((s) => s.nim && s.name);
+  const now = Date.now();
+  const nowBase36 = now.toString(36);
+
+  await Promise.all(
+    validStudents.map((s, idx) => {
+      const id = s.id || `s-${now}-${nowBase36}-${idx}`;
+      return db.execute({
+        sql: `INSERT OR REPLACE INTO students (id, nim, name, phone, is_guest, course_ids, is_admin) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          id,
+          String(s.nim).trim(),
+          String(s.name).trim(),
+          s.phone ? String(s.phone).trim() : null,
+          s.isGuest ? 1 : 0,
+          s.courseIds?.length ? JSON.stringify(s.courseIds) : null,
+          s.isAdmin ? 1 : 0,
+        ],
+      });
+    })
+  );
+
+  const inserted = validStudents.length;
   return res.status(201).json({
     success: true,
     message: `${inserted} mahasiswa berhasil diproses.`,

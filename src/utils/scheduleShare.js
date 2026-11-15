@@ -12,7 +12,7 @@ scheduleData.master_mata_kuliah.forEach((m) => {
  * @returns {string}
  */
 export function formatMentariShareText(pekan, weekIdx = 0) {
-  if (!pekan || !pekan.daring || pekan.daring.length === 0) {
+  if (!pekan?.daring?.length) {
     return "Tidak ada jadwal Mentari online untuk pekan ini.";
   }
 
@@ -37,7 +37,7 @@ export function formatMentariShareText(pekan, weekIdx = 0) {
     const k1Title = isK1Tambahan ? "• Kelompok 1 (Tambahan Online 3 SKS):" : "• Kelompok 1:";
     lines.push(k1Title);
     k1.forEach(({ item, master }) => {
-      const p = item.pertemuan && item.pertemuan.length > 0 ? item.pertemuan.join(" & ") : "";
+      const p = item.pertemuan?.length ? item.pertemuan.join(" & ") : "";
       const sksStr = isK2Tambahan ? ` (${master?.sks || 2} SKS)` : "";
       lines.push(`  - ${item.mata_kuliah}${sksStr} — Pertemuan ${p}`);
     });
@@ -47,7 +47,7 @@ export function formatMentariShareText(pekan, weekIdx = 0) {
     const k2Title = isK2Tambahan ? "• Kelompok 2 (Tambahan Online 3 SKS):" : "• Kelompok 2:";
     lines.push(k2Title);
     k2.forEach(({ item, master }) => {
-      const p = item.pertemuan && item.pertemuan.length > 0 ? item.pertemuan.join(" & ") : "";
+      const p = item.pertemuan?.length ? item.pertemuan.join(" & ") : "";
       const sksStr = isK1Tambahan ? ` (${master?.sks || 2} SKS)` : "";
       lines.push(`  - ${item.mata_kuliah}${sksStr} — Pertemuan ${p}`);
     });
@@ -56,7 +56,7 @@ export function formatMentariShareText(pekan, weekIdx = 0) {
   if (other.length > 0) {
     lines.push("• Ujian / Agenda Lain:");
     other.forEach(({ item }) => {
-      const p = item.pertemuan && item.pertemuan.length > 0 ? `Pertemuan ${item.pertemuan.join(" & ")}` : "Ujian Mentari";
+      const p = item.pertemuan?.length ? `Pertemuan ${item.pertemuan.join(" & ")}` : "Ujian Mentari";
       lines.push(`  - ${item.mata_kuliah} — ${p}`);
     });
   }
@@ -79,7 +79,7 @@ export function formatAgendaShareText(agendasList) {
     .map((item) => {
       const matkul = item.mata_kuliah ? item.mata_kuliah.trim() : "";
       const parts = [`*${matkul}*`, item.judul];
-      if (item.keterangan && item.keterangan.trim()) {
+      if (item.keterangan?.trim()) {
         parts.push(item.keterangan.trim());
       }
       return parts.join("\n");
@@ -90,34 +90,17 @@ export function formatAgendaShareText(agendasList) {
 }
 
 /**
- * Copy text to clipboard with fallback.
+ * Copy text to clipboard using Clipboard API.
  * @param {string} text
  * @returns {Promise<boolean>}
  */
 export async function copyToClipboard(text) {
   if (typeof window === "undefined" || !text) return false;
-
-  if (navigator?.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      // fallback below
-    }
-  }
+  if (!navigator?.clipboard?.writeText) return false;
 
   try {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    textarea.style.pointerEvents = "none";
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    const successful = document.execCommand("copy");
-    document.body.removeChild(textarea);
-    return successful;
+    await navigator.clipboard.writeText(text);
+    return true;
   } catch {
     return false;
   }

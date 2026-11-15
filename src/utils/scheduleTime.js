@@ -2,6 +2,8 @@
  * Utility functions for schedule time parsing and live ongoing session detection in WIB (UTC+7).
  */
 
+const TIME_RANGE_REGEX = /^(\d{1,2})[.:](\d{2})\s*[-–]\s*(\d{1,2})[.:](\d{2})$/;
+
 /**
  * Parse a time range string like "07.40 - 09.20" or "07:40 - 09:20"
  * into startMinutes and endMinutes relative to midnight.
@@ -10,7 +12,7 @@
  */
 export function parseTimeRange(timeStr) {
   if (!timeStr || typeof timeStr !== "string") return null;
-  const match = timeStr.trim().match(/^(\d{1,2})[.:](\d{2})\s*[-–]\s*(\d{1,2})[.:](\d{2})$/);
+  const match = TIME_RANGE_REGEX.exec(timeStr.trim());
   if (!match) return null;
 
   const startHour = Number.parseInt(match[1], 10);

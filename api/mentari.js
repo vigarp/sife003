@@ -120,14 +120,19 @@ export default async function handler(req, res) {
         mentariRes.text.includes("challenge-error") ||
         mentariRes.text.includes("_cf_chl_opt");
 
+      const rawPreview =
+        mentariRes.text.length > 300
+          ? `${mentariRes.text.slice(0, 300)}...`
+          : mentariRes.text;
+      const fallbackMessage =
+        rawPreview || "Respons tidak terduga dari Mentari UNPAM";
+
       return res.status(mentariRes.status || 502).json({
         success: false,
         isCloudflare,
         message: isCloudflare
           ? "Cloudflare WAF memblokir server Vercel (Managed Challenge). Silakan gunakan Mode Script Browser di tab Mentari untuk memindai data secara langsung tanpa blokir."
-          : (mentariRes.text.length > 300
-              ? mentariRes.text.slice(0, 300) + "..."
-              : mentariRes.text) || "Respons tidak terduga dari Mentari UNPAM",
+          : fallbackMessage,
       });
     }
   } catch (error) {

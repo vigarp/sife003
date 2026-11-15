@@ -70,13 +70,15 @@ async function syncLecturerCourses(db, lecturerId, courseIds) {
   });
 
   // Assign selected courses
-  for (const cid of courseIds) {
-    if (!cid) continue;
-    await db.execute({
-      sql: "UPDATE courses SET lecturer_id = ? WHERE id = ?",
-      args: [lecturerId, cid],
-    });
-  }
+  const validIds = courseIds.filter(Boolean);
+  await Promise.all(
+    validIds.map((cid) =>
+      db.execute({
+        sql: "UPDATE courses SET lecturer_id = ? WHERE id = ?",
+        args: [lecturerId, cid],
+      })
+    )
+  );
 }
 
 async function handlePost(req, res, db) {

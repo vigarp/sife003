@@ -155,50 +155,59 @@ async function ensureAdminUser(db) {
 }
 
 async function seedCourses(db, courses) {
-  for (const c of courses) {
-    await db.execute({
-      sql: `INSERT OR IGNORE INTO courses (id, code, name, class_name, lecturer, time)
-            VALUES (?, ?, ?, ?, ?, ?)`,
-      args: [c.id, c.code || null, c.name, c.className || "03SIFE003", c.lecturer || null, c.time || null],
-    });
-  }
+  await Promise.all(
+    courses.map((c) =>
+      db.execute({
+        sql: `INSERT OR IGNORE INTO courses (id, code, name, class_name, lecturer, time)
+              VALUES (?, ?, ?, ?, ?, ?)`,
+        args: [c.id, c.code || null, c.name, c.className || "03SIFE003", c.lecturer || null, c.time || null],
+      })
+    )
+  );
 }
 
 async function seedStudents(db, students) {
-  for (const s of students) {
-    await db.execute({
-      sql: `INSERT OR IGNORE INTO students (id, nim, name, phone, is_guest, course_ids)
-            VALUES (?, ?, ?, ?, ?, ?)`,
-      args: [
-        s.id,
-        s.nim,
-        s.name,
-        s.phone || null,
-        s.isGuest ? 1 : 0,
-        s.courseIds?.length ? JSON.stringify(s.courseIds) : null,
-      ],
-    });
-  }
+  await Promise.all(
+    students.map((s) =>
+      db.execute({
+        sql: `INSERT OR IGNORE INTO students (id, nim, name, phone, is_guest, course_ids)
+              VALUES (?, ?, ?, ?, ?, ?)`,
+        args: [
+          s.id,
+          s.nim,
+          s.name,
+          s.phone || null,
+          s.isGuest ? 1 : 0,
+          s.courseIds?.length ? JSON.stringify(s.courseIds) : null,
+        ],
+      })
+    )
+  );
 }
 
 async function seedSessions(db, sessions) {
-  for (const sess of sessions) {
-    await db.execute({
-      sql: `INSERT OR IGNORE INTO attendance_sessions (id, course_id, date, meeting_no, updated_at)
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [sess.id, sess.courseId, sess.date, sess.meetingNo || null, sess.updatedAt || Date.now()],
-    });
+  await Promise.all(
+    sessions.map((sess) =>
+      db.execute({
+        sql: `INSERT OR IGNORE INTO attendance_sessions (id, course_id, date, meeting_no, updated_at)
+              VALUES (?, ?, ?, ?, ?)`,
+        args: [sess.id, sess.courseId, sess.date, sess.meetingNo || null, sess.updatedAt || Date.now()],
+      })
+    )
+  );
 
-    if (sess.records) {
-      for (const [studentId, status] of Object.entries(sess.records)) {
-        await db.execute({
-          sql: `INSERT OR IGNORE INTO attendance_records (session_id, student_id, status)
-                VALUES (?, ?, ?)`,
-          args: [sess.id, studentId, status],
-        });
-      }
-    }
-  }
+  const recordQueries = sessions.flatMap((sess) =>
+    sess.records
+      ? Object.entries(sess.records).map(([studentId, status]) =>
+          db.execute({
+            sql: `INSERT OR IGNORE INTO attendance_records (session_id, student_id, status)
+                  VALUES (?, ?, ?)`,
+            args: [sess.id, studentId, status],
+          })
+        )
+      : []
+  );
+  await Promise.all(recordQueries);
 }
 
 async function seedInitialData(db) {
@@ -226,6 +235,8 @@ async function seedLecturers(db) {
 
   const coursesRes = await db.execute("SELECT id, lecturer FROM courses WHERE lecturer IS NOT NULL AND lecturer != ''");
   const seenLecturers = new Map();
+  const insertQueries = [];
+  const updateQueries = [];
 
   for (const c of coursesRes.rows) {
     const rawName = String(c.lecturer).trim();
@@ -234,18 +245,25 @@ async function seedLecturers(db) {
     let lecturerId = seenLecturers.get(rawName);
     if (!lecturerId) {
       lecturerId = `d-${Date.now()}-${seenLecturers.size + 1}`;
-      await db.execute({
-        sql: `INSERT OR IGNORE INTO lecturers (id, name, phone) VALUES (?, ?, NULL)`,
-        args: [lecturerId, rawName],
-      });
       seenLecturers.set(rawName, lecturerId);
+      insertQueries.push(
+        db.execute({
+          sql: `INSERT OR IGNORE INTO lecturers (id, name, phone) VALUES (?, ?, NULL)`,
+          args: [lecturerId, rawName],
+        })
+      );
     }
 
-    await db.execute({
-      sql: `UPDATE courses SET lecturer_id = ? WHERE id = ? AND lecturer_id IS NULL`,
-      args: [lecturerId, c.id],
-    });
+    updateQueries.push(
+      db.execute({
+        sql: `UPDATE courses SET lecturer_id = ? WHERE id = ? AND lecturer_id IS NULL`,
+        args: [lecturerId, c.id],
+      })
+    );
   }
+
+  await Promise.all(insertQueries);
+  await Promise.all(updateQueries);
 }
 
 export async function ensureSchema() {
