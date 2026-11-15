@@ -49,12 +49,12 @@ export function useAcademicCalendar() {
     }
   }
 
-  async function createEvent(payload) {
+  async function sendCalendarMutation(method, payload, fallbackError, onSuccess) {
     loading.value = true;
     error.value = null;
     try {
       const res = await fetch("/api/calendar", {
-        method: "POST",
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token.value}`,
@@ -64,73 +64,52 @@ export function useAcademicCalendar() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.message || "Gagal menambah agenda akademik.");
+        throw new Error(data.message || fallbackError);
       }
 
-      await fetchEvents();
-      return { success: true, data: data.data };
+      return await onSuccess(data);
     } catch (err) {
       error.value = err.message;
       return { success: false, message: err.message };
     } finally {
       loading.value = false;
     }
+  }
+
+  async function createEvent(payload) {
+    return sendCalendarMutation(
+      "POST",
+      payload,
+      "Gagal menambah agenda akademik.",
+      async (data) => {
+        await fetchEvents();
+        return { success: true, data: data.data };
+      }
+    );
   }
 
   async function updateEvent(payload) {
-    loading.value = true;
-    error.value = null;
-    try {
-      const res = await fetch("/api/calendar", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token.value}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Gagal memperbarui agenda akademik.");
+    return sendCalendarMutation(
+      "PUT",
+      payload,
+      "Gagal memperbarui agenda akademik.",
+      async (data) => {
+        await fetchEvents();
+        return { success: true, data: data.data };
       }
-
-      await fetchEvents();
-      return { success: true, data: data.data };
-    } catch (err) {
-      error.value = err.message;
-      return { success: false, message: err.message };
-    } finally {
-      loading.value = false;
-    }
+    );
   }
 
   async function deleteEvent(id) {
-    loading.value = true;
-    error.value = null;
-    try {
-      const res = await fetch("/api/calendar", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token.value}`,
-        },
-        body: JSON.stringify({ id }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Gagal menghapus agenda akademik.");
+    return sendCalendarMutation(
+      "DELETE",
+      { id },
+      "Gagal menghapus agenda akademik.",
+      () => {
+        events.value = events.value.filter((e) => e.id !== id);
+        return { success: true };
       }
-
-      events.value = events.value.filter((e) => e.id !== id);
-      return { success: true };
-    } catch (err) {
-      error.value = err.message;
-      return { success: false, message: err.message };
-    } finally {
-      loading.value = false;
-    }
+    );
   }
 
   return {

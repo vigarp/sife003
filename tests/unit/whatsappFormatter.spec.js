@@ -23,20 +23,22 @@ describe("whatsappFormatter.js", () => {
     expect(formatted.toLowerCase()).toContain("september");
   });
 
-  it("should format absent_only mode reporting only absent/permit/sick", () => {
-    const records = {
-      "s-1": "present",
-      "s-2": "permit",
-      "s-3": "absent",
-    };
-
-    const text = formatWhatsAppReport({
+  function generateReport(records, filterMode = "absent_only") {
+    return formatWhatsAppReport({
       course: dummyCourse,
       date: "2026-09-26",
       meetingNo: 4,
       students: dummyStudents,
       records,
-      filterMode: "absent_only",
+      filterMode,
+    });
+  }
+
+  it("should format absent_only mode reporting only absent/permit/sick", () => {
+    const text = generateReport({
+      "s-1": "present",
+      "s-2": "permit",
+      "s-3": "absent",
     });
 
     expect(text).toContain("*LAPORAN PRESENSI KELAS*");
@@ -49,39 +51,24 @@ describe("whatsappFormatter.js", () => {
   });
 
   it("should display 'Nihil' when everyone is present in absent_only mode", () => {
-    const records = {
+    const text = generateReport({
       "s-1": "present",
       "s-2": "present",
       "s-3": "present",
-    };
-
-    const text = formatWhatsAppReport({
-      course: dummyCourse,
-      date: "2026-09-26",
-      meetingNo: 4,
-      students: dummyStudents,
-      records,
-      filterMode: "absent_only",
     });
 
     expect(text).toContain("Nihil (Semua mahasiswa hadir)");
   });
 
   it("should format full class recap in 'all' mode", () => {
-    const records = {
-      "s-1": "present",
-      "s-2": "sick",
-      "s-3": "absent",
-    };
-
-    const text = formatWhatsAppReport({
-      course: dummyCourse,
-      date: "2026-09-26",
-      meetingNo: 4,
-      students: dummyStudents,
-      records,
-      filterMode: "all",
-    });
+    const text = generateReport(
+      {
+        "s-1": "present",
+        "s-2": "sick",
+        "s-3": "absent",
+      },
+      "all"
+    );
 
     expect(text).toContain("*REKAP LENGKAP PRESENSI (3 Mahasiswa):*");
     expect(text).toContain("*1. HADIR (1):*");

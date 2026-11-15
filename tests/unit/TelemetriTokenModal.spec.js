@@ -22,7 +22,7 @@ describe("TelemetriTokenModal.vue", () => {
     expect(wrapper.text()).toContain("Salin Perintah");
   });
 
-  it("should detect and show session profile preview when access JSON is pasted", async () => {
+  async function mountWithSampleSession() {
     const wrapper = mount(TelemetriTokenModal, {
       props: { isOpen: true },
     });
@@ -39,6 +39,12 @@ describe("TelemetriTokenModal.vue", () => {
 
     const textarea = wrapper.find("textarea#mentari-session");
     await textarea.setValue(accessJson);
+
+    return { wrapper, mockJwt };
+  }
+
+  it("should detect and show session profile preview when access JSON is pasted", async () => {
+    const { wrapper } = await mountWithSampleSession();
 
     // Live preview card should appear
     expect(wrapper.text()).toContain("Profil Sesi Terdeteksi");
@@ -48,22 +54,7 @@ describe("TelemetriTokenModal.vue", () => {
   });
 
   it("should save session and auto-fill student NIM and name on submit", async () => {
-    const wrapper = mount(TelemetriTokenModal, {
-      props: { isOpen: true },
-    });
-
-    const mockPayload = btoa(
-      JSON.stringify({
-        username: "251011700088",
-        fullname: "VIGAR RIVAI PUTRA",
-        role: "MAHASISWA",
-      })
-    );
-    const mockJwt = `header.${mockPayload}.signature`;
-    const accessJson = JSON.stringify([{ role: "MAHASISWA", token: mockJwt }]);
-
-    const textarea = wrapper.find("textarea#mentari-session");
-    await textarea.setValue(accessJson);
+    const { wrapper, mockJwt } = await mountWithSampleSession();
 
     await wrapper.find("form").trigger("submit.prevent");
 

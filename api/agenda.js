@@ -1,20 +1,24 @@
-import { getDb } from "./_lib/db.js";
-import { ensureSchema } from "./_lib/schema.js";
-import { verifyToken } from "./_lib/auth.js";
+import { createCrudHandler, getRequestId } from "./_lib/http.js";
 
-function parseBody(req) {
-  if (!req.body) return {};
-  if (typeof req.body === "string") {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      return {};
-    }
+function parsePertemuanValue(pertemuan) {
+  if (pertemuan === undefined || pertemuan === null || pertemuan === "") {
+    return null;
   }
-  return req.body;
+  return Number.parseInt(pertemuan, 10);
 }
 
-async function handleGet(req, res, db) {
+function parsePekanValue(pekan) {
+  if (pekan === undefined || pekan === null || pekan === "") {
+    return null;
+  }
+  const pekanUpper = String(pekan).trim().toUpperCase();
+  if (pekanUpper === "UTS" || pekanUpper === "UAS") {
+    return pekanUpper;
+  }
+  return Number.parseInt(pekan, 10) || pekan;
+}
+
+async function handleGet({ req, res, db }) {
   const { pekan, all } = req.query || {};
 
   let sql = `SELECT * FROM agenda ORDER BY
@@ -37,8 +41,7 @@ async function handleGet(req, res, db) {
   });
 }
 
-async function handlePost(req, res, db, user) {
-  const body = parseBody(req);
+async function handlePost({ res, db, user, body }) {
   const {
     pekan,
     pertemuan = null,
@@ -57,16 +60,8 @@ async function handlePost(req, res, db, user) {
     });
   }
 
-  const parsedPertemuan =
-    pertemuan !== undefined && pertemuan !== null && pertemuan !== ""
-      ? Number.parseInt(pertemuan, 10)
-      : null;
-
-  const pekanUpper = String(pekan).trim().toUpperCase();
-  const pekanVal =
-    pekanUpper === "UTS" || pekanUpper === "UAS"
-      ? pekanUpper
-      : Number.parseInt(pekan, 10) || pekan;
+  const parsedPertemuan = parsePertemuanValue(pertemuan);
+  const pekanVal = parsePekanValue(pekan);
 
   const result = await db.execute({
     sql: `INSERT INTO agenda (pekan, pertemuan, mata_kuliah, judul, keterangan, tipe_deadline, tanggal, jam, created_by)
@@ -93,9 +88,8 @@ async function handlePost(req, res, db, user) {
   });
 }
 
-async function handlePut(req, res, db) {
-  const body = parseBody(req);
-  const id = req.query?.id || body.id;
+async function handlePut({ req, res, db, body }) {
+  const id = getRequestId(req, body);
 
   if (!id) {
     return res.status(400).json({
@@ -116,19 +110,8 @@ async function handlePut(req, res, db) {
     is_completed,
   } = body;
 
-  const parsedPertemuan =
-    pertemuan !== undefined && pertemuan !== null && pertemuan !== ""
-      ? Number.parseInt(pertemuan, 10)
-      : null;
-
-  let pekanVal = null;
-  if (pekan !== undefined && pekan !== null && pekan !== "") {
-    const pekanUpper = String(pekan).trim().toUpperCase();
-    pekanVal =
-      pekanUpper === "UTS" || pekanUpper === "UAS"
-        ? pekanUpper
-        : Number.parseInt(pekan, 10) || pekan;
-  }
+  const parsedPertemuan = parsePertemuanValue(pertemuan);
+  const pekanVal = parsePekanValue(pekan);
 
   await db.execute({
     sql: `UPDATE agenda SET
@@ -163,9 +146,8 @@ async function handlePut(req, res, db) {
   });
 }
 
-async function handleDelete(req, res, db) {
-  const body = parseBody(req);
-  const id = req.query?.id || body.id;
+async function handleDelete({ req, res, db, body }) {
+  const id = getRequestId(req, body);
 
   if (!id) {
     return res.status(400).json({
@@ -185,51 +167,18 @@ async function handleDelete(req, res, db) {
   });
 }
 
-export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-
-  try {
-    await ensureSchema();
-    const db = getDb();
-
-    if (req.method === "GET") {
-      return await handleGet(req, res, db);
-    }
-
-    const user = verifyToken(req);
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Akses ditolak: Silakan login sebagai pengurus kelas.",
-      });
-    }
-
-    if (req.method === "POST") {
-      return await handlePost(req, res, db, user);
-    }
-    if (req.method === "PUT") {
-      return await handlePut(req, res, db);
-    }
-    if (req.method === "DELETE") {
-      return await handleDelete(req, res, db);
-    }
-
-    return res.status(405).json({
-      success: false,
-      message: `Method ${req.method} tidak didukung.`,
-    });
-  } catch (error) {
-    console.error("API Agenda Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada server database.",
-      error: error.message,
-    });
-  }
-}
+export default createCrudHandler({
+  handlers: {
+    GET: handleGet,
+    POST: handlePost,
+    PUT: handlePut,
+    DELETE: handleDelete,
+  },
+  optionsStatus: 204,
+  auth: {
+    unauthenticatedMessage: "Akses ditolak: Silakan login sebagai pengurus kelas.",
+  },
+  methodNotAllowedMessage: (req) => `Method ${req.method} tidak didukung.`,
+  errorLogLabel: "API Agenda Error:",
+  errorMessage: "Terjadi kesalahan pada server database.",
+});

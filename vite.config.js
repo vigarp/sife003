@@ -2,6 +2,20 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 
+const API_ROUTE_MODULES = {
+  "/api/agenda": "./api/agenda.js",
+  "/api/calendar": "./api/calendar.js",
+  "/api/auth/login": "./api/auth/login.js",
+  "/api/auth/me": "./api/auth/me.js",
+  "/api/auth/change-password": "./api/auth/change-password.js",
+  "/api/presensi": "./api/presensi/index.js",
+  "/api/presensi/sync": "./api/presensi/sync.js",
+  "/api/presensi/students": "./api/presensi/students.js",
+  "/api/presensi/courses": "./api/presensi/courses.js",
+  "/api/presensi/lecturers": "./api/presensi/lecturers.js",
+  "/api/mentari": "./api/mentari.js",
+};
+
 function apiDevPlugin() {
   return {
     name: "vite-api-dev-server",
@@ -13,36 +27,13 @@ function apiDevPlugin() {
 
         try {
           const urlObj = new URL(req.url, "http://localhost");
-          const pathname = urlObj.pathname;
+          const modulePath = API_ROUTE_MODULES[urlObj.pathname];
 
-          let handlerModule = null;
-          if (pathname === "/api/agenda") {
-            handlerModule = await import("./api/agenda.js");
-          } else if (pathname === "/api/calendar") {
-            handlerModule = await import("./api/calendar.js");
-          } else if (pathname === "/api/auth/login") {
-            handlerModule = await import("./api/auth/login.js");
-          } else if (pathname === "/api/auth/me") {
-            handlerModule = await import("./api/auth/me.js");
-          } else if (pathname === "/api/auth/change-password") {
-            handlerModule = await import("./api/auth/change-password.js");
-          } else if (pathname === "/api/presensi") {
-            handlerModule = await import("./api/presensi/index.js");
-          } else if (pathname === "/api/presensi/sync") {
-            handlerModule = await import("./api/presensi/sync.js");
-          } else if (pathname === "/api/presensi/students") {
-            handlerModule = await import("./api/presensi/students.js");
-          } else if (pathname === "/api/presensi/courses") {
-            handlerModule = await import("./api/presensi/courses.js");
-          } else if (pathname === "/api/presensi/lecturers") {
-            handlerModule = await import("./api/presensi/lecturers.js");
-          } else if (pathname === "/api/mentari") {
-            handlerModule = await import("./api/mentari.js");
-          }
-
-          if (!handlerModule) {
+          if (!modulePath) {
             return next();
           }
+
+          const handlerModule = await import(modulePath);
 
           req.query = Object.fromEntries(urlObj.searchParams.entries());
 

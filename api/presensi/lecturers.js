@@ -1,24 +1,6 @@
-import { getDb } from "../_lib/db.js";
-import { ensureSchema } from "../_lib/schema.js";
-import { verifyToken } from "../_lib/auth.js";
+import { createCrudHandler, getRequestId } from "../_lib/http.js";
 
-function parseBody(req) {
-  if (!req.body) return {};
-  if (typeof req.body === "string") {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      return {};
-    }
-  }
-  return req.body;
-}
-
-function authenticate(req) {
-  return verifyToken(req);
-}
-
-async function handleGet(res, db) {
+async function handleGet({ res, db }) {
   const lecturersRes = await db.execute(`
     SELECT
       l.id,
@@ -81,8 +63,7 @@ async function syncLecturerCourses(db, lecturerId, courseIds) {
   );
 }
 
-async function handlePost(req, res, db) {
-  const body = parseBody(req);
+async function handlePost({ res, db, body }) {
   const { name, phone, email, note, courseIds } = body;
 
   if (!name?.trim()) {
@@ -113,9 +94,8 @@ async function handlePost(req, res, db) {
   });
 }
 
-async function handlePut(req, res, db) {
-  const body = parseBody(req);
-  const id = req.query?.id || body.id;
+async function handlePut({ req, res, db, body }) {
+  const id = getRequestId(req, body);
   if (!id) {
     return res.status(400).json({ success: false, message: "ID dosen wajib disertakan." });
   }
@@ -160,9 +140,8 @@ async function handlePut(req, res, db) {
   return res.status(200).json({ success: true, message: "Data dosen berhasil diperbarui." });
 }
 
-async function handleDelete(req, res, db) {
-  const body = parseBody(req);
-  const id = req.query?.id || body.id;
+async function handleDelete({ req, res, db, body }) {
+  const id = getRequestId(req, body);
   if (!id) {
     return res.status(400).json({ success: false, message: "ID dosen wajib disertakan." });
   }
@@ -181,30 +160,11 @@ async function handleDelete(req, res, db) {
   return res.status(200).json({ success: true, message: "Data dosen berhasil dihapus." });
 }
 
-export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  const db = getDb();
-  await ensureSchema();
-
-  if (req.method === "GET") {
-    return handleGet(res, db);
-  }
-
-  const user = authenticate(req);
-  if (!user) {
-    return res.status(401).json({ success: false, message: "Akses ditolak: Sesi tidak valid atau telah kedaluwarsa." });
-  }
-
-  if (req.method === "POST") return handlePost(req, res, db);
-  if (req.method === "PUT") return handlePut(req, res, db);
-  if (req.method === "DELETE") return handleDelete(req, res, db);
-
-  return res.status(405).json({ success: false, message: "Method not allowed." });
-}
+export default createCrudHandler({
+  handlers: {
+    GET: handleGet,
+    POST: handlePost,
+    PUT: handlePut,
+    DELETE: handleDelete,
+  },
+});
