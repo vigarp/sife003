@@ -263,7 +263,7 @@ onUnmounted(() => {
       <!-- Footer Last Update (Under the calendar, inside the calendar container) -->
       <div class="px-4 py-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--muted)]">
         <span class="inline-flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>Last update: {{ lastUpdatedTime }}</span>
@@ -274,7 +274,7 @@ onUnmounted(() => {
           class="font-medium text-[var(--accent)] hover:underline inline-flex items-center gap-1"
         >
           <span>Kelola di Zona Pengurus</span>
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </router-link>
@@ -286,6 +286,7 @@ onUnmounted(() => {
       v-if="isModalOpen && selectedEvent"
       class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3 sm:p-4"
       @click.self="closeModal"
+      @keydown.esc="closeModal"
     >
       <div
         class="mk-card w-full max-w-lg max-h-[85vh] sm:max-h-[80vh] shadow-xl flex flex-col overflow-hidden"

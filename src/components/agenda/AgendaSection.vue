@@ -113,10 +113,10 @@ onUnmounted(() => {
           :title="copiedAgenda ? 'Tersalin ke clipboard!' : 'Salin format tugas pekan ini'"
           :aria-label="copiedAgenda ? 'Agenda tugas tersalin' : 'Salin format tugas pekan ini'"
         >
-          <svg v-if="copiedAgenda" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg aria-hidden="true" v-if="copiedAgenda" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
           </svg>
-          <svg v-else class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg aria-hidden="true" v-else class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
           </svg>
           <span>{{ copiedAgenda ? 'Tersalin' : 'Salin Tugas' }}</span>
@@ -171,7 +171,7 @@ onUnmounted(() => {
             v-if="item.tipe_deadline === 'datetime'"
             class="inline-flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-medium tabular-nums"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>{{ formatAgendaDeadline(item) }}</span>
@@ -181,7 +181,7 @@ onUnmounted(() => {
             v-else-if="item.tipe_deadline === 'date_only'"
             class="inline-flex items-center gap-1 text-xs text-[var(--muted)] font-medium tabular-nums"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <span>{{ formatAgendaDeadline(item) }}</span>
@@ -191,7 +191,7 @@ onUnmounted(() => {
             v-else
             class="inline-flex items-center gap-1 text-xs text-[var(--muted)] font-medium px-2 py-0.5 rounded bg-[var(--bg)] border border-[var(--border)]"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <span>{{ formatAgendaDeadline(item) }}</span>
@@ -214,7 +214,7 @@ onUnmounted(() => {
     <!-- Section Footer Link to Pengurus Portal -->
     <div class="pt-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--muted)]">
       <span class="inline-flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span>Last update: {{ lastUpdatedTime }}</span>
@@ -225,7 +225,7 @@ onUnmounted(() => {
         class="font-medium text-[var(--accent)] hover:underline inline-flex items-center gap-1"
       >
         <span>Kelola di Zona Pengurus</span>
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </router-link>

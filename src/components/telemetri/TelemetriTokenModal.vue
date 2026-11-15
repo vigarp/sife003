@@ -104,6 +104,7 @@ function handleClear() {
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs w-full h-full max-w-none max-h-none border-none m-0"
     aria-labelledby="modal-title"
     @click.self="emit('close')"
+    @keydown.esc="emit('close')"
   >
     <div
       class="w-full max-w-lg mk-card shadow-xl p-4 sm:p-5 space-y-4 max-h-[92vh] overflow-y-auto"
