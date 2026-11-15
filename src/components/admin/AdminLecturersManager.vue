@@ -200,19 +200,19 @@ onMounted(async () => {
   <div class="space-y-6">
     <!-- Top Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold">Total Dosen Pengampu</p>
-        <p class="text-xl font-bold text-slate-900 dark:text-white mt-1">{{ stats.total }} Orang</p>
+      <div class="mk-card p-4">
+        <p class="text-xs text-[var(--muted)] font-semibold">Total Dosen Pengampu</p>
+        <p class="text-xl font-bold font-mono tabular-nums text-[var(--text)] mt-1">{{ stats.total }} Orang</p>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold">WhatsApp Terdata</p>
-        <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{{ stats.withPhone }} Dosen</p>
+      <div class="mk-card p-4">
+        <p class="text-xs text-[var(--muted)] font-semibold">WhatsApp Terdata</p>
+        <p class="text-xl font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 mt-1">{{ stats.withPhone }} Dosen</p>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold">Belum Ada Nomor WA</p>
-        <p class="text-xl font-bold text-amber-500 mt-1">{{ stats.withoutPhone }} Dosen</p>
+      <div class="mk-card p-4">
+        <p class="text-xs text-[var(--muted)] font-semibold">Belum Ada Nomor WA</p>
+        <p class="text-xl font-bold font-mono tabular-nums text-amber-500 mt-1">{{ stats.withoutPhone }} Dosen</p>
       </div>
     </div>
 
@@ -250,7 +250,7 @@ onMounted(async () => {
     </div>
 
     <!-- Lecturers Table Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="mk-card overflow-hidden">
       <div v-if="loading" class="p-8 text-center text-xs text-slate-400">
         Memuat data dosen...
       </div>
@@ -363,7 +363,7 @@ onMounted(async () => {
       v-if="isModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
     >
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="mk-card max-w-md w-full p-5 space-y-4 shadow-xl">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <h2 class="text-sm font-bold text-slate-900 dark:text-white">
             {{ isEditing ? "Edit Dosen Pengampu" : "Tambah Dosen Baru" }}

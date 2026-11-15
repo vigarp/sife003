@@ -185,7 +185,7 @@ onMounted(async () => {
     </div>
 
     <!-- Courses Grid/Table -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="mk-card overflow-hidden">
       <div v-if="loading" class="p-8 text-center text-xs text-slate-400">
         Memuat data mata kuliah...
       </div>
@@ -277,7 +277,7 @@ onMounted(async () => {
       v-if="isModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
     >
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="mk-card max-w-md w-full p-5 space-y-4 shadow-xl">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <h2 class="text-sm font-bold text-slate-900 dark:text-white">
             {{ isEditing ? "Edit Mata Kuliah" : "Tambah Mata Kuliah Baru" }}

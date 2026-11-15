@@ -132,40 +132,36 @@ function getTooltipAlignClass(idx, totalDays) {
 <template>
   <div
     v-if="isForumOpen && chartData.days.length > 0"
-    class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-5 shadow-xs space-y-3 sm:space-y-4"
+    class="mk-card p-3 sm:p-4 space-y-3"
   >
     <!-- Header & Legend -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/80 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-          <span class="material-symbols-outlined text-[18px]">bar_chart</span>
-        </div>
-        <div>
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">
-            Aktivitas Reply Pekan Ini
-          </h3>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400">
-            Total {{ chartData.totalAll }} balasan ({{ chartData.totalStudent }} Mahasiswa, {{ chartData.totalLecturer }} Dosen)
-          </p>
-        </div>
+      <div>
+        <h3 class="mk-section-title flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px]">bar_chart</span>
+          <span>Aktivitas Reply Pekan Ini</span>
+        </h3>
+        <p class="text-[11px] text-[var(--muted)] mt-0.5 tabular-nums">
+          Total {{ chartData.totalAll }} balasan ({{ chartData.totalStudent }} Mahasiswa, {{ chartData.totalLecturer }} Dosen)
+        </p>
       </div>
 
-      <div class="flex items-center gap-3 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+      <div class="flex items-center gap-3 text-[11px] font-medium text-[var(--muted)]">
         <span class="inline-flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-xs bg-indigo-500 dark:bg-indigo-400"></span>
+          <span class="w-2.5 h-2.5 rounded-[2px] bg-blue-600 dark:bg-blue-400"></span>
           <span>Mahasiswa</span>
         </span>
         <span class="inline-flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-xs bg-amber-400 dark:bg-amber-500"></span>
+          <span class="w-2.5 h-2.5 rounded-[2px] bg-amber-500 dark:bg-amber-400"></span>
           <span>Dosen</span>
         </span>
       </div>
     </div>
 
     <!-- Bar Chart -->
-    <div class="pt-2">
+    <div class="pt-1.5">
       <div
-        class="grid gap-2 sm:gap-3 items-end h-40 border-b border-slate-200 dark:border-slate-800 pb-2"
+        class="grid gap-2 sm:gap-3 items-end h-36 border-b border-[var(--border)] pb-2"
         :style="{ gridTemplateColumns: `repeat(${chartData.days.length}, minmax(0, 1fr))` }"
       >
         <div
@@ -176,29 +172,29 @@ function getTooltipAlignClass(idx, totalDays) {
           <!-- Hover Tooltip (Role + Per-Topic Student/Lecturer Breakdown) -->
           <div
             v-if="day.total > 0"
-            class="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 absolute bottom-full mb-2 z-20 w-max max-w-[260px] rounded-xl bg-slate-900 dark:bg-slate-800 text-white border border-slate-700/80 shadow-lg px-3 py-2 text-[11px] space-y-1.5"
+            class="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-150 absolute bottom-full mb-2 z-20 w-max max-w-[260px] rounded-[8px] bg-slate-900 dark:bg-slate-800 text-slate-100 border border-slate-700 px-2.5 py-2 text-[11px] space-y-1.5"
             :class="getTooltipAlignClass(idx, chartData.days.length)"
           >
-            <div class="flex items-center gap-3 font-semibold">
-              <span class="inline-flex items-center gap-1 text-indigo-300">
-                <span class="w-2 h-2 rounded-xs bg-indigo-400"></span>
+            <div class="flex items-center gap-3 font-semibold tabular-nums">
+              <span class="inline-flex items-center gap-1 text-blue-300">
+                <span class="w-2 h-2 rounded-[2px] bg-blue-400"></span>
                 <span>{{ day.studentCount }} Mahasiswa</span>
               </span>
               <span class="inline-flex items-center gap-1 text-amber-300">
-                <span class="w-2 h-2 rounded-xs bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-[2px] bg-amber-400"></span>
                 <span>{{ day.lecturerCount }} Dosen</span>
               </span>
             </div>
 
-            <div class="border-t border-slate-700/80 pt-1 space-y-1">
+            <div class="border-t border-slate-700 pt-1 space-y-1">
               <div
                 v-for="(tCount, topicName) in day.topicCounts"
                 :key="topicName"
                 class="flex items-center justify-between gap-3 text-[10px] text-slate-300"
               >
                 <span class="truncate max-w-[135px]">{{ topicName }}</span>
-                <span class="flex items-center gap-1.5 font-bold shrink-0 tabular-nums">
-                  <span class="text-indigo-300">{{ tCount.student }} Mhs</span>
+                <span class="flex items-center gap-1.5 font-semibold shrink-0 tabular-nums">
+                  <span class="text-blue-300">{{ tCount.student }} Mhs</span>
                   <span class="text-slate-600">&bull;</span>
                   <span class="text-amber-300">{{ tCount.lecturer }} Dsn</span>
                 </span>
@@ -208,35 +204,35 @@ function getTooltipAlignClass(idx, totalDays) {
 
           <!-- Total label above bar -->
           <span
-            class="text-[11px] font-bold tabular-nums"
-            :class="day.total > 0 ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400 dark:text-slate-600'"
+            class="text-[11px] font-semibold tabular-nums"
+            :class="day.total > 0 ? 'text-[var(--text)]' : 'text-[var(--muted)] opacity-60'"
           >
             {{ day.total }}
           </span>
 
           <!-- Stacked Bar Track -->
-          <div class="w-full max-w-[44px] flex-1 flex flex-col justify-end items-center">
+          <div class="w-full max-w-[40px] flex-1 flex flex-col justify-end items-center">
             <div
               v-if="day.total > 0"
-              class="w-full flex flex-col justify-end rounded-t-lg overflow-hidden transition-all duration-300 group-hover:opacity-90"
+              class="w-full flex flex-col justify-end rounded-t-[4px] overflow-hidden transition-opacity duration-200 group-hover:opacity-85"
               :style="{ height: getSegmentHeight(day.total, chartData.maxTotal) }"
             >
               <!-- Lecturer Segment (Top) -->
               <div
                 v-if="day.lecturerCount > 0"
-                class="w-full bg-amber-400 dark:bg-amber-500"
+                class="w-full bg-amber-500 dark:bg-amber-400"
                 :style="{ height: `${(day.lecturerCount / day.total) * 100}%` }"
               ></div>
               <!-- Student Segment (Bottom) -->
               <div
                 v-if="day.studentCount > 0"
-                class="w-full bg-indigo-500 dark:bg-indigo-400"
+                class="w-full bg-blue-600 dark:bg-blue-400"
                 :style="{ height: `${(day.studentCount / day.total) * 100}%` }"
               ></div>
             </div>
             <div
               v-else
-              class="w-full h-1 rounded-full bg-slate-100 dark:bg-slate-800"
+              class="w-full h-1 rounded-full bg-[var(--border)]"
             ></div>
           </div>
         </div>
@@ -253,11 +249,11 @@ function getTooltipAlignClass(idx, totalDays) {
           class="text-center"
         >
           <span
-            class="inline-flex flex-col items-center px-1.5 py-0.5 rounded-md text-[11px] leading-tight"
+            class="inline-flex flex-col items-center px-1.5 py-0.5 rounded-[4px] text-[11px] leading-tight tabular-nums"
             :class="
               day.isToday
-                ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-extrabold'
-                : 'text-slate-500 dark:text-slate-400 font-semibold'
+                ? 'bg-blue-500/10 text-[var(--accent)] font-semibold'
+                : 'text-[var(--muted)] font-medium'
             "
           >
             <span>{{ day.dayName }}</span>

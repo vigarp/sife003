@@ -8,21 +8,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#1d4ed8",
-        "primary-dark": "#1e3a8a",
+        primary: "#2563eb",
+        "primary-dark": "#1d4ed8",
         "primary-navy": "#0f172a",
-        "primary-subtle": "#dbeafe",
+        "primary-subtle": "#eff6ff",
         secondary: "#d97706",
         "accent-gold": "#f59e0b",
         "gold-light": "#fef3c7",
         "gold-border": "#fcd34d",
-        surface: "#f8fafc",
+        surface: "#f5f7fa",
         "surface-card": "#ffffff",
         "surface-alt": "#f1f5f9",
         "border-ui": "#e2e8f0",
         "text-main": "#0f172a",
-        "text-muted": "#334155",
-        "text-subtle": "#475569",
+        "text-muted": "#64748b",
+        "text-subtle": "#64748b",
       },
       spacing: {
         "space-xs": "0.25rem",
@@ -34,7 +34,8 @@ export default {
         margin: "2rem",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
     },
   },

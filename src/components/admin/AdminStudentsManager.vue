@@ -296,7 +296,7 @@ onMounted(async () => {
     <!-- Controls & Action Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <!-- Search & Filters -->
-      <div class="flex items-center gap-2 flex-wrap flex-1 max-w-lg">
+      <div class="flex items-center gap-2 flex-wrap flex-1">
         <div class="relative flex-1 min-w-[200px]">
           <label for="student-search-input" class="sr-only">Cari Mahasiswa</label>
           <input
@@ -315,7 +315,7 @@ onMounted(async () => {
           <button
             @click="statusFilter = 'all'"
             :class="[
-              'px-3 py-1 rounded-lg transition-colors cursor-pointer',
+              'px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap',
               statusFilter === 'all'
                 ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
@@ -326,7 +326,7 @@ onMounted(async () => {
           <button
             @click="statusFilter = 'regular'"
             :class="[
-              'px-3 py-1 rounded-lg transition-colors cursor-pointer',
+              'px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap',
               statusFilter === 'regular'
                 ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
@@ -337,7 +337,7 @@ onMounted(async () => {
           <button
             @click="statusFilter = 'guest'"
             :class="[
-              'px-3 py-1 rounded-lg transition-colors cursor-pointer',
+              'px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap',
               statusFilter === 'guest'
                 ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
@@ -351,7 +351,7 @@ onMounted(async () => {
           <button
             @click="roleFilter = 'all'"
             :class="[
-              'px-2.5 py-1 rounded-lg transition-colors cursor-pointer',
+              'px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap',
               roleFilter === 'all'
                 ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
@@ -362,7 +362,7 @@ onMounted(async () => {
           <button
             @click="roleFilter = 'admin'"
             :class="[
-              'px-2.5 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1',
+              'px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1',
               roleFilter === 'admin'
                 ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
@@ -373,7 +373,7 @@ onMounted(async () => {
           <button
             @click="roleFilter = 'student'"
             :class="[
-              'px-2.5 py-1 rounded-lg transition-colors cursor-pointer',
+              'px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap',
               roleFilter === 'student'
                 ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
@@ -409,7 +409,7 @@ onMounted(async () => {
     </div>
 
     <!-- Student Table Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="mk-card overflow-hidden">
       <div v-if="loading" class="p-8 text-center text-xs text-slate-400">
         Memuat data mahasiswa...
       </div>
@@ -500,7 +500,7 @@ onMounted(async () => {
                     @click="handleToggleAdmin(st)"
                     :title="st.isAdmin ? 'Cabut hak akses Pengurus' : 'Jadikan Pengurus / Admin Kelas'"
                     :class="[
-                      'px-2 py-0.5 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer border',
+                      'px-2.5 py-1 rounded-[6px] text-[11px] font-semibold transition-colors cursor-pointer border whitespace-nowrap',
                       st.isAdmin
                         ? 'border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60'
                         : 'border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/60',
@@ -558,7 +558,7 @@ onMounted(async () => {
       v-if="isModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
     >
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="mk-card max-w-md w-full p-5 space-y-4 shadow-xl">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <h2 class="text-sm font-bold text-slate-900 dark:text-white">
             {{ isEditing ? "Edit Mahasiswa" : "Tambah Mahasiswa Baru" }}
@@ -706,7 +706,7 @@ onMounted(async () => {
       v-if="isSmartPasteOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
     >
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="mk-card max-w-lg w-full p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>
             <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">

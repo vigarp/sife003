@@ -197,17 +197,17 @@ watch(
 </script>
 
 <template>
-  <div class="w-full space-y-5 pb-20">
+  <div class="w-full space-y-4 pb-16">
     <!-- Toast Alert -->
     <div
       v-if="toast.show"
-      class="fixed top-4 right-4 z-50 p-4 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-3 transition-all border"
+      class="fixed top-4 right-4 z-50 mk-card p-3 shadow-lg text-xs font-medium flex items-center gap-3"
       :class="[
         toast.type === 'error'
-          ? 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950 dark:text-rose-200 dark:border-rose-800'
+          ? '!border-red-500/50 text-red-700 dark:text-red-300'
           : toast.type === 'warning'
-          ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800'
-          : 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800',
+          ? '!border-amber-500/50 text-amber-700 dark:text-amber-300'
+          : '!border-emerald-500/50 text-emerald-700 dark:text-emerald-300',
       ]"
     >
       <span>{{ toast.message }}</span>
@@ -215,28 +215,24 @@ watch(
     </div>
 
     <!-- Header & Navigation -->
-    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-xs">
-      <div class="flex items-center gap-3">
+    <header class="mk-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4">
+      <div class="flex items-center gap-2.5">
         <router-link
           to="/pengurus"
-          class="p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          class="mk-btn !p-2"
           title="Kembali ke Zona Pengurus"
         >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
         </router-link>
 
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <span>m-hadir</span>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-                Offline-First
-              </span>
-            </h1>
-          </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400">
+          <h1 class="text-base sm:text-lg font-semibold text-[var(--text)] tracking-tight flex items-center gap-2">
+            <span>m-hadir</span>
+            <span class="mk-badge bg-[var(--hover)] text-[var(--accent)] border border-[var(--border)]">
+              Offline-First
+            </span>
+          </h1>
+          <p class="text-xs text-[var(--muted)]">
             Presensi Kelas Cepat • Generator Format WhatsApp Dosen
           </p>
         </div>
@@ -246,22 +242,22 @@ watch(
       <div class="flex items-center gap-2 flex-wrap">
         <!-- Online / Offline Badge -->
         <span
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border"
+          class="mk-badge"
           :class="[
             !isOnline
-              ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+              ? 'mk-badge-warn'
               : pendingCount > 0
-              ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
-              : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+              ? 'bg-blue-500/10 text-[var(--accent)] border border-blue-500/25'
+              : 'mk-badge-ok',
           ]"
         >
           <span
-            class="w-2 h-2 rounded-full"
+            class="w-1.5 h-1.5 rounded-full"
             :class="[
               !isOnline
                 ? 'bg-amber-500'
                 : pendingCount > 0
-                ? 'bg-blue-500 animate-pulse'
+                ? 'bg-blue-500'
                 : 'bg-emerald-500',
             ]"
           ></span>
@@ -280,34 +276,29 @@ watch(
         <button
           @click="handleManualSync"
           :disabled="isSyncing"
-          class="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+          class="mk-btn disabled:opacity-50"
         >
-          <svg
-            class="w-3.5 h-3.5"
+          <span
+            class="material-symbols-outlined text-[15px]"
             :class="{ 'animate-spin': isSyncing }"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
+          >sync</span>
           <span>{{ isSyncing ? "Menyinkronkan..." : "Sinkronkan" }}</span>
         </button>
       </div>
     </header>
 
     <!-- Session Picker Form -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-4">
+    <div class="mk-card p-3.5 sm:p-4 space-y-3">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
         <!-- Mata Kuliah -->
         <div class="sm:col-span-1">
-          <label for="select-course" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <label for="select-course" class="block font-semibold text-[var(--text)] mb-1">
             Mata Kuliah
           </label>
           <select
             id="select-course"
             v-model="selectedCourseId"
-            class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+            class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium focus:border-[var(--accent)] focus:outline-none"
           >
             <option v-for="c in courses" :key="c.id" :value="c.id">
               {{ c.name }}
@@ -317,7 +308,7 @@ watch(
 
         <!-- Pertemuan Ke- -->
         <div>
-          <label for="meeting-number" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <label for="meeting-number" class="block font-semibold text-[var(--text)] mb-1">
             Pertemuan Ke-
           </label>
           <input
@@ -326,54 +317,54 @@ watch(
             type="number"
             min="1"
             max="21"
-            class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+            class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium tabular-nums focus:border-[var(--accent)] focus:outline-none"
           />
         </div>
 
         <!-- Tanggal -->
         <div>
-          <label for="meeting-date" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <label for="meeting-date" class="block font-semibold text-[var(--text)] mb-1">
             Tanggal Pertemuan
           </label>
           <input
             id="meeting-date"
             v-model="selectedDate"
             type="date"
-            class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+            class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium focus:border-[var(--accent)] focus:outline-none"
           />
         </div>
       </div>
 
       <!-- Course info pill if selected -->
-      <div v-if="currentCourse" class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
+      <div v-if="currentCourse" class="pt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] text-xs text-[var(--muted)]">
         <div>
-          <strong class="text-slate-800 dark:text-slate-200">{{ currentCourse.name }}</strong>
+          <strong class="text-[var(--text)]">{{ currentCourse.name }}</strong>
           <span v-if="currentCourse.lecturer"> • Dosen: {{ currentCourse.lecturer }}</span>
           <span v-if="currentCourse.time"> • {{ currentCourse.time }}</span>
         </div>
-        <div class="text-[11px] font-medium text-slate-400">
+        <div class="text-[11px] font-mono tabular-nums">
           {{ formatIndonesianDate(selectedDate) }} (Pertemuan {{ meetingNo }})
         </div>
       </div>
     </div>
 
     <!-- Quick Action Bar & Summary Counters -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
       <!-- Counters -->
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold">
-        <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-semibold tabular-nums">
+        <span class="mk-badge bg-[var(--surface)] text-[var(--text)] border border-[var(--border)]">
           Total: {{ sessionStats.total }}
         </span>
-        <span class="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+        <span class="mk-badge mk-badge-ok">
           H: {{ sessionStats.present }}
         </span>
-        <span class="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+        <span class="mk-badge mk-badge-warn">
           I: {{ sessionStats.permit }}
         </span>
-        <span class="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+        <span class="mk-badge bg-blue-500/10 text-[var(--accent)] border border-blue-500/25">
           S: {{ sessionStats.sick }}
         </span>
-        <span class="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+        <span class="mk-badge mk-badge-down">
           A: {{ sessionStats.absent }}
         </span>
       </div>
@@ -382,28 +373,24 @@ watch(
       <div class="flex items-center gap-2">
         <button
           @click="handleMarkAllPresent"
-          class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+          class="px-3.5 py-2 rounded-[6px] bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
         >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
+          <span class="material-symbols-outlined text-[15px]">check</span>
           <span>Semua Hadir</span>
         </button>
 
         <button
           @click="isWaModalOpen = true"
-          class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+          class="px-3.5 py-2 rounded-[6px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
         >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+          <span class="material-symbols-outlined text-[15px]">chat</span>
           <span>Laporan WA</span>
         </button>
       </div>
     </div>
 
     <!-- Student Search & Filter Tabs -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
       <div class="relative flex-1 max-w-md">
         <label for="search-student-input" class="sr-only">Cari nama atau NIM</label>
         <input
@@ -411,14 +398,12 @@ watch(
           v-model="searchQuery"
           type="text"
           placeholder="Cari nama atau NIM..."
-          class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full pl-8 pr-3 py-1.5 rounded-[6px] border border-[var(--border)] bg-[var(--surface)] text-xs text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:border-[var(--accent)]"
         />
-        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <span class="material-symbols-outlined text-[16px] text-[var(--muted)] absolute left-2.5 top-2">search</span>
       </div>
 
-      <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold overflow-x-auto">
+      <div class="flex items-center gap-1.5 text-xs overflow-x-auto">
         <button
           v-for="f in [
             { key: 'all', label: 'Semua' },
@@ -430,10 +415,8 @@ watch(
           :key="f.key"
           @click="statusFilter = f.key"
           :class="[
-            'px-3 py-1 rounded-lg transition-colors cursor-pointer',
-            statusFilter === f.key
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
+            'mk-subtab whitespace-nowrap',
+            { 'mk-subtab-active': statusFilter === f.key },
           ]"
         >
           {{ f.label }}
@@ -443,30 +426,30 @@ watch(
 
     <!-- Student List Cards -->
     <div class="space-y-2">
-      <div v-if="visibleStudents.length === 0" class="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs text-slate-400">
+      <div v-if="visibleStudents.length === 0" class="mk-card p-8 text-center text-xs text-[var(--muted)]">
         Tidak ada mahasiswa ditemukan.
       </div>
 
       <div
         v-for="st in visibleStudents"
         :key="st.id"
-        class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 flex items-center justify-between gap-3 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all"
+        class="mk-card p-3 flex items-center justify-between gap-3 hover:border-[var(--accent)] transition-colors"
       >
         <!-- Student Info -->
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 flex-wrap">
-            <h3 class="text-xs font-bold text-slate-900 dark:text-white truncate">
+            <h3 class="text-xs font-semibold text-[var(--text)] truncate">
               {{ st.name }}
             </h3>
             <span
               v-if="st.isGuest"
-              class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
+              class="mk-badge bg-blue-500/10 text-[var(--accent)] border border-blue-500/25 !text-[10px]"
             >
               Revisi
             </span>
           </div>
-          <div class="flex items-center gap-2 mt-0.5">
-            <span class="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+          <div class="flex items-center gap-2 mt-0.5 tabular-nums">
+            <span class="text-[11px] text-[var(--muted)] font-mono">
               {{ st.nim }}
             </span>
             <a
@@ -488,10 +471,10 @@ watch(
           <button
             @click="handleSetStatus(st.id, 'present')"
             :class="[
-              'w-8 h-8 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center justify-center border',
+              'w-8 h-8 rounded-[6px] font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center border',
               (currentSession?.records?.[st.id] || 'present') === 'present'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750',
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-[var(--bg)] text-[var(--muted)] border-[var(--border)] hover:bg-[var(--hover)]',
             ]"
             title="Hadir"
           >
@@ -502,10 +485,10 @@ watch(
           <button
             @click="handleSetStatus(st.id, 'permit')"
             :class="[
-              'w-8 h-8 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center justify-center border',
+              'w-8 h-8 rounded-[6px] font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center border',
               currentSession?.records?.[st.id] === 'permit'
-                ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
-                : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750',
+                ? 'bg-amber-500 text-white border-amber-500'
+                : 'bg-[var(--bg)] text-[var(--muted)] border-[var(--border)] hover:bg-[var(--hover)]',
             ]"
             title="Izin"
           >
@@ -516,10 +499,10 @@ watch(
           <button
             @click="handleSetStatus(st.id, 'sick')"
             :class="[
-              'w-8 h-8 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center justify-center border',
+              'w-8 h-8 rounded-[6px] font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center border',
               currentSession?.records?.[st.id] === 'sick'
-                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750',
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-[var(--bg)] text-[var(--muted)] border-[var(--border)] hover:bg-[var(--hover)]',
             ]"
             title="Sakit"
           >
@@ -530,10 +513,10 @@ watch(
           <button
             @click="handleSetStatus(st.id, 'absent')"
             :class="[
-              'w-8 h-8 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center justify-center border',
+              'w-8 h-8 rounded-[6px] font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center border',
               currentSession?.records?.[st.id] === 'absent'
-                ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
-                : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-750',
+                ? 'bg-red-600 text-white border-red-600'
+                : 'bg-[var(--bg)] text-[var(--muted)] border-[var(--border)] hover:bg-[var(--hover)]',
             ]"
             title="Alpa / Tanpa Keterangan"
           >
@@ -548,14 +531,14 @@ watch(
       v-if="isWaModalOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
     >
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-          <h2 class="text-base font-bold text-slate-900 dark:text-white">
+      <div class="mk-card max-w-lg w-full p-4 sm:p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between pb-2.5 border-b border-[var(--border)]">
+          <h2 class="text-sm font-semibold text-[var(--text)]">
             Generator Format WhatsApp
           </h2>
           <button
             @click="isWaModalOpen = false"
-            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold cursor-pointer"
+            class="mk-btn !p-1"
           >
             ✕
           </button>
@@ -563,7 +546,7 @@ watch(
 
         <!-- Mode Selection -->
         <div class="space-y-3 text-xs">
-          <p class="block font-semibold text-slate-700 dark:text-slate-300">
+          <p class="block font-semibold text-[var(--text)]">
             Format Laporan:
           </p>
           <div class="grid grid-cols-3 gap-2">
@@ -576,10 +559,8 @@ watch(
               :key="m.key"
               @click="waFilterMode = m.key"
               :class="[
-                'p-2 rounded-xl border text-center font-semibold transition-all cursor-pointer',
-                waFilterMode === m.key
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
-                  : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400',
+                'mk-subtab !py-2 text-center',
+                { 'mk-subtab-active': waFilterMode === m.key },
               ]"
             >
               {{ m.label }}
@@ -591,15 +572,15 @@ watch(
               id="include-nim-check"
               v-model="waIncludeNIM"
               type="checkbox"
-              class="rounded border-slate-300 text-blue-600"
+              class="rounded border-[var(--border)] text-blue-600"
             />
-            <label for="include-nim-check" class="text-slate-700 dark:text-slate-300 font-medium">
+            <label for="include-nim-check" class="text-[var(--text)] font-medium">
               Sertakan NIM Mahasiswa
             </label>
           </div>
 
           <div>
-            <label for="wa-custom-note" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="wa-custom-note" class="block font-semibold text-[var(--text)] mb-1">
               Catatan Tambahan (Opsional):
             </label>
             <input
@@ -607,13 +588,13 @@ watch(
               v-model="waCustomNote"
               type="text"
               placeholder="Contoh: Dosen berhalangan hadir, tugas menyusul"
-              class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
 
           <!-- Preview Textarea -->
           <div>
-            <label for="wa-preview-text" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="wa-preview-text" class="block font-semibold text-[var(--text)] mb-1">
               Pratinjau Pesan:
             </label>
             <textarea
@@ -621,37 +602,33 @@ watch(
               readonly
               :value="generatedWaText"
               rows="8"
-              class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 text-slate-800 dark:text-slate-200 font-mono text-[11px] leading-relaxed resize-none focus:outline-none"
+              class="w-full p-2.5 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-mono text-[11px] leading-relaxed resize-none focus:outline-none"
             ></textarea>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div class="flex items-center justify-end gap-2 pt-2.5 border-t border-[var(--border)]">
           <button
             @click="isWaModalOpen = false"
-            class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            class="mk-btn"
           >
             Tutup
           </button>
 
           <button
             @click="copyWaText"
-            class="px-4 py-2 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            class="mk-btn"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-            </svg>
+            <span class="material-symbols-outlined text-[15px]">content_copy</span>
             <span>Salin Teks</span>
           </button>
 
           <button
             @click="openWhatsAppUrl"
-            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+            class="px-3.5 py-2 rounded-[6px] bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
+            <span class="material-symbols-outlined text-[15px]">chat</span>
             <span>Buka WhatsApp</span>
           </button>
         </div>

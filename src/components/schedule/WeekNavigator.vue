@@ -23,10 +23,10 @@ const {
       v-if="!isCurrentWeek"
       type="button"
       @click="resetToCurrentWeek"
-      class="shrink-0 px-2 sm:px-2.5 py-1.5 rounded-lg bg-primary-subtle dark:bg-blue-950/80 text-primary dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+      class="shrink-0 px-2.5 py-1.5 rounded-md border border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--text)] text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
       title="Kembali ke Pekan Sedang Berjalan"
     >
-      <span class="material-symbols-outlined text-[15px]">today</span>
+      <span class="material-symbols-outlined text-[15px] text-[var(--accent)]">today</span>
       <span class="hidden min-[380px]:inline sm:inline">Pekan Ini</span>
     </button>
 
@@ -35,7 +35,7 @@ const {
       type="button"
       @click="prevWeek"
       :disabled="viewedWeekIndex === 0"
-      class="shrink-0 w-8 h-8 rounded-lg bg-surface-card dark:bg-slate-800 text-text-muted dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 border border-border-ui dark:border-slate-700/80 flex items-center justify-center transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+      class="shrink-0 w-8 h-8 rounded-md bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       title="Pekan Sebelumnya"
       aria-label="Pekan Sebelumnya"
     >
@@ -47,7 +47,7 @@ const {
       <select
         :value="viewedWeekIndex"
         @change="(e) => setWeek(parseInt(e.target.value, 10))"
-        class="w-full appearance-none truncate bg-surface-card dark:bg-slate-900 text-text-main dark:text-slate-100 text-xs font-semibold rounded-lg border border-border-ui dark:border-slate-700/80 pl-2.5 sm:pl-3 py-1.5 pr-7 sm:pr-8 focus:outline-none focus:ring-2 focus:ring-primary shadow-2xs cursor-pointer"
+        class="w-full appearance-none truncate bg-[var(--surface)] text-[var(--text)] text-xs font-medium rounded-md border border-[var(--border)] hover:border-[var(--accent)] pl-2.5 sm:pl-3 py-1.5 pr-7 sm:pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
         aria-label="Pilih Pekan Kuliah"
       >
         <option
@@ -59,7 +59,7 @@ const {
         </option>
       </select>
       <div
-        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-text-subtle dark:text-slate-400"
+        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 sm:px-2 text-[var(--muted)]"
       >
         <span class="material-symbols-outlined text-[18px]">unfold_more</span>
       </div>
@@ -70,7 +70,7 @@ const {
       type="button"
       @click="nextWeek"
       :disabled="viewedWeekIndex === allWeeks.length - 1"
-      class="shrink-0 w-8 h-8 rounded-lg bg-surface-card dark:bg-slate-800 text-text-muted dark:text-slate-300 hover:text-primary dark:hover:text-blue-400 border border-border-ui dark:border-slate-700/80 flex items-center justify-center transition-colors shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+      class="shrink-0 w-8 h-8 rounded-md bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       title="Pekan Selanjutnya"
       aria-label="Pekan Selanjutnya"
     >

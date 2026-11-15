@@ -204,13 +204,19 @@ export function getPekanLabel(pekanOrWeek) {
   return `Pekan ${p}`;
 }
 
-const activeInfo = computeActiveWeekInfo();
-const activeWeekIndex = activeInfo.detected;
+let activeInfo = computeActiveWeekInfo();
+let activeWeekIndex = activeInfo.detected;
 const activeWeekStatus = ref(activeInfo.status);
 const viewedWeekIndex = ref(activeWeekIndex);
 
 export function useSchedule() {
   const allWeeks = scheduleData.jadwal_per_pekan;
+  const latestInfo = computeActiveWeekInfo();
+  if (viewedWeekIndex.value === activeWeekIndex) {
+    activeWeekIndex = latestInfo.detected;
+    activeWeekStatus.value = latestInfo.status;
+    viewedWeekIndex.value = latestInfo.detected;
+  }
   const currentWeek = computed(() => allWeeks[viewedWeekIndex.value]);
 
   const activeWeekNumber = computed(() =>
@@ -245,6 +251,9 @@ export function useSchedule() {
   }
 
   function resetToCurrentWeek() {
+    const info = computeActiveWeekInfo();
+    activeWeekIndex = info.detected;
+    activeWeekStatus.value = info.status;
     viewedWeekIndex.value = activeWeekIndex;
   }
 

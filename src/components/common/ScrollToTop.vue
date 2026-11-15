@@ -66,7 +66,7 @@ defineExpose({
       @click="scrollToTop"
       aria-label="Kembali ke atas"
       title="Kembali ke atas"
-      class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 p-3 rounded-2xl bg-white/90 dark:bg-slate-900/90 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 shadow-lg shadow-slate-900/10 dark:shadow-black/40 backdrop-blur-md hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white hover:border-blue-600 dark:hover:border-blue-600 hover:shadow-blue-500/25 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950"
+      class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 p-2.5 rounded-[8px] bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] shadow-md hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors cursor-pointer flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
     >
       <svg
         class="w-5 h-5 transition-transform duration-200 group-hover:-translate-y-0.5"

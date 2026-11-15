@@ -52,16 +52,16 @@ function formatReplyTime(reply) {
 <template>
   <div
     v-if="isForumOpen"
-    class="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-5 md:p-6 shadow-xs space-y-3 sm:space-y-4"
+    class="mk-card p-3 sm:p-4 space-y-3.5"
   >
     <!-- Header -->
-    <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-[var(--border)]">
       <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
-        <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[20px]">person_check</span>
-        <h2 class="text-base font-bold text-slate-900 dark:text-white">
+        <span class="material-symbols-outlined text-[var(--accent)] text-[18px]">person_check</span>
+        <h2 class="text-sm font-semibold text-[var(--text)]">
           Radar Pribadi Anda {{ userName ? `(${userName})` : '' }}
         </h2>
-        <span class="text-xs font-mono text-slate-400 dark:text-slate-500">
+        <span class="text-xs font-mono text-[var(--muted)]">
           {{ userNim ? `(NIM: ${userNim})` : '(NIM belum diatur)' }}
         </span>
       </div>
@@ -69,36 +69,54 @@ function formatReplyTime(reply) {
       <button
         type="button"
         @click="$emit('edit-nim')"
-        class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer"
+        class="mk-btn !py-1 !px-2 !text-[11px]"
       >
         {{ userNim ? 'Ganti NIM' : 'Atur NIM' }}
       </button>
     </div>
 
     <!-- Personal Eligibility Badge & Counters -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
       <!-- 1. Eligibility Status -->
       <div
-        class="p-4 rounded-xl border flex flex-col justify-between space-y-2"
+        class="p-3 rounded-[8px] border bg-[var(--bg)] flex flex-col justify-between space-y-2"
         :class="
           personalStats.isEligible
-            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/80 text-emerald-900 dark:text-emerald-200'
+            ? 'border-emerald-500/40'
             : personalStats.myReplyCount === 1
-            ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200'
-            : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/80 text-rose-900 dark:text-rose-200'
+            ? 'border-amber-500/40'
+            : 'border-red-500/40'
         "
       >
-        <span class="text-[11px] font-bold uppercase tracking-wider opacity-75">Status Kelayakan</span>
-        <div>
-          <div class="flex items-center gap-1.5 font-black text-base">
-            <span class="material-symbols-outlined text-[20px]">
+        <span class="mk-section-title">Status Kelayakan</span>
+        <div class="space-y-1">
+          <div class="flex items-center gap-1.5 font-semibold text-sm">
+            <span
+              class="material-symbols-outlined text-[18px]"
+              :class="
+                personalStats.isEligible
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : personalStats.myReplyCount === 1
+                  ? 'text-amber-600 dark:text-amber-400'
+                  : 'text-red-600 dark:text-red-400'
+              "
+            >
               {{ personalStats.isEligible ? 'check_circle' : personalStats.myReplyCount === 1 ? 'warning' : 'cancel' }}
             </span>
-            <span>
+            <span
+              class="mk-badge !text-[11px]"
+              :class="
+                personalStats.isEligible
+                  ? 'mk-badge-ok'
+                  : personalStats.myReplyCount === 1
+                  ? 'mk-badge-warn'
+                  : 'mk-badge-down'
+              "
+            >
               {{ personalStats.isEligible ? 'MEMENUHI SYARAT' : personalStats.myReplyCount === 1 ? 'KURANG 1x REPLY' : 'BELUM REPLY' }}
             </span>
           </div>
-          <p class="text-[11px] mt-1 opacity-90 leading-tight">
+          <p class="text-[11px] text-[var(--muted)] leading-snug">
             {{
               personalStats.isEligible
                 ? 'Minimal 2x reply tercapai. Anda berhak mengikuti post-test & kuisioner!'
@@ -111,69 +129,65 @@ function formatReplyTime(reply) {
       </div>
 
       <!-- 2. Total Replies -->
-      <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Balasan Anda</span>
-        <div class="flex items-baseline gap-2">
-          <span class="text-3xl font-black text-slate-900 dark:text-white">{{ personalStats.myReplyCount }}</span>
-          <span class="text-xs font-semibold text-slate-400">/ 2x target minimum</span>
+      <div class="p-3 rounded-[8px] bg-[var(--bg)] border border-[var(--border)] flex flex-col justify-between">
+        <span class="mk-section-title">Total Balasan Anda</span>
+        <div class="flex items-baseline gap-1.5 my-1">
+          <span class="text-2xl font-semibold text-[var(--text)] tabular-nums">{{ personalStats.myReplyCount }}</span>
+          <span class="text-xs text-[var(--muted)] tabular-nums">/ 2x target minimum</span>
         </div>
-        <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mt-2 overflow-hidden">
+        <div class="w-full bg-[var(--border)] h-1.5 rounded-full overflow-hidden">
           <div
-            class="h-full rounded-full transition-all duration-500"
-            :class="personalStats.isEligible ? 'bg-emerald-500' : personalStats.myReplyCount === 1 ? 'bg-amber-500' : 'bg-rose-500'"
+            class="h-full rounded-full transition-all duration-300"
+            :class="personalStats.isEligible ? 'bg-emerald-500' : personalStats.myReplyCount === 1 ? 'bg-amber-500' : 'bg-red-500'"
             :style="{ width: `${Math.min(100, (personalStats.myReplyCount / 2) * 100)}%` }"
           ></div>
         </div>
       </div>
 
       <!-- 3. Breakdown per Topic -->
-      <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-1">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rincian per Topik</span>
-        <div v-if="Object.keys(personalStats.topicBreakdown).length > 0" class="space-y-1 text-xs">
+      <div class="p-3 rounded-[8px] bg-[var(--bg)] border border-[var(--border)] flex flex-col justify-between space-y-1.5">
+        <span class="mk-section-title">Rincian per Topik</span>
+        <div v-if="Object.keys(personalStats.topicBreakdown).length > 0" class="text-xs">
           <div
             v-for="(count, topic) in personalStats.topicBreakdown"
             :key="topic"
-            class="flex items-center justify-between font-semibold"
+            class="mk-kv"
           >
-            <span class="text-slate-600 dark:text-slate-300 truncate max-w-[140px]">{{ topic }}</span>
-            <span class="px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[11px]">
+            <span class="k truncate max-w-[140px]">{{ topic }}</span>
+            <span class="mk-badge bg-[var(--hover)] text-[var(--accent)] border border-[var(--border)] tabular-nums">
               {{ count }}x reply
             </span>
           </div>
         </div>
-        <p v-else class="text-xs text-slate-400 italic">Belum ada aktivitas di topik mana pun.</p>
+        <p v-else class="text-xs text-[var(--muted)] italic">Belum ada aktivitas di topik mana pun.</p>
       </div>
     </div>
 
     <!-- 4. Riwayat Balasan Anda per Topik (beserta Tanggapan Dosen relatif per reply) -->
-    <div v-if="forumTopics.length > 0" class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
-      <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
-        <span class="material-symbols-outlined text-[16px] text-indigo-500 dark:text-indigo-400">chat</span>
+    <div v-if="forumTopics.length > 0" class="pt-3 border-t border-[var(--border)] space-y-2.5">
+      <div class="mk-section-title flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[15px]">chat</span>
         <span>Balasan Anda di Pertemuan Ini</span>
       </div>
 
       <!-- Horizontal Topic Selector Pills -->
-      <div class="flex items-center gap-2 flex-wrap">
+      <div class="flex items-center gap-1.5 flex-wrap">
         <button
           v-for="t in forumTopics"
           :key="t.id"
           type="button"
           @click="selectedTopicId = t.id"
-          :class="[
-            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer border',
-            selectedTopicId === t.id
-              ? 'bg-indigo-600 dark:bg-indigo-500 text-white border-indigo-700 dark:border-indigo-400 ring-2 ring-indigo-500/30'
-              : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
-          ]"
+          class="mk-subtab inline-flex items-center gap-1.5 text-left"
+          :class="{ 'mk-subtab-active': selectedTopicId === t.id }"
         >
           <span>{{ t.judul }}</span>
           <span
-            :class="[
-              'px-1.5 py-0.5 rounded-full text-[10px] font-extrabold',
+            class="mk-badge !py-0 !px-1.5 !text-[10px] tabular-nums"
+            :class="
               selectedTopicId === t.id
-                ? 'bg-indigo-800/60 text-white'
-                : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
-            ]"
+                ? 'bg-white/20 text-white'
+                : 'bg-[var(--hover)] text-[var(--muted)]'
+            "
           >
             {{ getMyTopicReplyCount(t.id) }} balasan
           </span>
@@ -181,22 +195,22 @@ function formatReplyTime(reply) {
       </div>
 
       <!-- Selected Topic Replies List -->
-      <div v-if="activeTopicReplies.length > 0" class="space-y-3">
+      <div v-if="activeTopicReplies.length > 0" class="space-y-2.5">
         <div
           v-for="(reply, idx) in activeTopicReplies"
           :key="reply.id || idx"
           class="space-y-2"
         >
-          <div class="p-2.5 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+          <div class="p-3 rounded-[8px] bg-[var(--bg)] border border-[var(--border)] space-y-1">
             <div class="flex items-center justify-between gap-2 text-[11px]">
-              <span class="font-bold text-indigo-600 dark:text-indigo-400">
+              <span class="font-semibold text-[var(--accent)] tabular-nums">
                 Balasan #{{ idx + 1 }}
               </span>
-              <span v-if="formatReplyTime(reply)" class="text-slate-400 dark:text-slate-500">
+              <span v-if="formatReplyTime(reply)" class="text-[var(--muted)] tabular-nums font-mono text-[10px]">
                 {{ formatReplyTime(reply) }}
               </span>
             </div>
-            <p class="text-xs text-slate-700 dark:text-slate-200 whitespace-pre-line leading-relaxed">
+            <p class="text-xs text-[var(--text)] whitespace-pre-line leading-relaxed">
               {{ formatHtmlToText(reply.konten) || "(Tanpa teks)" }}
             </p>
           </div>
@@ -204,46 +218,35 @@ function formatReplyTime(reply) {
           <!-- Nested Child Replies (Dosen & Mahasiswa lain) directly under the matched reply -->
           <div
             v-if="getChildRepliesForReply(reply.id).length > 0"
-            class="ml-2.5 sm:ml-6 pl-2.5 sm:pl-3 border-l-2 border-slate-300 dark:border-slate-700 space-y-2"
+            class="ml-2.5 sm:ml-5 pl-2.5 sm:pl-3 border-l-2 border-[var(--border)] space-y-2"
           >
             <div
               v-for="child in getChildRepliesForReply(reply.id)"
               :key="child.id"
-              class="p-2.5 sm:p-3 rounded-xl border space-y-1"
-              :class="
-                child.isLecturer
-                  ? 'bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 border-purple-200 dark:border-purple-800/70'
-                  : 'bg-slate-50/80 dark:bg-slate-900/70 border-slate-200 dark:border-slate-800'
-              "
+              class="p-2.5 sm:p-3 rounded-[8px] border bg-[var(--bg)] space-y-1"
+              :class="child.isLecturer ? 'border-amber-500/40' : 'border-[var(--border)]'"
             >
               <div class="flex items-center justify-between gap-2 text-[11px]">
-                <span
-                  class="inline-flex items-center gap-1.5 font-bold"
-                  :class="
-                    child.isLecturer
-                      ? 'text-purple-800 dark:text-purple-300'
-                      : 'text-sky-700 dark:text-sky-300'
-                  "
-                >
-                  <span class="material-symbols-outlined text-[14px]">reply</span>
+                <span class="inline-flex items-center gap-1.5 font-semibold text-[var(--text)]">
+                  <span class="material-symbols-outlined text-[14px] text-[var(--muted)]">reply</span>
                   <span>{{ child.author }}</span>
                   <span
-                    class="px-1.5 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide"
+                    class="mk-badge !py-0 !px-1.5 !text-[9px] uppercase tracking-wide"
                     :class="
                       child.isLecturer
-                        ? 'bg-purple-200/80 text-purple-900 dark:bg-purple-900/70 dark:text-purple-200'
-                        : 'bg-sky-100 text-sky-800 dark:bg-sky-950/80 dark:text-sky-300'
+                        ? 'mk-badge-warn'
+                        : 'bg-blue-500/10 text-[var(--accent)] border border-blue-500/25'
                     "
                   >
                     {{ child.isLecturer ? 'Dosen' : child.isSelf ? 'Anda' : 'Mahasiswa' }}
                   </span>
                 </span>
-                <span v-if="formatReplyTime(child)" class="text-slate-400 dark:text-slate-500">
+                <span v-if="formatReplyTime(child)" class="text-[var(--muted)] tabular-nums font-mono text-[10px]">
                   {{ formatReplyTime(child) }}
                 </span>
               </div>
               <p
-                class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line"
+                class="text-xs text-[var(--text)] leading-relaxed whitespace-pre-line"
                 :class="{ italic: child.isLecturer }"
               >
                 {{ formatHtmlToText(child.konten) || "(Tanpa teks)" }}
@@ -255,7 +258,7 @@ function formatReplyTime(reply) {
 
       <p
         v-else
-        class="text-xs text-slate-400 dark:text-slate-500 italic py-2"
+        class="text-xs text-[var(--muted)] italic py-1.5"
       >
         Belum ada balasan Anda pada topik ini.
       </p>

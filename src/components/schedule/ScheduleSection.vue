@@ -44,15 +44,13 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
 </script>
 
 <template>
-  <section class="w-full mb-space-xl scroll-mt-20" id="jadwal">
+  <section class="w-full mb-6 scroll-mt-20" id="jadwal">
     <!-- Header with Title & Week Navigator -->
     <div
-      class="flex flex-col sm:flex-row sm:items-end justify-between mb-4 sm:mb-6 gap-4"
+      class="flex flex-col sm:flex-row sm:items-end justify-between mb-3 gap-3"
     >
       <div>
-        <h2
-          class="text-2xl font-bold text-primary-navy dark:text-slate-100 flex items-center gap-2"
-        >
+        <h2 class="mk-section-title">
           Agenda Pekan Perkuliahan
         </h2>
       </div>
@@ -63,105 +61,81 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
 
     <!-- Active Week Status Banner -->
     <div
-      class="mb-4 p-3 sm:px-4 sm:py-3 rounded-xl bg-surface-card dark:bg-slate-900 border border-border-ui dark:border-slate-800 shadow-2xs flex flex-wrap items-center justify-between gap-2.5 transition-colors"
+      class="mb-4 px-4 py-2.5 mk-card flex flex-wrap items-center justify-between gap-2.5 transition-colors"
     >
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
         <!-- Week Status Badge -->
         <span
           v-if="isCurrentWeek && activeWeekStatus === 'upcoming'"
-          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60 shadow-2xs"
+          class="mk-badge mk-badge-warn"
         >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"
-            ></span>
-          </span>
-          <span>Pekan Mendatang (Upcoming)</span>
+          Pekan Mendatang (Upcoming)
         </span>
         <span
           v-else-if="isCurrentWeek"
-          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 shadow-2xs"
+          class="mk-badge mk-badge-ok"
         >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
-            ></span>
-            <span
-              class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
-            ></span>
-          </span>
-          <span>Pekan Berjalan (Ongoing)</span>
+          Pekan Berjalan (Ongoing)
         </span>
         <span
           v-else-if="isPastWeek"
-          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-text-muted dark:text-slate-300 border border-border-ui dark:border-slate-700"
+          class="mk-badge bg-[var(--hover)] text-[var(--muted)] gap-1"
         >
           <span class="material-symbols-outlined text-[13px]">history</span>
           <span>Pekan Lalu</span>
         </span>
         <span
           v-else
-          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-primary dark:text-blue-300 border border-blue-200 dark:border-blue-800/60"
+          class="mk-badge bg-[var(--accent-soft)] text-[var(--accent)] gap-1"
         >
           <span class="material-symbols-outlined text-[13px]">schedule</span>
           <span>Pekan Mendatang</span>
         </span>
 
         <!-- Week Title Heading -->
-        <h3 class="text-sm sm:text-base font-bold text-text-main dark:text-slate-100">
+        <h3 class="text-sm font-semibold text-[var(--text)]">
           Pekan {{ currentWeek?.pekan }} ({{ currentWeek?.tanggal_daring }})
         </h3>
       </div>
 
-      <div class="flex items-center gap-2 text-xs text-text-subtle dark:text-slate-400">
+      <div class="flex items-center gap-2 text-xs text-[var(--muted)]">
         <span class="hidden md:inline">Semester Ganjil 2026/2027</span>
       </div>
     </div>
 
     <!-- Dual Column Schedule Layout (Mentari vs Tatap Muka) -->
     <div
-      class="bg-surface-card dark:bg-slate-900 rounded-2xl border border-border-ui dark:border-slate-800 shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border-ui dark:divide-slate-800 transition-colors"
+      class="mk-card overflow-hidden grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-[var(--border)] transition-colors"
     >
       <!-- Column 1: Mentari (Online) -->
-      <div class="p-5 md:p-6 flex flex-col justify-between">
+      <div class="p-4 sm:p-5 flex flex-col justify-between">
         <div>
           <!-- Subhead -->
           <div
-            class="flex items-center justify-between pb-4 mb-4 border-b border-border-ui dark:border-slate-800"
+            class="flex items-center justify-between pb-3 mb-3 border-b border-[var(--border)]"
           >
-            <div class="flex items-center gap-2.5">
-              <div
-                class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-gold-border dark:border-amber-800/40 flex items-center justify-center text-accent-gold dark:text-amber-200/90"
-              >
-                <span class="material-symbols-outlined text-[20px]">wb_sunny</span>
-              </div>
-              <div>
-                <h4
-                  class="text-sm font-bold text-text-main dark:text-slate-100 flex items-center gap-1.5"
-                >
-                  <span>🌞</span>
-                  <span>Mentari (Online)</span>
-                </h4>
-                <p class="text-xs text-text-muted dark:text-slate-400">
-                  {{ currentWeek?.tanggal_daring }}
-                </p>
-              </div>
+            <div>
+              <h4 class="mk-section-title flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-amber-600 dark:text-amber-400">wb_sunny</span>
+                <span>Mentari (Online)</span>
+              </h4>
+              <p class="text-xs text-[var(--muted)] mt-0.5">
+                {{ currentWeek?.tanggal_daring }}
+              </p>
             </div>
-            <div class="flex flex-col items-end gap-1.5 shrink-0">
-              <span
-                class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200/90 border border-amber-200 dark:border-amber-800/40 text-[11px] font-bold"
-              >
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="mk-badge mk-badge-warn tabular-nums">
                 {{ daringCount }} Matkul
               </span>
               <button
                 v-if="isAdmin"
                 type="button"
                 @click="handleCopyMentari"
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all duration-200 cursor-pointer border shadow-2xs active:scale-95"
+                class="inline-flex items-center gap-1 px-2 py-1 mk-btn cursor-pointer"
                 :class="
                   copiedMentari
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:text-amber-700 dark:hover:text-amber-300 hover:border-amber-300 dark:hover:border-amber-700'
+                    ? 'border-emerald-500 text-emerald-700 dark:text-emerald-300'
+                    : ''
                 "
                 :title="copiedMentari ? 'Tersalin ke clipboard!' : 'Salin format jadwal Mentari pekan ini'"
                 :aria-label="copiedMentari ? 'Jadwal Mentari tersalin' : 'Salin jadwal Mentari pekan ini'"
@@ -178,17 +152,17 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
           </div>
 
           <!-- Daring Items List -->
-          <div class="space-y-4">
+          <div class="space-y-3.5">
             <!-- Empty state -->
             <div
               v-if="daringCount === 0"
-              class="p-4 rounded-xl bg-surface dark:bg-slate-800/40 text-center text-xs text-text-muted dark:text-slate-400 border border-border-ui dark:border-slate-800"
+              class="p-4 rounded-[8px] bg-[var(--bg)] text-center text-xs text-[var(--muted)] border border-[var(--border)]"
             >
               Tidak ada agenda online Mentari pada pekan ini.
             </div>
 
             <!-- Other items (e.g. UTS / UAS aggregate) -->
-            <div v-if="daringData.other.length > 0" class="space-y-2.5">
+            <div v-if="daringData.other.length > 0" class="space-y-2">
               <CourseCard
                 v-for="(entry, oIdx) in daringData.other"
                 :key="'other-' + oIdx"
@@ -200,26 +174,23 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             </div>
 
             <!-- Kelompok 1 (Mentari) -->
-            <div v-if="daringData.k1.length > 0" class="flex flex-col gap-2.5">
+            <div v-if="daringData.k1.length > 0" class="flex flex-col gap-2">
               <div
-                class="flex items-center justify-between pb-1.5 pt-0.5 border-b border-border-ui/80 dark:border-slate-800"
+                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
               >
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500 dark:bg-amber-400/80"></span>
-                  <span class="text-xs font-bold text-amber-900 dark:text-amber-200/90"
+                  <span class="text-xs font-semibold text-[var(--text)]"
                     >Kelompok 1</span
                   >
-                  <span class="text-[11px] font-medium text-text-subtle dark:text-slate-400"
+                  <span class="text-[11px] text-[var(--muted)]"
                     >({{ daringData.k1Label }})</span
                   >
                 </div>
-                <span
-                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200/90 border border-gold-border dark:border-amber-800/40"
-                >
+                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
                   {{ daringData.k1.length }} Matkul
                 </span>
               </div>
-              <div class="space-y-2.5">
+              <div class="space-y-2">
                 <CourseCard
                   v-for="(entry, k1Idx) in daringData.k1"
                   :key="'k1-' + k1Idx"
@@ -232,26 +203,23 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             </div>
 
             <!-- Kelompok 2 (Mentari) -->
-            <div v-if="daringData.k2.length > 0" class="flex flex-col gap-2.5 pt-2">
+            <div v-if="daringData.k2.length > 0" class="flex flex-col gap-2 pt-1">
               <div
-                class="flex items-center justify-between pb-1.5 pt-0.5 border-b border-border-ui/80 dark:border-slate-800"
+                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
               >
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 dark:bg-amber-400/70"></span>
-                  <span class="text-xs font-bold text-yellow-900 dark:text-amber-200/90"
+                  <span class="text-xs font-semibold text-[var(--text)]"
                     >Kelompok 2</span
                   >
-                  <span class="text-[11px] font-medium text-text-subtle dark:text-slate-400"
+                  <span class="text-[11px] text-[var(--muted)]"
                     >({{ daringData.k2Label }})</span
                   >
                 </div>
-                <span
-                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-yellow-50 dark:bg-amber-950/30 text-yellow-900 dark:text-amber-200/90 border border-yellow-200 dark:border-amber-800/40"
-                >
+                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
                   {{ daringData.k2.length }} Matkul
                 </span>
               </div>
-              <div class="space-y-2.5">
+              <div class="space-y-2">
                 <CourseCard
                   v-for="(entry, k2Idx) in daringData.k2"
                   :key="'k2-' + k2Idx"
@@ -268,50 +236,39 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
 
       <!-- Column 2: Tatap Muka di Kelas -->
       <div
-        class="p-5 md:p-6 flex flex-col justify-between bg-surface-alt/40 dark:bg-slate-900/40"
+        class="p-4 sm:p-5 flex flex-col justify-between bg-[var(--surface)]"
       >
         <div>
           <!-- Subhead -->
           <div
-            class="flex items-center justify-between pb-4 mb-4 border-b border-border-ui dark:border-slate-800"
+            class="flex items-center justify-between pb-3 mb-3 border-b border-[var(--border)]"
           >
-            <div class="flex items-center gap-2.5">
-              <div
-                class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800/60 flex items-center justify-center text-primary dark:text-blue-400"
-              >
-                <span class="material-symbols-outlined text-[20px]">school</span>
-              </div>
-              <div>
-                <h4
-                  class="text-sm font-bold text-text-main dark:text-slate-100 flex items-center gap-1.5"
-                >
-                  <span>🏫</span>
-                  <span>Tatap Muka di Kelas</span>
-                </h4>
-                <p class="text-xs text-text-muted dark:text-slate-400">
-                  Sabtu, {{ currentWeek?.tanggal_luring }}
-                </p>
-              </div>
+            <div>
+              <h4 class="mk-section-title flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-[var(--accent)]">school</span>
+                <span>Tatap Muka di Kelas</span>
+              </h4>
+              <p class="text-xs text-[var(--muted)] mt-0.5">
+                Sabtu, {{ currentWeek?.tanggal_luring }}
+              </p>
             </div>
-            <span
-              class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-primary dark:text-blue-300 text-[11px] font-bold"
-            >
+            <span class="mk-badge bg-[var(--accent-soft)] text-[var(--accent)] tabular-nums">
               {{ luringCount }} Sesi
             </span>
           </div>
 
           <!-- Luring Items List -->
-          <div class="space-y-4">
+          <div class="space-y-3.5">
             <!-- Empty state -->
             <div
               v-if="luringCount === 0"
-              class="p-4 rounded-xl bg-surface dark:bg-slate-800/40 text-center text-xs text-text-muted dark:text-slate-400 border border-border-ui dark:border-slate-800"
+              class="p-4 rounded-[8px] bg-[var(--bg)] text-center text-xs text-[var(--muted)] border border-[var(--border)]"
             >
               Tidak ada perkuliahan tatap muka pada pekan ini.
             </div>
 
             <!-- Other items (e.g. UTS / UAS aggregate) -->
-            <div v-if="luringData.other.length > 0" class="space-y-2.5">
+            <div v-if="luringData.other.length > 0" class="space-y-2">
               <CourseCard
                 v-for="(entry, oIdx) in luringData.other"
                 :key="'luring-other-' + oIdx"
@@ -323,26 +280,23 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             </div>
 
             <!-- Kelompok 1 (Tatap Muka) -->
-            <div v-if="luringData.k1.length > 0" class="flex flex-col gap-2.5">
+            <div v-if="luringData.k1.length > 0" class="flex flex-col gap-2">
               <div
-                class="flex items-center justify-between pb-1.5 pt-0.5 border-b border-border-ui/80 dark:border-slate-800"
+                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
               >
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                  <span class="text-xs font-bold text-primary dark:text-blue-300"
+                  <span class="text-xs font-semibold text-[var(--text)]"
                     >Kelompok 1</span
                   >
-                  <span class="text-[11px] font-medium text-text-subtle dark:text-slate-400"
+                  <span class="text-[11px] text-[var(--muted)]"
                     >(Tatap Muka di Kelas)</span
                   >
                 </div>
-                <span
-                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-primary dark:text-blue-300 border border-blue-200 dark:border-blue-800/60"
-                >
+                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
                   {{ luringData.k1.length }} Sesi
                 </span>
               </div>
-              <div class="space-y-2.5">
+              <div class="space-y-2">
                 <CourseCard
                   v-for="(entry, k1Idx) in luringData.k1"
                   :key="'luring-k1-' + k1Idx"
@@ -355,26 +309,23 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             </div>
 
             <!-- Kelompok 2 (Tatap Muka) -->
-            <div v-if="luringData.k2.length > 0" class="flex flex-col gap-2.5 pt-2">
+            <div v-if="luringData.k2.length > 0" class="flex flex-col gap-2 pt-1">
               <div
-                class="flex items-center justify-between pb-1.5 pt-0.5 border-b border-border-ui/80 dark:border-slate-800"
+                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
               >
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                  <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300"
+                  <span class="text-xs font-semibold text-[var(--text)]"
                     >Kelompok 2</span
                   >
-                  <span class="text-[11px] font-medium text-text-subtle dark:text-slate-400"
+                  <span class="text-[11px] text-[var(--muted)]"
                     >(Tatap Muka di Kelas)</span
                   >
                 </div>
-                <span
-                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60"
-                >
+                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
                   {{ luringData.k2.length }} Sesi
                 </span>
               </div>
-              <div class="space-y-2.5">
+              <div class="space-y-2">
                 <CourseCard
                   v-for="(entry, k2Idx) in luringData.k2"
                   :key="'luring-k2-' + k2Idx"

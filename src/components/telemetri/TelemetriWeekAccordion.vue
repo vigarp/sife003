@@ -211,69 +211,62 @@ function handleResetWeek() {
 </script>
 
 <template>
-  <div class="space-y-5">
+  <div class="space-y-4">
     <!-- Week Navigator Bar -->
     <div
-      class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      class="mk-card p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
     >
-      <div class="flex items-start sm:items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/80 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0"
-        >
-          <span class="material-symbols-outlined text-[20px]">calendar_view_week</span>
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-2">
+          <h2 class="text-sm font-semibold text-[var(--text)]">
+            {{ getPekanLabel(currentWeek?.pekan) }}
+          </h2>
+          <span
+            v-if="isCurrentWeek"
+            class="mk-badge mk-badge-ok"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            {{ activeWeekStatus === "upcoming" ? "Pekan Berikutnya" : "Pekan Berjalan" }}
+          </span>
+          <span
+            v-else
+            class="mk-badge bg-[var(--hover)] text-[var(--muted)] border border-[var(--border)]"
+          >
+            Arsip / Rencana Pekan
+          </span>
         </div>
-        <div>
-          <div class="flex flex-wrap items-center gap-2">
-            <h2 class="text-sm font-bold text-slate-900 dark:text-white">
-              {{ getPekanLabel(currentWeek?.pekan) }}
-            </h2>
-            <span
-              v-if="isCurrentWeek"
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              {{ activeWeekStatus === "upcoming" ? "Pekan Berikutnya" : "Pekan Berjalan" }}
-            </span>
-            <span
-              v-else
-              class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-            >
-              Arsip / Rencana Pekan
-            </span>
-          </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {{ currentWeek?.tanggal_daring || "Jadwal Pekan" }}
-          </p>
-        </div>
+        <p class="text-xs text-[var(--muted)] mt-0.5 tabular-nums">
+          {{ currentWeek?.tanggal_daring || "Jadwal Pekan" }}
+        </p>
       </div>
 
-      <div class="flex items-center gap-2 self-end sm:self-center">
+      <div class="flex items-center gap-1.5 self-end sm:self-center">
         <button
           v-if="!isCurrentWeek"
           type="button"
           @click="handleResetWeek"
-          class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition-colors cursor-pointer"
+          class="mk-btn !border-[var(--accent)] !text-[var(--accent)]"
         >
           Pekan Ini
         </button>
-        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+        <div class="inline-flex items-center gap-1">
           <button
             type="button"
             @click="handlePrevWeek"
             :disabled="viewedWeekIndex <= 0"
             aria-label="Pekan Sebelumnya"
-            class="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            class="mk-btn !px-2 !py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span class="material-symbols-outlined text-[18px] block">chevron_left</span>
+            <span class="material-symbols-outlined text-[16px] block">chevron_left</span>
           </button>
           <button
             type="button"
             @click="handleNextWeek"
             :disabled="viewedWeekIndex >= allWeeks.length - 1"
             aria-label="Pekan Berikutnya"
-            class="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            class="mk-btn !px-2 !py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span class="material-symbols-outlined text-[18px] block">chevron_right</span>
+            <span class="material-symbols-outlined text-[16px] block">chevron_right</span>
           </button>
         </div>
       </div>
@@ -282,14 +275,14 @@ function handleResetWeek() {
     <!-- Exam Week Banner (UTS / UAS) -->
     <div
       v-if="isExamWeek"
-      class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 text-center space-y-3"
+      class="mk-card border-amber-500/40 p-5 text-center space-y-2"
     >
-      <span class="material-symbols-outlined text-amber-500 text-[32px]">assignment</span>
+      <span class="material-symbols-outlined text-amber-500 text-[28px]">assignment</span>
       <div class="space-y-1">
-        <p class="text-sm font-bold text-amber-900 dark:text-amber-200">
+        <p class="text-sm font-semibold text-[var(--text)]">
           {{ getPekanLabel(currentWeek?.pekan) }}
         </p>
-        <p class="text-xs text-amber-700 dark:text-amber-300 max-w-md mx-auto">
+        <p class="text-xs text-[var(--muted)] max-w-md mx-auto">
           Pekan ujian tidak memiliki sesi pertemuan forum reguler. Gunakan tombol navigasi pekan (&lsaquo; / &rsaquo;) untuk melihat pekan perkuliahan lainnya.
         </p>
       </div>
@@ -300,77 +293,60 @@ function handleResetWeek() {
       <section
         v-for="section in courseSections"
         :key="section.id"
-        class="space-y-3"
+        class="space-y-2.5"
       >
         <!-- Section Subhead -->
-        <div class="flex items-center justify-between gap-2 px-1">
-          <div class="flex items-center gap-2.5">
-            <div
-              class="w-7 h-7 rounded-lg flex items-center justify-center border shrink-0"
-              :class="
-                section.theme === 'amber'
-                  ? 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/80 text-amber-600 dark:text-amber-400'
-                  : 'bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800/80 text-blue-600 dark:text-blue-400'
-              "
-            >
-              <span class="material-symbols-outlined text-[16px]">{{ section.icon }}</span>
-            </div>
-            <div>
-              <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+        <div class="flex items-center justify-between gap-2 px-0.5">
+          <div class="flex items-center gap-2 min-w-0">
+            <span
+              class="material-symbols-outlined text-[16px] shrink-0"
+              :class="section.theme === 'amber' ? 'text-amber-600 dark:text-amber-400' : 'text-[var(--accent)]'"
+            >{{ section.icon }}</span>
+            <div class="min-w-0">
+              <h3 class="mk-section-title">
                 {{ section.title }}
               </h3>
-              <p v-if="section.subtitle" class="text-[11px] text-slate-500 dark:text-slate-400">
+              <p v-if="section.subtitle" class="text-[11px] text-[var(--muted)]">
                 {{ section.subtitle }}
               </p>
             </div>
           </div>
 
           <span
-            class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
-            :class="
-              section.theme === 'amber'
-                ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70'
-                : 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/70'
-            "
+            class="mk-badge bg-[var(--hover)] text-[var(--muted)] border border-[var(--border)] shrink-0 tabular-nums"
           >
             {{ section.courses.length }} Matkul
           </span>
         </div>
 
         <!-- Accordion List of Courses -->
-        <div class="space-y-2.5">
+        <div class="space-y-2">
           <div
             v-for="course in section.courses"
             :key="course.key"
-            class="bg-white dark:bg-slate-900 rounded-2xl border transition-all overflow-hidden shadow-xs"
-            :class="
-              isCourseExpanded(course.key)
-                ? section.theme === 'amber'
-                  ? 'border-amber-400/70 dark:border-amber-700 ring-1 ring-amber-500/20'
-                  : 'border-blue-400/70 dark:border-blue-700 ring-1 ring-blue-500/20'
-                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-            "
+            class="mk-card overflow-hidden transition-colors"
+            :class="isCourseExpanded(course.key) ? 'border-[var(--accent)]' : ''"
           >
             <!-- Level 1: Course Header -->
             <button
               type="button"
               @click="toggleCourse(course)"
               :aria-expanded="isCourseExpanded(course.key)"
-              class="w-full px-3 py-3 sm:px-4 sm:py-3.5 flex items-center justify-between gap-2.5 sm:gap-3 text-left cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+              class="w-full px-3.5 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-2.5 text-left cursor-pointer hover:bg-[var(--hover)] transition-colors"
             >
               <div class="min-w-0 flex-1 space-y-1">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="text-sm font-bold text-slate-900 dark:text-white truncate">
+                  <span class="text-sm font-semibold text-[var(--text)] truncate">
                     {{ course.name }}
                   </span>
                   <span
-                    class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                    class="mk-badge bg-[var(--hover)] text-[var(--muted)] border border-[var(--border)] font-mono !text-[10px]"
                   >
                     {{ course.sks }} SKS
                   </span>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div class="flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
                   <span v-if="course.dosen" class="truncate max-w-[260px] sm:max-w-none">
                     {{ course.dosen }}
                   </span>
@@ -379,11 +355,11 @@ function handleResetWeek() {
                     <span
                       v-for="s in course.sessions"
                       :key="s.pertemuan"
-                      class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold border"
+                      class="mk-badge !rounded-[6px] !text-[11px]"
                       :class="
                         section.theme === 'amber'
-                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200/70 dark:border-amber-800/60'
-                          : 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200/70 dark:border-blue-800/60'
+                          ? 'mk-badge-warn'
+                          : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/25'
                       "
                     >
                       Pertemuan {{ s.pertemuan }}
@@ -393,8 +369,8 @@ function handleResetWeek() {
               </div>
 
               <span
-                class="material-symbols-outlined text-slate-400 transition-transform duration-200 shrink-0"
-                :class="{ 'rotate-180': isCourseExpanded(course.key) }"
+                class="material-symbols-outlined text-[var(--muted)] transition-transform duration-200 shrink-0 text-[20px]"
+                :class="{ 'rotate-180 text-[var(--accent)]': isCourseExpanded(course.key) }"
               >
                 expand_more
               </span>
@@ -403,25 +379,25 @@ function handleResetWeek() {
             <!-- Level 1 Body: Pertemuan Accordions (Level 2) -->
             <div
               v-if="isCourseExpanded(course.key)"
-              class="border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 p-1.5 sm:p-4 space-y-2 sm:space-y-3"
+              class="border-t border-[var(--border)] bg-[var(--bg)] p-2 sm:p-3 space-y-2"
             >
               <div
                 v-for="session in course.sessions"
                 :key="session.pertemuan"
-                class="rounded-xl border bg-white dark:bg-slate-900 overflow-hidden transition-colors"
+                class="rounded-[8px] border bg-[var(--surface)] overflow-hidden transition-colors"
                 :class="
                   isSessionExpanded(course.key, session.pertemuan)
-                    ? 'border-indigo-300 dark:border-indigo-700'
-                    : 'border-slate-200 dark:border-slate-800'
+                    ? 'border-[var(--accent)]'
+                    : 'border-[var(--border)]'
                 "
               >
                 <!-- Level 2: Pertemuan Header + Actions (Pindai Ulang & Buka di Mentari) -->
-                <div class="w-full px-2.5 sm:px-3.5 flex items-center justify-between gap-2 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                <div class="w-full px-3 sm:px-3.5 flex items-center justify-between gap-2 hover:bg-[var(--hover)] transition-colors">
                   <button
                     type="button"
                     @click="toggleSession(course, session)"
                     :aria-expanded="isSessionExpanded(course.key, session.pertemuan)"
-                    class="flex-1 py-2.5 text-left text-xs font-bold text-slate-900 dark:text-white cursor-pointer"
+                    class="flex-1 py-2 text-left text-xs font-semibold text-[var(--text)] cursor-pointer"
                   >
                     Pertemuan {{ session.pertemuan }}
                   </button>
@@ -431,7 +407,7 @@ function handleResetWeek() {
                       type="button"
                       @click="triggerScan(course, session, true)"
                       :disabled="scanning || scanningForum"
-                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+                      class="mk-btn !py-1 !px-2 !text-[11px] disabled:opacity-50"
                     >
                       <span
                         class="material-symbols-outlined text-[14px]"
@@ -445,7 +421,7 @@ function handleResetWeek() {
                     <button
                       type="button"
                       @click="openMentariLms(course, session.pertemuan)"
-                      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-[11px] font-bold transition-colors cursor-pointer"
+                      class="mk-btn !py-1 !px-2 !text-[11px] !border-amber-500/35 !text-amber-700 dark:!text-amber-300"
                     >
                       <span class="hidden sm:inline">Buka di Mentari</span>
                       <span class="sm:hidden">Mentari</span>
@@ -457,11 +433,11 @@ function handleResetWeek() {
                       @click="toggleSession(course, session)"
                       :aria-expanded="isSessionExpanded(course.key, session.pertemuan)"
                       :aria-label="`Toggle Pertemuan ${session.pertemuan}`"
-                      class="p-0.5 rounded-md text-slate-400 cursor-pointer"
+                      class="p-0.5 rounded-[6px] text-[var(--muted)] cursor-pointer"
                     >
                       <span
-                        class="material-symbols-outlined text-[20px] transition-transform duration-200 block"
-                        :class="{ 'rotate-180 text-indigo-500': isSessionExpanded(course.key, session.pertemuan) }"
+                        class="material-symbols-outlined text-[18px] transition-transform duration-200 block"
+                        :class="{ 'rotate-180 text-[var(--accent)]': isSessionExpanded(course.key, session.pertemuan) }"
                       >
                         expand_more
                       </span>
@@ -472,7 +448,7 @@ function handleResetWeek() {
                 <!-- Level 2 Body: Level 3 Stage Tabs -->
                 <div
                   v-if="isSessionExpanded(course.key, session.pertemuan)"
-                  class="border-t border-slate-100 dark:border-slate-800 px-1.5 py-2.5 sm:p-4"
+                  class="border-t border-[var(--border)] p-2.5 sm:p-3.5"
                 >
                   <TelemetriScanResult
                     :is-active="isActiveTarget(course, session.pertemuan)"

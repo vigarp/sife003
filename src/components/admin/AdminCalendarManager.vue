@@ -164,8 +164,7 @@ const filteredEvents = computed(() => {
     const matchSearch =
       !searchQuery.value.trim() ||
       e.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      (e.description &&
-        e.description.toLowerCase().includes(searchQuery.value.toLowerCase()));
+      Boolean(e.description?.toLowerCase().includes(searchQuery.value.toLowerCase()));
     return matchCat && matchSearch;
   });
 });
@@ -210,7 +209,7 @@ onMounted(() => {
 
     <!-- Header & Action Bar -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs"
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mk-card p-5"
     >
       <div>
         <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -277,7 +276,7 @@ onMounted(() => {
 
     <!-- Events Table Card -->
     <div
-      class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden"
+      class="mk-card overflow-hidden"
     >
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
@@ -373,7 +372,7 @@ onMounted(() => {
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in-50"
     >
       <div
-        class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden transform transition-all"
+        class="mk-card shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden transform transition-all"
       >
         <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
           <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -530,7 +529,7 @@ onMounted(() => {
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in-50"
     >
       <div
-        class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-sm p-6 text-center space-y-4"
+        class="mk-card shadow-xl w-full max-w-sm p-6 text-center space-y-4"
       >
         <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center mx-auto">
           <span class="material-symbols-outlined text-2xl">delete</span>

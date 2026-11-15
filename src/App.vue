@@ -26,13 +26,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-surface dark:bg-slate-950 transition-colors duration-200">
+  <div class="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-200">
     <!-- Sticky Navigation Header -->
     <Navbar />
 
     <!-- Main Content Container with Router View -->
     <main
-      class="w-full max-w-[1440px] mx-auto px-margin-mobile lg:px-margin pt-10 min-h-[calc(100vh-16rem)] flex-1 min-w-0"
+      class="w-full max-w-[1140px] mx-auto px-3.5 sm:px-6 pt-5 min-h-[calc(100vh-12rem)] flex-1 min-w-0"
     >
       <router-view />
     </main>

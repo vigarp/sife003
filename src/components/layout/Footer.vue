@@ -4,27 +4,23 @@ const currentYear = new Date().getFullYear();
 
 <template>
   <footer
-    class="w-full bg-surface-card dark:bg-slate-900 border-t border-border-ui dark:border-slate-800 mt-space-xl transition-colors"
+    class="w-full bg-[var(--surface)] border-t border-[var(--border)] mt-8 py-4 transition-colors"
   >
     <div
-      class="py-space-md bg-surface-alt dark:bg-slate-950 transition-colors"
+      class="max-w-[1140px] mx-auto px-3.5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left"
     >
-      <div
-        class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-space-sm text-center sm:text-left"
-      >
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-          <span class="text-xs text-slate-700 dark:text-slate-300 font-semibold"
-            >© {{ currentYear }} SI-KEMARI (Sistem Informasi Kelas 03SIFE003)</span
-          >
-          <span class="hidden sm:inline text-xs text-slate-400 dark:text-slate-600">•</span>
-          <span class="text-xs text-slate-500 dark:text-slate-400 italic"
-            >"Sistem Informasi Kelas: Biar Ga Usah Kesana-Kemari"</span
-          >
-        </div>
-        <span class="text-xs text-slate-600 dark:text-slate-400 font-medium"
-          >Universitas Pamulang</span
+      <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+        <span class="text-xs text-[var(--text)] font-medium"
+          >© {{ currentYear }} SI-KEMARI (Sistem Informasi Kelas 03SIFE003)</span
+        >
+        <span class="hidden sm:inline text-xs text-[var(--muted)]">•</span>
+        <span class="text-xs text-[var(--muted)]"
+          >"Sistem Informasi Kelas: Biar Ga Usah Kesana-Kemari"</span
         >
       </div>
+      <span class="text-xs text-[var(--muted)] font-medium"
+        >Universitas Pamulang</span
+      >
     </div>
   </footer>
 </template>

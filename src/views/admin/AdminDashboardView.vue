@@ -220,12 +220,12 @@ async function handleChangePasswordSubmit() {
 
 function handleLogout() {
   logout();
-  router.replace("/pengurus/login");
+  void router.replace("/pengurus/login");
 }
 
 onMounted(async () => {
   if (!isAuthenticated.value) {
-    router.replace("/pengurus/login");
+    await router.replace("/pengurus/login");
     return;
   }
   if (!user.value && token.value) {
@@ -243,63 +243,57 @@ onMounted(async () => {
 
 <template>
   <!-- Loading state when token exists but user profile is being fetched -->
-  <div v-if="verifyingAuth" class="max-w-md mx-auto text-center py-20 px-4 space-y-3">
-    <div class="w-9 h-9 mx-auto border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Memverifikasi hak akses pengurus...</p>
+  <div v-if="verifyingAuth" class="max-w-md mx-auto text-center py-16 px-4 space-y-2.5">
+    <div class="w-7 h-7 mx-auto border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
+    <p class="text-xs text-[var(--muted)] font-medium">Memverifikasi hak akses pengurus...</p>
   </div>
 
   <!-- Unauthorized Regular Student Notice -->
-  <div v-else-if="!isAdmin" class="max-w-md mx-auto text-center py-16 px-4 space-y-4">
-    <div class="w-16 h-16 mx-auto rounded-3xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center shadow-xs">
-      <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
-    </div>
-    <div class="space-y-1">
-      <h2 class="text-base font-bold text-slate-900 dark:text-white">Akses Terbatas: Bukan Pengurus Kelas</h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400">
-        Halo, <strong class="text-slate-800 dark:text-slate-200">{{ user?.nama_lengkap || "Mahasiswa" }}</strong>
-        <span v-if="user?.nim"> (NIM: {{ user.nim }})</span>.
-      </p>
-      <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">
-        Akun Anda berstatus <strong>Mahasiswa Reguler</strong>. Hanya mahasiswa yang telah disahkan sebagai <strong>Pengurus / Admin</strong> oleh pengurus kelas yang dapat mengakses Zona Pengurus.
-      </p>
-    </div>
-    <div class="flex items-center justify-center gap-2 pt-2">
-      <router-link
-        to="/"
-        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs"
-      >
-        Kembali ke Portal
-      </router-link>
-      <button
-        @click="handleLogout"
-        class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-      >
-        Keluar
-      </button>
+  <div v-else-if="!isAdmin" class="max-w-md mx-auto py-12 px-4">
+    <div class="mk-card p-5 text-center space-y-3">
+      <span class="material-symbols-outlined text-[28px] text-amber-500">lock</span>
+      <div class="space-y-1">
+        <h2 class="text-sm font-semibold text-[var(--text)]">Akses Terbatas: Bukan Pengurus Kelas</h2>
+        <p class="text-xs text-[var(--muted)]">
+          Halo, <strong class="text-[var(--text)]">{{ user?.nama_lengkap || "Mahasiswa" }}</strong>
+          <span v-if="user?.nim" class="font-mono"> (NIM: {{ user.nim }})</span>.
+        </p>
+        <p class="text-xs text-[var(--muted)] pt-0.5 leading-relaxed">
+          Akun Anda berstatus <strong>Mahasiswa Reguler</strong>. Hanya mahasiswa yang telah disahkan sebagai <strong>Pengurus / Admin</strong> oleh pengurus kelas yang dapat mengakses Zona Pengurus.
+        </p>
+      </div>
+      <div class="flex items-center justify-center gap-2 pt-1">
+        <router-link
+          to="/"
+          class="px-3.5 py-1.5 rounded-[6px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-xs transition-colors"
+        >
+          Kembali ke Portal
+        </router-link>
+        <button
+          @click="handleLogout"
+          class="mk-btn"
+        >
+          Keluar
+        </button>
+      </div>
     </div>
   </div>
 
-  <div v-else class="w-full max-w-full space-y-6 pb-16 min-w-0">
+  <div v-else class="w-full max-w-full space-y-4 pb-16 min-w-0">
     <!-- Top Action Bar -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 md:p-6 shadow-xs">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-        </div>
+    <div class="mk-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="material-symbols-outlined text-[22px] text-[var(--accent)] shrink-0">verified_user</span>
         <div class="min-w-0">
-          <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 flex-wrap">
+          <h1 class="text-base sm:text-lg font-semibold text-[var(--text)] tracking-tight flex items-center gap-2 flex-wrap">
             <span>Zona Pengurus</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 shrink-0">
+            <span class="mk-badge bg-[var(--hover)] text-[var(--accent)] border border-[var(--border)] shrink-0 font-mono">
               03SIFE003
             </span>
           </h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 break-words">
-            Halo, <strong class="text-slate-800 dark:text-slate-200">{{ user?.nama_lengkap || "Pengurus Kelas" }}</strong>
-            <span v-if="user?.nim" class="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-semibold ml-1">({{ user.nim }})</span>
+          <p class="text-xs text-[var(--muted)] break-words">
+            Halo, <strong class="text-[var(--text)]">{{ user?.nama_lengkap || "Pengurus Kelas" }}</strong>
+            <span v-if="user?.nim" class="font-mono text-[11px] text-[var(--accent)] font-semibold ml-1">({{ user.nim }})</span>
             • Manajemen Agenda & Tugas Mahasiswa
           </p>
         </div>
@@ -308,34 +302,30 @@ onMounted(async () => {
       <div class="flex items-center gap-2 flex-wrap">
         <router-link
           to="/pengurus/presensi"
-          class="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800 text-xs font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors inline-flex items-center gap-1.5 shadow-2xs"
+          class="mk-btn !border-[var(--accent)] !text-[var(--accent)]"
         >
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-          </svg>
+          <span class="material-symbols-outlined text-[15px]">fact_check</span>
           <span>Presensi (m-hadir)</span>
         </router-link>
 
         <router-link
           to="/"
-          class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors inline-flex items-center gap-1.5"
+          class="mk-btn"
         >
           <span>Lihat Portal</span>
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
+          <span class="material-symbols-outlined text-[14px]">open_in_new</span>
         </router-link>
 
         <button
           @click="isPasswordModalOpen = true"
-          class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          class="mk-btn"
         >
           Ubah Sandi
         </button>
 
         <button
           @click="handleLogout"
-          class="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-semibold transition-colors cursor-pointer"
+          class="mk-btn !border-red-500/35 !text-red-600 dark:!text-red-400"
         >
           Keluar
         </button>
@@ -346,10 +336,10 @@ onMounted(async () => {
     <div
       v-if="toast.show"
       :class="[
-        'p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-sm transition-all',
+        'p-3 rounded-[8px] text-xs font-medium flex items-center justify-between border',
         toast.type === 'success'
-          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-          : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800',
+          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/35'
+          : 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/35',
       ]"
     >
       <span>{{ toast.message }}</span>
@@ -358,96 +348,74 @@ onMounted(async () => {
 
     <!-- Admin Navigation Tabs -->
     <div class="w-full overflow-x-auto pb-1 max-w-full">
-      <div class="inline-flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 min-w-max text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
+      <div class="inline-flex items-center gap-2 min-w-max">
         <button
           @click="activeAdminTab = 'agenda'"
           :class="[
-            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
-            activeAdminTab === 'agenda'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            'mk-subtab inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap',
+            { 'mk-subtab-active': activeAdminTab === 'agenda' },
           ]"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
+          <span class="material-symbols-outlined text-[16px]">assignment</span>
           <span>Agenda & Tugas</span>
         </button>
 
         <button
           @click="activeAdminTab = 'students'"
           :class="[
-            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
-            activeAdminTab === 'students'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            'mk-subtab inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap',
+            { 'mk-subtab-active': activeAdminTab === 'students' },
           ]"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
+          <span class="material-symbols-outlined text-[16px]">groups</span>
           <span>Data Mahasiswa</span>
         </button>
 
         <button
           @click="activeAdminTab = 'courses'"
           :class="[
-            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
-            activeAdminTab === 'courses'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            'mk-subtab inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap',
+            { 'mk-subtab-active': activeAdminTab === 'courses' },
           ]"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+          <span class="material-symbols-outlined text-[16px]">menu_book</span>
           <span>Mata Kuliah</span>
         </button>
 
         <button
           @click="activeAdminTab = 'lecturers'"
           :class="[
-            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
-            activeAdminTab === 'lecturers'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            'mk-subtab inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap',
+            { 'mk-subtab-active': activeAdminTab === 'lecturers' },
           ]"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
+          <span class="material-symbols-outlined text-[16px]">badge</span>
           <span>Data Dosen</span>
         </button>
 
         <button
           @click="activeAdminTab = 'calendar'"
           :class="[
-            'px-4 py-2 rounded-xl transition-all flex items-center gap-2 cursor-pointer shrink-0 whitespace-nowrap',
-            activeAdminTab === 'calendar'
-              ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+            'mk-subtab inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap',
+            { 'mk-subtab-active': activeAdminTab === 'calendar' },
           ]"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+          <span class="material-symbols-outlined text-[16px]">calendar_month</span>
           <span>Kalender Akademik</span>
         </button>
       </div>
     </div>
 
     <!-- TAB 1: AGENDA & TUGAS -->
-    <div v-if="activeAdminTab === 'agenda'" class="space-y-6">
+    <div v-if="activeAdminTab === 'agenda'" class="space-y-4">
       <!-- Management Controls & Filters -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl w-fit max-w-full overflow-x-auto">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2 w-fit max-w-full overflow-x-auto">
           <button
             @click="handleFilterChange('active')"
             :class="[
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 whitespace-nowrap',
-              selectedFilter === 'active'
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+              'mk-subtab shrink-0 whitespace-nowrap',
+              { 'mk-subtab-active': selectedFilter === 'active' },
             ]"
           >
             {{ getPekanLabel(activeWeekNumber) }} {{ activeWeekBadgeText }}
@@ -455,10 +423,8 @@ onMounted(async () => {
           <button
             @click="handleFilterChange('all')"
             :class="[
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 whitespace-nowrap',
-              selectedFilter === 'all'
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200',
+              'mk-subtab shrink-0 whitespace-nowrap',
+              { 'mk-subtab-active': selectedFilter === 'all' },
             ]"
           >
             Semua Pekan
@@ -467,28 +433,26 @@ onMounted(async () => {
 
         <button
           @click="openCreateModal"
-          class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer shrink-0"
+          class="px-4 py-2 rounded-[6px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
         >
-          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
+          <span class="material-symbols-outlined text-[16px]">add</span>
           <span>Tambah Agenda Tugas</span>
         </button>
       </div>
 
     <!-- Agenda Table Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="mk-card overflow-hidden">
       <!-- Loading indicator -->
-      <div v-if="loading" class="p-8 text-center text-xs text-slate-400 dark:text-slate-500">
+      <div v-if="loading" class="p-8 text-center text-xs text-[var(--muted)]">
         Memuat data agenda...
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="agendas.length === 0" class="p-12 text-center space-y-2">
-        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+      <div v-else-if="agendas.length === 0" class="p-10 text-center space-y-1.5">
+        <p class="text-sm font-semibold text-[var(--text)]">
           Belum ada agenda pada filter ini
         </p>
-        <p class="text-xs text-slate-400 dark:text-slate-500">
+        <p class="text-xs text-[var(--muted)]">
           Klik tombol "+ Tambah Agenda Tugas" untuk membuat catatan tugas baru bagi mahasiswa.
         </p>
       </div>
@@ -497,75 +461,63 @@ onMounted(async () => {
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left text-xs border-collapse">
           <thead>
-            <tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
-              <th class="p-4 w-20">Pekan</th>
-              <th class="p-4 w-52">Mata Kuliah</th>
-              <th class="p-4">Judul & Keterangan</th>
-              <th class="p-4 w-48">Tenggat Waktu</th>
-              <th class="p-4 w-28 text-right">Aksi</th>
+            <tr class="border-b border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] uppercase tracking-wider font-semibold text-[11px]">
+              <th class="p-3 w-20">Pekan</th>
+              <th class="p-3 w-52">Mata Kuliah</th>
+              <th class="p-3">Judul & Keterangan</th>
+              <th class="p-3 w-48">Tenggat Waktu</th>
+              <th class="p-3 w-28 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-            <tr v-for="item in agendas" :key="item.id" class="hover:bg-slate-50/60 dark:hover:bg-slate-850/50 transition-colors">
-              <td class="p-4 font-semibold text-slate-800 dark:text-slate-200">
+          <tbody class="divide-y divide-[var(--border)]">
+            <tr v-for="item in agendas" :key="item.id" class="hover:bg-[var(--hover)] transition-colors">
+              <td class="p-3 font-semibold text-[var(--text)] tabular-nums">
                 {{ getPekanLabel(item.pekan) }}
-                <div v-if="item.pertemuan" class="text-[11px] font-normal text-slate-400">
+                <div v-if="item.pertemuan" class="text-[11px] font-normal text-[var(--muted)]">
                   Pert. {{ item.pertemuan }}
                 </div>
               </td>
-              <td class="p-4 font-bold text-blue-600 dark:text-blue-400">
+              <td class="p-3 font-semibold text-[var(--accent)]">
                 {{ item.mata_kuliah }}
               </td>
-              <td class="p-4 space-y-0.5">
-                <div class="font-semibold text-slate-900 dark:text-slate-100 text-sm">
+              <td class="p-3 space-y-0.5">
+                <div class="font-semibold text-[var(--text)] text-xs sm:text-sm">
                   {{ item.judul }}
                 </div>
-                <div v-if="item.keterangan" class="text-slate-500 dark:text-slate-400 text-xs line-clamp-2">
+                <div v-if="item.keterangan" class="text-[var(--muted)] text-xs line-clamp-2">
                   {{ item.keterangan }}
                 </div>
               </td>
-              <td class="p-4">
+              <td class="p-3.5">
                 <span
                   :class="[
-                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border',
+                    'mk-badge font-mono tabular-nums',
                     item.tipe_deadline === 'datetime'
-                      ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-900'
+                      ? 'mk-badge-down'
                       : item.tipe_deadline === 'date_only'
-                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                      : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+                      ? ''
+                      : 'mk-badge-ok',
                   ]"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      v-if="item.tipe_deadline === 'datetime'"
-                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                    <path
-                      v-else
-                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>{{ formatAgendaDeadline(item) }}</span>
+                  {{ formatAgendaDeadline(item) }}
                 </span>
               </td>
-              <td class="p-4 text-right space-x-1">
+              <td class="p-3.5 text-right space-x-1">
                 <button
                   @click="openEditModal(item)"
-                  class="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  class="mk-btn !p-1.5"
                   title="Edit Agenda"
                 >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </button>
                 <button
                   @click="handleDelete(item)"
-                  class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                  class="mk-btn !p-1.5 hover:!text-rose-600 dark:hover:!text-rose-400"
                   title="Hapus Agenda"
                 >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </button>
@@ -604,39 +556,39 @@ onMounted(async () => {
     <!-- MODAL TAMBAH / EDIT AGENDA -->
     <div
       v-if="isModalOpen"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
     >
-      <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden space-y-0">
+      <div class="mk-card w-full max-w-lg shadow-xl overflow-hidden">
         
         <!-- Modal Header -->
-        <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="p-4 border-b border-[var(--border)] flex items-center justify-between">
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">
+            <h3 class="text-sm font-semibold text-[var(--text)]">
               {{ isEditing ? "Edit Agenda Tugas" : "Tambah Agenda Tugas Baru" }}
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
+            <p class="text-xs text-[var(--muted)] mt-0.5">
               Formulir fleksibel dengan 3 ragam model batas waktu
             </p>
           </div>
           <button
             @click="closeModal"
-            class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-lg font-bold cursor-pointer p-1"
+            class="mk-btn !p-1"
           >
             ✕
           </button>
         </div>
 
         <!-- Modal Form -->
-        <form @submit.prevent="handleSubmit" class="p-5 space-y-4 text-xs">
+        <form @submit.prevent="handleSubmit" class="p-4 space-y-3.5 text-xs">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label for="agenda-pekan" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="agenda-pekan" class="block font-semibold text-[var(--text)] mb-1">
                 Target Pekan
               </label>
               <select
                 id="agenda-pekan"
                 v-model="form.pekan"
-                class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
+                class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium focus:border-[var(--accent)] focus:outline-none"
               >
                 <option v-for="item in weekOptions" :key="item.value" :value="item.value">
                   {{ item.label }} {{ item.value === activeWeekNumber ? activeWeekBadgeText : '' }}
@@ -645,8 +597,8 @@ onMounted(async () => {
             </div>
 
             <div>
-              <label for="agenda-pertemuan" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Pertemuan Ke- <span class="font-normal text-slate-400 dark:text-slate-500">(Opsional)</span>
+              <label for="agenda-pertemuan" class="block font-semibold text-[var(--text)] mb-1">
+                Pertemuan Ke- <span class="font-normal text-[var(--muted)]">(Opsional)</span>
               </label>
               <input
                 id="agenda-pertemuan"
@@ -655,19 +607,19 @@ onMounted(async () => {
                 min="1"
                 max="21"
                 placeholder="Contoh: 4 (Opsional)"
-                class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label for="agenda-matkul" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="agenda-matkul" class="block font-semibold text-[var(--text)] mb-1">
               Mata Kuliah
             </label>
             <select
               id="agenda-matkul"
               v-model="form.mata_kuliah"
-              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium focus:border-[var(--accent)] focus:outline-none"
             >
               <option v-for="matkul in masterMatkulList" :key="matkul" :value="matkul">
                 {{ matkul }}
@@ -676,7 +628,7 @@ onMounted(async () => {
           </div>
 
           <div>
-            <label for="agenda-judul" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="agenda-judul" class="block font-semibold text-[var(--text)] mb-1">
               Judul Tugas / Agenda
             </label>
             <input
@@ -685,23 +637,23 @@ onMounted(async () => {
               type="text"
               required
               placeholder="Contoh: Lanjutan Praktikum Pertemuan 4 (Polymorphism)"
-              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
 
           <!-- Tipe Batas Waktu -->
-          <fieldset class="space-y-2 pt-1 border-t border-slate-100 dark:border-slate-800">
-            <legend class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <fieldset class="space-y-2 pt-2 border-t border-[var(--border)]">
+            <legend class="block font-semibold text-[var(--text)] mb-1">
               Format Batas Waktu (Deadline)
             </legend>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <label
                 for="deadline-type-week"
                 :class="[
-                  'p-2.5 rounded-xl border cursor-pointer flex flex-col justify-between transition-colors',
+                  'p-2.5 rounded-[8px] border cursor-pointer flex flex-col justify-between transition-colors',
                   form.tipe_deadline === 'week_only'
-                    ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
-                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800',
+                    ? 'border-[var(--accent)] bg-blue-500/10 text-[var(--accent)]'
+                    : 'border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--hover)]',
                 ]"
               >
                 <div class="flex items-center gap-2">
@@ -713,18 +665,18 @@ onMounted(async () => {
                     value="week_only"
                     class="text-blue-600"
                   />
-                  <span class="font-bold">By Pekan</span>
+                  <span class="font-semibold">By Pekan</span>
                 </div>
-                <span class="text-[10px] opacity-75 mt-1">Cukup "{{ getPekanLabel(form.pekan) }}"</span>
+                <span class="text-[10px] text-[var(--muted)] mt-1">Cukup "{{ getPekanLabel(form.pekan) }}"</span>
               </label>
 
               <label
                 for="deadline-type-date"
                 :class="[
-                  'p-2.5 rounded-xl border cursor-pointer flex flex-col justify-between transition-colors',
+                  'p-2.5 rounded-[8px] border cursor-pointer flex flex-col justify-between transition-colors',
                   form.tipe_deadline === 'date_only'
-                    ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
-                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800',
+                    ? 'border-[var(--accent)] bg-blue-500/10 text-[var(--accent)]'
+                    : 'border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--hover)]',
                 ]"
               >
                 <div class="flex items-center gap-2">
@@ -736,18 +688,18 @@ onMounted(async () => {
                     value="date_only"
                     class="text-blue-600"
                   />
-                  <span class="font-bold">Hanya Tanggal</span>
+                  <span class="font-semibold">Hanya Tanggal</span>
                 </div>
-                <span class="text-[10px] opacity-75 mt-1">Contoh: 2 Okt 2026</span>
+                <span class="text-[10px] text-[var(--muted)] mt-1">Contoh: 2 Okt 2026</span>
               </label>
 
               <label
                 for="deadline-type-datetime"
                 :class="[
-                  'p-2.5 rounded-xl border cursor-pointer flex flex-col justify-between transition-colors',
+                  'p-2.5 rounded-[8px] border cursor-pointer flex flex-col justify-between transition-colors',
                   form.tipe_deadline === 'datetime'
-                    ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
-                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800',
+                    ? 'border-[var(--accent)] bg-blue-500/10 text-[var(--accent)]'
+                    : 'border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--hover)]',
                 ]"
               >
                 <div class="flex items-center gap-2">
@@ -759,9 +711,9 @@ onMounted(async () => {
                     value="datetime"
                     class="text-blue-600"
                   />
-                  <span class="font-bold">Tanggal & Jam</span>
+                  <span class="font-semibold">Tanggal & Jam</span>
                 </div>
-                <span class="text-[10px] opacity-75 mt-1">Ketat (misal 23:59 WIB)</span>
+                <span class="text-[10px] text-[var(--muted)] mt-1">Ketat (misal 23:59 WIB)</span>
               </label>
             </div>
           </fieldset>
@@ -769,10 +721,10 @@ onMounted(async () => {
           <!-- Date and Time Picker -->
           <div
             v-if="form.tipe_deadline !== 'week_only'"
-            class="grid grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800"
+            class="grid grid-cols-2 gap-3 p-3 rounded-[8px] bg-[var(--bg)] border border-[var(--border)]"
           >
             <div>
-              <label for="agenda-tanggal" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="agenda-tanggal" class="block font-semibold text-[var(--text)] mb-1">
                 Tanggal Tenggat
               </label>
               <input
@@ -780,12 +732,12 @@ onMounted(async () => {
                 v-model="form.tanggal"
                 type="date"
                 required
-                class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--surface)] text-[var(--text)]"
               />
             </div>
 
             <div v-if="form.tipe_deadline === 'datetime'">
-              <label for="agenda-jam" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label for="agenda-jam" class="block font-semibold text-[var(--text)] mb-1">
                 Jam Batas (WIB)
               </label>
               <input
@@ -793,13 +745,13 @@ onMounted(async () => {
                 v-model="form.jam"
                 type="time"
                 placeholder="23:59"
-                class="w-full p-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--surface)] text-[var(--text)]"
               />
             </div>
           </div>
 
           <div>
-            <label for="agenda-keterangan" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            <label for="agenda-keterangan" class="block font-semibold text-[var(--text)] mb-1">
               Catatan / Instruksi Dosen (Opsional)
             </label>
             <textarea
@@ -807,23 +759,23 @@ onMounted(async () => {
               v-model="form.keterangan"
               rows="3"
               placeholder="Contoh: Upload PDF di LMS Mentari atau format bebas..."
-              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
             ></textarea>
           </div>
 
           <!-- Modal Action Buttons -->
-          <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+          <div class="pt-3 border-t border-[var(--border)] flex justify-end gap-2">
             <button
               type="button"
               @click="closeModal"
-              class="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              class="mk-btn"
             >
               Batal
             </button>
             <button
               type="submit"
               :disabled="submitting"
-              class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold cursor-pointer disabled:opacity-50"
+              class="px-4 py-2 rounded-[6px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold cursor-pointer disabled:opacity-50"
             >
               {{ submitting ? "Menyimpan..." : "Simpan Agenda" }}
             </button>
@@ -836,66 +788,66 @@ onMounted(async () => {
     <!-- CHANGE PASSWORD MODAL -->
     <div
       v-if="isPasswordModalOpen"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
     >
-      <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">
+      <div class="mk-card w-full max-w-sm shadow-xl p-5 space-y-4">
+        <div class="flex items-center justify-between pb-2.5 border-b border-[var(--border)]">
+          <h3 class="text-sm font-semibold text-[var(--text)]">
             Ubah Kata Sandi Pengurus
           </h3>
-          <button @click="isPasswordModalOpen = false" class="text-slate-400 font-bold cursor-pointer">✕</button>
+          <button @click="isPasswordModalOpen = false" class="mk-btn !p-1">✕</button>
         </div>
 
-        <div v-if="passwordForm.error" class="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs">
+        <div v-if="passwordForm.error" class="p-2.5 rounded-[8px] bg-red-500/10 border border-red-500/40 text-red-700 dark:text-red-300 text-xs">
           {{ passwordForm.error }}
         </div>
-        <div v-if="passwordForm.success" class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs">
+        <div v-if="passwordForm.success" class="p-2.5 rounded-[8px] bg-emerald-500/10 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300 text-xs">
           {{ passwordForm.success }}
         </div>
 
         <form @submit.prevent="handleChangePasswordSubmit" class="space-y-3 text-xs">
           <div>
-            <label for="pwd-old" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Kata Sandi Lama</label>
+            <label for="pwd-old" class="block font-semibold text-[var(--text)] mb-1">Kata Sandi Lama</label>
             <input
               id="pwd-old"
               v-model="passwordForm.oldPassword"
               type="password"
               required
-              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
           <div>
-            <label for="pwd-new" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Kata Sandi Baru</label>
+            <label for="pwd-new" class="block font-semibold text-[var(--text)] mb-1">Kata Sandi Baru</label>
             <input
               id="pwd-new"
               v-model="passwordForm.newPassword"
               type="password"
               required
               minlength="6"
-              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
           <div>
-            <label for="pwd-confirm" class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Ulangi Kata Sandi Baru</label>
+            <label for="pwd-confirm" class="block font-semibold text-[var(--text)] mb-1">Ulangi Kata Sandi Baru</label>
             <input
               id="pwd-confirm"
               v-model="passwordForm.confirmPassword"
               type="password"
               required
-              class="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:border-[var(--accent)] focus:outline-none"
             />
           </div>
-          <div class="pt-2 flex justify-end gap-2">
+          <div class="pt-2 border-t border-[var(--border)] flex justify-end gap-2">
             <button
               type="button"
               @click="isPasswordModalOpen = false"
-              class="px-3 py-1.5 rounded-xl text-slate-600 dark:text-slate-400 font-semibold cursor-pointer"
+              class="mk-btn"
             >
               Batal
             </button>
             <button
               type="submit"
-              class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold cursor-pointer"
+              class="px-4 py-2 rounded-[6px] bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold cursor-pointer"
             >
               Simpan Sandi
             </button>
