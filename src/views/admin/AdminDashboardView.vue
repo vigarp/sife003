@@ -3,7 +3,12 @@ import { ref, reactive, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
-import { useSchedule, getPekanNumber, getPekanLabel } from "@/composables/useSchedule";
+import {
+  useSchedule,
+  getPekanNumber,
+  getPekanLabel,
+  getAgendaWeekStatus,
+} from "@/composables/useSchedule";
 import AdminStudentsManager from "@/components/admin/AdminStudentsManager.vue";
 import AdminCoursesManager from "@/components/admin/AdminCoursesManager.vue";
 import AdminLecturersManager from "@/components/admin/AdminLecturersManager.vue";
@@ -25,6 +30,31 @@ const isUpcoming = computed(() => activeWeekStatus.value === "upcoming");
 const activeWeekBadgeText = computed(() =>
   isUpcoming.value ? "(Upcoming)" : "(Ongoing)"
 );
+
+function getTaskWeekStatus(pekan) {
+  return getAgendaWeekStatus(pekan, activeWeekNumber.value, activeWeekStatus.value);
+}
+
+function getWeekStatusLabel(pekan) {
+  const status = getTaskWeekStatus(pekan);
+  if (status === "ongoing") return "Ongoing";
+  if (status === "upcoming") return "Upcoming";
+  return "Selesai";
+}
+
+function getWeekStatusClass(pekan) {
+  const status = getTaskWeekStatus(pekan);
+  if (status === "ongoing") return "mk-badge-ok";
+  if (status === "upcoming") return "mk-badge-warn";
+  return "opacity-70";
+}
+
+function getWeekOptionBadge(pekanVal) {
+  const status = getTaskWeekStatus(pekanVal);
+  if (status === "ongoing") return "(Ongoing)";
+  if (status === "upcoming") return "(Upcoming)";
+  return "";
+}
 
 // Filter state: 'active' or 'all'
 const selectedFilter = ref("active");
@@ -418,7 +448,7 @@ onMounted(async () => {
               { 'mk-subtab-active': selectedFilter === 'active' },
             ]"
           >
-            {{ getPekanLabel(activeWeekNumber) }} {{ activeWeekBadgeText }}
+            {{ getPekanLabel(activeWeekNumber) }}+ (Ongoing &amp; Upcoming)
           </button>
           <button
             @click="handleFilterChange('all')"
@@ -462,7 +492,7 @@ onMounted(async () => {
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr class="border-b border-[var(--border)] bg-[var(--bg)] text-[var(--muted)] uppercase tracking-wider font-semibold text-[11px]">
-              <th class="p-3 w-20">Pekan</th>
+              <th class="p-3 w-32">Pekan</th>
               <th class="p-3 w-52">Mata Kuliah</th>
               <th class="p-3">Judul & Keterangan</th>
               <th class="p-3 w-48">Tenggat Waktu</th>
@@ -472,8 +502,13 @@ onMounted(async () => {
           <tbody class="divide-y divide-[var(--border)]">
             <tr v-for="item in agendas" :key="item.id" class="hover:bg-[var(--hover)] transition-colors">
               <td class="p-3 font-semibold text-[var(--text)] tabular-nums">
-                {{ getPekanLabel(item.pekan) }}
-                <div v-if="item.pertemuan" class="text-[11px] font-normal text-[var(--muted)]">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span>{{ getPekanLabel(item.pekan) }}</span>
+                  <span :class="['mk-badge text-[10px] font-mono', getWeekStatusClass(item.pekan)]">
+                    {{ getWeekStatusLabel(item.pekan) }}
+                  </span>
+                </div>
+                <div v-if="item.pertemuan" class="text-[11px] font-normal text-[var(--muted)] mt-0.5">
                   Pert. {{ item.pertemuan }}
                 </div>
               </td>
@@ -591,7 +626,7 @@ onMounted(async () => {
                 class="w-full p-2 rounded-[6px] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] font-medium focus:border-[var(--accent)] focus:outline-none"
               >
                 <option v-for="item in weekOptions" :key="item.value" :value="item.value">
-                  {{ item.label }} {{ item.value === activeWeekNumber ? activeWeekBadgeText : '' }}
+                  {{ item.label }} {{ getWeekOptionBadge(item.value) }}
                 </option>
               </select>
             </div>

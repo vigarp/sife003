@@ -204,6 +204,21 @@ export function getPekanLabel(pekanOrWeek) {
   return `Pekan ${p}`;
 }
 
+export function getPekanOrder(pekanOrWeek) {
+  const p = getPekanNumber(pekanOrWeek);
+  if (p === "UTS") return 7.5;
+  if (p === "UAS") return 14.5;
+  return Number(p) || 1;
+}
+
+export function getAgendaWeekStatus(itemPekan, activeWeekNumber, activeWeekStatus = "ongoing") {
+  const itemOrder = getPekanOrder(itemPekan);
+  const activeOrder = getPekanOrder(activeWeekNumber);
+  if (itemOrder > activeOrder) return "upcoming";
+  if (itemOrder < activeOrder) return "past";
+  return activeWeekStatus === "upcoming" ? "upcoming" : "ongoing";
+}
+
 let activeInfo = computeActiveWeekInfo();
 let activeWeekIndex = activeInfo.detected;
 const activeWeekStatus = ref(activeInfo.status);
@@ -335,6 +350,8 @@ export function useSchedule() {
     nextWeek,
     getPekanNumber,
     getPekanLabel,
+    getPekanOrder,
+    getAgendaWeekStatus,
     resetToCurrentWeek,
     partitionDaring,
     partitionLuring,

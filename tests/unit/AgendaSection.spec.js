@@ -215,4 +215,52 @@ describe("AgendaSection.vue", () => {
     // Clean up
     user.value = null;
   });
+
+  it("should render both ongoing and upcoming week tasks with proper week status badges", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 10, 12, 12, 0, 0)); // 12 Nov 2026 (Pekan 10, Ongoing)
+
+    const { useSchedule } = await import("@/composables/useSchedule");
+    const { resetToCurrentWeek } = useSchedule();
+    resetToCurrentWeek();
+
+    const mockTasks = [
+      {
+        id: 101,
+        pekan: 10,
+        pertemuan: 10,
+        mata_kuliah: "Rekayasa Web",
+        judul: "Tugas Pekan Berjalan",
+        tipe_deadline: "week_only",
+      },
+      {
+        id: 102,
+        pekan: 14,
+        pertemuan: 14,
+        mata_kuliah: "Pemrograman Berorientasi Obyek (Java I)",
+        judul: "Tugas Pra-UAS",
+        tipe_deadline: "date_only",
+        tanggal: "2026-12-12",
+      },
+    ];
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: mockTasks,
+      }),
+    });
+
+    const wrapper = mount(AgendaSection, { global: globalConfig });
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("Pekan 10 (Ongoing)");
+    expect(wrapper.text()).toContain("Tugas Pekan Berjalan");
+    expect(wrapper.text()).toContain("Pekan 14 (Upcoming)");
+    expect(wrapper.text()).toContain("Tugas Pra-UAS");
+
+    vi.useRealTimers();
+    resetToCurrentWeek();
+  });
 });

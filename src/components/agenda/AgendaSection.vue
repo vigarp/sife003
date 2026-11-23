@@ -1,7 +1,12 @@
 <script setup>
 import { onMounted, onUnmounted, computed, ref, watch } from "vue";
 import { useAgenda, formatAgendaDeadline } from "@/composables/useAgenda";
-import { useSchedule, getPekanNumber, getPekanLabel } from "@/composables/useSchedule";
+import {
+  useSchedule,
+  getPekanNumber,
+  getPekanLabel,
+  getAgendaWeekStatus,
+} from "@/composables/useSchedule";
 import { useAdminAuth } from "@/composables/useAdminAuth";
 import { getLatestTimestamp, formatRelativeTime } from "@/utils/timeAgo";
 import { formatAgendaShareText, copyToClipboard } from "@/utils/scheduleShare";
@@ -34,6 +39,10 @@ const weekDateRange = computed(() => {
 });
 
 const isUpcoming = computed(() => activeWeekStatus.value === "upcoming");
+
+function getTaskWeekStatus(item) {
+  return getAgendaWeekStatus(item?.pekan, activeWeekNumber.value, activeWeekStatus.value);
+}
 
 const latestTimestamp = computed(() => getLatestTimestamp(agendas.value));
 const lastUpdatedTime = computed(() => {
@@ -90,9 +99,19 @@ onUnmounted(() => {
           >
             {{ getPekanLabel(activeWeekNumber) }} (Ongoing)
           </span>
+          <span
+            v-if="!isUpcoming"
+            class="mk-badge mk-badge-warn"
+          >
+            + Upcoming
+          </span>
         </div>
         <p class="text-xs text-[var(--muted)] mt-1">
-          {{ isUpcoming ? 'Target tugas yang akan dimulai pada pekan nanti' : 'Target tugas yang harus diselesaikan pada pekan ini' }}
+          {{
+            isUpcoming
+              ? "Target tugas yang akan dimulai pada pekan nanti dan pekan mendatang"
+              : "Target tugas yang harus diselesaikan pada pekan ini (Ongoing) maupun pekan mendatang (Upcoming)"
+          }}
         </p>
       </div>
 
@@ -142,10 +161,10 @@ onUnmounted(() => {
       class="py-8 text-center flex flex-col items-center justify-center space-y-1.5"
     >
       <p class="text-sm font-medium text-[var(--text)]">
-        Tidak ada agenda tugas untuk pekan ini
+        Tidak ada agenda tugas untuk pekan ini maupun pekan mendatang
       </p>
       <p class="text-xs text-[var(--muted)]">
-        Semua tugas pekan ini telah terselesaikan atau belum ada tugas baru dari dosen.
+        Semua tugas telah terselesaikan atau belum ada tugas baru dari dosen.
       </p>
     </div>
 
@@ -157,7 +176,15 @@ onUnmounted(() => {
         class="py-3 first:pt-0.5 last:pb-0.5 space-y-1"
       >
         <div class="flex items-center justify-between gap-2 flex-wrap">
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span
+              :class="[
+                'mk-badge text-[10px] font-mono',
+                getTaskWeekStatus(item) === 'ongoing' ? 'mk-badge-ok' : 'mk-badge-warn',
+              ]"
+            >
+              {{ getPekanLabel(item.pekan) }} ({{ getTaskWeekStatus(item) === 'ongoing' ? 'Ongoing' : 'Upcoming' }})
+            </span>
             <span class="text-xs font-semibold text-[var(--accent)]">
               {{ item.mata_kuliah }}
             </span>

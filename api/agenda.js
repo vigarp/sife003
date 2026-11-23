@@ -1,5 +1,22 @@
 import { createCrudHandler, getRequestId } from "./_lib/http.js";
 
+const PEKAN_ORDER_SQL = `CASE
+  WHEN UPPER(CAST(pekan AS TEXT)) = 'UTS' THEN 7.5
+  WHEN UPPER(CAST(pekan AS TEXT)) = 'UAS' THEN 14.5
+  ELSE CAST(pekan AS REAL)
+END`;
+
+function getPekanSortOrder(pekan) {
+  if (pekan === undefined || pekan === null || pekan === "") {
+    return null;
+  }
+  const upper = String(pekan).trim().toUpperCase();
+  if (upper === "UTS" || upper === "PEKAN UTS") return 7.5;
+  if (upper === "UAS" || upper === "PEKAN UAS") return 14.5;
+  const parsed = Number.parseFloat(upper.replace(/^PEKAN\s*/i, ""));
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
 function parsePertemuanValue(pertemuan) {
   if (pertemuan === undefined || pertemuan === null || pertemuan === "") {
     return null;
@@ -19,19 +36,20 @@ function parsePekanValue(pekan) {
 }
 
 async function handleGet({ req, res, db }) {
-  const { pekan, all } = req.query || {};
+  const { pekan, all, exact } = req.query || {};
 
-  let sql = `SELECT * FROM agenda ORDER BY
-    CASE
-      WHEN UPPER(CAST(pekan AS TEXT)) = 'UTS' THEN 7.5
-      WHEN UPPER(CAST(pekan AS TEXT)) = 'UAS' THEN 14.5
-      ELSE CAST(pekan AS REAL)
-    END ASC, id ASC`;
+  let sql = `SELECT * FROM agenda ORDER BY ${PEKAN_ORDER_SQL} ASC, id ASC`;
   let args = [];
 
   if (pekan && !all) {
-    sql = "SELECT * FROM agenda WHERE CAST(pekan AS TEXT) = ? ORDER BY id ASC";
-    args = [String(pekan).trim()];
+    const targetOrder = getPekanSortOrder(pekan);
+    if (exact === "true" || targetOrder === null) {
+      sql = "SELECT * FROM agenda WHERE CAST(pekan AS TEXT) = ? ORDER BY id ASC";
+      args = [String(pekan).trim()];
+    } else {
+      sql = `SELECT * FROM agenda WHERE (${PEKAN_ORDER_SQL}) >= ? ORDER BY ${PEKAN_ORDER_SQL} ASC, id ASC`;
+      args = [targetOrder];
+    }
   }
 
   const result = await db.execute({ sql, args });

@@ -1,4 +1,5 @@
-import { fileURLToPath, URL } from "node:url";
+import { resolve } from "node:path";
+import { fileURLToPath, pathToFileURL, URL } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 
@@ -33,7 +34,8 @@ function apiDevPlugin() {
             return next();
           }
 
-          const handlerModule = await import(modulePath);
+          const moduleUrl = pathToFileURL(resolve(server.config.root, modulePath)).href;
+          const handlerModule = await import(moduleUrl);
 
           req.query = Object.fromEntries(urlObj.searchParams.entries());
 
