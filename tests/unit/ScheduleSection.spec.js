@@ -10,6 +10,13 @@ describe("ScheduleSection.vue", () => {
     vi.restoreAllMocks();
   });
 
+  it("should render 'Jadwal Perkuliahan' section heading", async () => {
+    const wrapper = mount(ScheduleSection);
+    await flushPromises();
+    expect(wrapper.text()).toContain("Jadwal Perkuliahan");
+    expect(wrapper.text()).not.toContain("Agenda Pekan Perkuliahan");
+  });
+
   it("should not show Mentari copy button for regular users", async () => {
     const { user } = useAdminAuth();
     user.value = null;

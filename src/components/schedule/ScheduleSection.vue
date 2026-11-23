@@ -51,7 +51,7 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
     >
       <div>
         <h2 class="mk-section-title">
-          Agenda Pekan Perkuliahan
+          Jadwal Perkuliahan
         </h2>
       </div>
 
@@ -176,19 +176,14 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             <!-- Kelompok 1 (Mentari) -->
             <div v-if="daringData.k1.length > 0" class="flex flex-col gap-2">
               <div
-                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
+                class="flex items-center justify-between gap-2 pb-1.5 border-b border-dashed border-[var(--border)]"
               >
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-semibold text-[var(--text)]"
-                    >Kelompok 1</span
-                  >
-                  <span class="text-[11px] text-[var(--muted)]"
-                    >({{ daringData.k1Label }})</span
-                  >
-                </div>
-                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
-                  {{ daringData.k1.length }} Matkul
-                </span>
+                <span class="text-xs font-semibold text-[var(--text)]"
+                  >Kelompok 1</span
+                >
+                <span class="text-[11px] text-[var(--muted)] text-right"
+                  >{{ daringData.k1Label }}</span
+                >
               </div>
               <div class="space-y-2">
                 <CourseCard
@@ -205,19 +200,14 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             <!-- Kelompok 2 (Mentari) -->
             <div v-if="daringData.k2.length > 0" class="flex flex-col gap-2 pt-1">
               <div
-                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
+                class="flex items-center justify-between gap-2 pb-1.5 border-b border-dashed border-[var(--border)]"
               >
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-semibold text-[var(--text)]"
-                    >Kelompok 2</span
-                  >
-                  <span class="text-[11px] text-[var(--muted)]"
-                    >({{ daringData.k2Label }})</span
-                  >
-                </div>
-                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
-                  {{ daringData.k2.length }} Matkul
-                </span>
+                <span class="text-xs font-semibold text-[var(--text)]"
+                  >Kelompok 2</span
+                >
+                <span class="text-[11px] text-[var(--muted)] text-right"
+                  >{{ daringData.k2Label }}</span
+                >
               </div>
               <div class="space-y-2">
                 <CourseCard
@@ -282,19 +272,14 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             <!-- Kelompok 1 (Tatap Muka) -->
             <div v-if="luringData.k1.length > 0" class="flex flex-col gap-2">
               <div
-                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
+                class="flex items-center justify-between gap-2 pb-1.5 border-b border-dashed border-[var(--border)]"
               >
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-semibold text-[var(--text)]"
-                    >Kelompok 1</span
-                  >
-                  <span class="text-[11px] text-[var(--muted)]"
-                    >(Tatap Muka di Kelas)</span
-                  >
-                </div>
-                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
-                  {{ luringData.k1.length }} Sesi
-                </span>
+                <span class="text-xs font-semibold text-[var(--text)]"
+                  >Kelompok 1</span
+                >
+                <span class="text-[11px] text-[var(--muted)] text-right"
+                  >Tatap Muka di Kelas</span
+                >
               </div>
               <div class="space-y-2">
                 <CourseCard
@@ -311,19 +296,14 @@ const luringCount = computed(() => currentWeek.value?.luring?.length || 0);
             <!-- Kelompok 2 (Tatap Muka) -->
             <div v-if="luringData.k2.length > 0" class="flex flex-col gap-2 pt-1">
               <div
-                class="flex items-center justify-between pb-1.5 border-b border-dashed border-[var(--border)]"
+                class="flex items-center justify-between gap-2 pb-1.5 border-b border-dashed border-[var(--border)]"
               >
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs font-semibold text-[var(--text)]"
-                    >Kelompok 2</span
-                  >
-                  <span class="text-[11px] text-[var(--muted)]"
-                    >(Tatap Muka di Kelas)</span
-                  >
-                </div>
-                <span class="text-[11px] font-mono tabular-nums text-[var(--muted)]">
-                  {{ luringData.k2.length }} Sesi
-                </span>
+                <span class="text-xs font-semibold text-[var(--text)]"
+                  >Kelompok 2</span
+                >
+                <span class="text-[11px] text-[var(--muted)] text-right"
+                  >Tatap Muka di Kelas</span
+                >
               </div>
               <div class="space-y-2">
                 <CourseCard

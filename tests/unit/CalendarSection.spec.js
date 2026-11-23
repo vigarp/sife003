@@ -164,6 +164,6 @@ describe("CalendarSection.vue (Pure FullCalendar)", () => {
     await flushPromises();
 
     expect(wrapper.text()).toContain("Last update: 3 hours ago");
-    expect(wrapper.text()).toContain("Kelola di Zona Pengurus");
+    expect(wrapper.text()).toContain("Kelola");
   });
 });

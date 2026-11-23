@@ -145,42 +145,6 @@ onUnmounted(() => {
               </div>
             </div>
             <!-- Navigation items -->
-            <a
-              href="#jadwal"
-              @click="closeDropdown"
-              class="flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover)] hover:text-[var(--accent)] transition-colors"
-              role="menuitem"
-            >
-              <span class="material-symbols-outlined text-[17px] text-[var(--muted)]"
-                >event_repeat</span
-              >
-              <span>Jadwal Pekan Ini</span>
-            </a>
-
-            <a
-              href="#agenda"
-              @click="closeDropdown"
-              class="flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover)] hover:text-[var(--accent)] transition-colors"
-              role="menuitem"
-            >
-              <span class="material-symbols-outlined text-[17px] text-[var(--muted)]"
-                >calendar_month</span
-              >
-              <span>Agenda Kelas</span>
-            </a>
-
-            <a
-              href="#kalender"
-              @click="closeDropdown"
-              class="flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover)] hover:text-[var(--accent)] transition-colors"
-              role="menuitem"
-            >
-              <span class="material-symbols-outlined text-[17px] text-[var(--muted)]"
-                >today</span
-              >
-              <span>Kalender</span>
-            </a>
-
             <router-link
               to="/telemetri"
               @click="closeDropdown"

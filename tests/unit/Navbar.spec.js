@@ -60,6 +60,13 @@ describe("Navbar.vue", () => {
     expect(isDark.value).toBe(!initialDark);
   });
 
+  it("should render Telemetri and Zona Pengurus in dropdown without in-page section links", () => {
+    const wrapper = mount(Navbar, { global: globalConfig });
+    expect(wrapper.text()).toContain("Telemetri (Mentari)");
+    expect(wrapper.text()).toContain("Zona Pengurus");
+    expect(wrapper.text()).not.toContain("Jadwal Pekan Ini");
+  });
+
   it("should render Kampus and Prodi links, and hide Pengurus links and WA invite button for unauthenticated user", () => {
     const wrapper = mount(Navbar, { global: globalConfig });
     expect(wrapper.text()).toContain("Satu UNPAM");

@@ -71,7 +71,7 @@ onUnmounted(() => {
   <section
     id="agenda"
     aria-labelledby="agenda-heading"
-    class="w-full mk-card p-4 sm:p-5 space-y-3 mb-6 transition-colors duration-200"
+    class="w-full mk-card p-4 sm:p-5 space-y-3 mb-6 scroll-mt-20 transition-colors duration-200"
   >
     <!-- Section Header with Active Week Context -->
     <div
@@ -99,18 +99,12 @@ onUnmounted(() => {
           >
             {{ getPekanLabel(activeWeekNumber) }} (Ongoing)
           </span>
-          <span
-            v-if="!isUpcoming"
-            class="mk-badge mk-badge-warn"
-          >
-            + Upcoming
-          </span>
         </div>
         <p class="text-xs text-[var(--muted)] mt-1">
           {{
             isUpcoming
               ? "Target tugas yang akan dimulai pada pekan nanti dan pekan mendatang"
-              : "Target tugas yang harus diselesaikan pada pekan ini (Ongoing) maupun pekan mendatang (Upcoming)"
+              : "Target tugas yang harus diselesaikan pada pekan ini maupun pekan mendatang"
           }}
         </p>
       </div>
@@ -250,8 +244,10 @@ onUnmounted(() => {
       <router-link
         to="/pengurus"
         class="font-medium text-[var(--accent)] hover:underline inline-flex items-center gap-1"
+        title="Kelola di Zona Pengurus"
       >
-        <span>Kelola di Zona Pengurus</span>
+        <span aria-hidden="true" class="material-symbols-outlined text-[15px]">admin_panel_settings</span>
+        <span>Kelola</span>
         <svg aria-hidden="true" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
